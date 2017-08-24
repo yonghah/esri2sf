@@ -19,7 +19,7 @@ Still many geographic data is delivered through ESRI's ArcGIS Server. It is not 
 
 ## How it works
 
-This program sends a request to ArcGIS Server and gets json responses containing coordinates. Unfortunately, ESRI's json format is not the same as geojson. So it converts the json into WKT strings and creates simple feature geometries from them. Then it combines attributes to the geometries to create sf dataframe. Often ArcGIS servers limits the maximum number of result sets. So this program creates features by 500 in one request and send a request until it gets all features. 
+This program sends a request to an ArcGIS Server and gets json responses containing coordinates of geometries. Unfortunately, ESRI's json format is not the same as geojson. So it converts the json into WKT strings first; then creates simple feature geometries from the strings. Then it combines attribute data to the geometries to create sf dataframe. Often ArcGIS servers limits the maximum number of rows in the result set. So this program creates 500 features per request and send requests until it gets all features. 
 
 ## Install
 
@@ -32,29 +32,34 @@ library("esri2sf")
 
 ## How to use
 
-The key is to get the endpoint of REST service that you want. Once you get the URL of the REST service, follow this.
-
+What you need is the URL of REST service you want. You can get the URL by asking GIS admin or looking at javascript code creating feature layer.
 
 ### Point data
 
 ```{r}
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
+df <- esri2sf(url)
+plot(df)
+```
+
+### Polyline data
+
+You can filter output fields. This may take a minute since it gets 18000 polylines. 
+
+```{r}
+url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0"
+outFields <- c("AADT", "DFLG")
 df <- esri2sf(url, outFields)
 plot(df)
 ```
 
+
 ### Polygon data
 
-```{r cars}
-summary(cars)
+You can filter rows as well by giving where condition.
+```{r}
+url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+where <- "STATE_NAME = 'Michigan'"
+df <- esri2sf(url, where=where, outFields=c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI"))
+plot(df)
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -30,7 +30,6 @@ esri2sf <- function(url, outFields="*", where="1=1", token='') {
 
 getEsriFeatures <- function(url, fields, where, token='') {
   ids <- getObjectIds(url, where, token)
-  print(ids)
   idSplits <- split(ids, ceiling(seq_along(ids)/500))
   results <- lapply(idSplits, getEsriFeaturesByIds, url, fields, token)
   merged <- unlist(results, recursive=FALSE)
@@ -105,7 +104,6 @@ esri2sfPolygon <- function(features) {
   getGeometry <- function(feature) {
     return(rings2multipoly(feature$geometry$rings))
   }
-  # geometry
   geoms <- st_sfc(lapply(features, getGeometry))
   return(geoms)
 }
@@ -120,7 +118,6 @@ esri2sfPolyline <- function(features) {
   getGeometry <- function(feature) {
     return(paths2multiline(feature$geometry$paths))
   }
-  # geometry
   geoms <- st_sfc(lapply(features, getGeometry))
   return(geoms)
 }

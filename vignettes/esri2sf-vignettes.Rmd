@@ -1,0 +1,60 @@
+---
+title: "esri2sf-vignettes"
+author: "Yongha Hwang"
+date: "August 23, 2017"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{esri2sf-vignettes}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## esri2sf
+
+Still many geographic data is delivered through ESRI's ArcGIS Server. It is not easy to utilize the geographic data in the server. This package enables users to use vector data in ArcGIS Server through the server's REST API. It download geographic features from ArcGIS Server and saves it as Simple Features. 
+
+## How it works
+
+This program sends a request to ArcGIS Server and gets json responses containing coordinates. Unfortunately, ESRI's json format is not the same as geojson. So it converts the json into WKT strings and creates simple feature geometries from them. Then it combines attributes to the geometries to create sf dataframe. Often ArcGIS servers limits the maximum number of result sets. So this program creates features by 500 in one request and send a request until it gets all features. 
+
+## Install
+
+I recommend devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
+
+```{r}
+devtools::install_github("yonghah/esri2sf")
+library("esri2sf")
+```
+
+## How to use
+
+The key is to get the endpoint of REST service that you want. Once you get the URL of the REST service, follow this.
+
+
+### Point data
+
+```{r}
+url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
+outFields <- c('Height', "Leaf_Area")
+df <- esri2sf(url, outFields)
+plot(df)
+```
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -14,11 +14,11 @@ library(dplyr)
 #' url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 #' outFields <- c("POP2007", "POP2000")
 #' where <- "STATE_NAME = 'Michigan'"
-#' df <- esri2sf(url, where=where)
+#' df <- esri2sf(url, outFields=outFields, where=where)
 #' plot(df)
 #' @export
 esri2sf <- function(url, outFields="*", where="1=1", token='') {
-  layerInfo <- fromJSON(content(POST(url, query=list(f="json", token=token), encode="form")))
+  layerInfo <- jsonlite::fromJSON(httr::content(httr::POST(url, query=list(f="json", token=token), encode="form")))
   print(layerInfo$type)
   geomType <- layerInfo$geometryType
   print(geomType)
@@ -28,15 +28,15 @@ esri2sf <- function(url, outFields="*", where="1=1", token='') {
   return(simpleFeatures)
 }
 
-getEsriFeatures <- function(url, fields, where, token='') {
-  ids <- getObjectIds(url, where, token)
+getEsriFeatures <- function(queryUrl, fields, where, token='') {
+  ids <- getObjectIds(queryUrl, where, token)
   idSplits <- split(ids, ceiling(seq_along(ids)/500))
-  results <- lapply(idSplits, getEsriFeaturesByIds, url, fields, token)
+  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token)
   merged <- unlist(results, recursive=FALSE)
   return(merged)
 }
 
-getObjectIds <- function(url, where, token=''){
+getObjectIds <- function(queryUrl, where, token=''){
   # create Simple Features from ArcGIS servers json response
   query <- list(
     where=where,
@@ -44,12 +44,12 @@ getObjectIds <- function(url, where, token=''){
     token=token,
     f="json"
   )
-  responseRaw <- content(POST(url, body=query, encode="form"))
-  response <- fromJSON(responseRaw)
+  responseRaw <- httr::content(httr::POST(queryUrl, body=query, encode="form"))
+  response <- jsonlite::fromJSON(responseRaw)
   return(response$objectIds)
 }
 
-getEsriFeaturesByIds <- function(ids, url, fields, token=''){
+getEsriFeaturesByIds <- function(ids, queryUrl, fields, token=''){
   # create Simple Features from ArcGIS servers json response
   query <- list(
     objectIds=paste(ids, collapse=","),
@@ -58,8 +58,8 @@ getEsriFeaturesByIds <- function(ids, url, fields, token=''){
     outSR='4326',
     f="json"
   )
-  responseRaw <- content(POST(url, body=query, encode="form"))
-  response <- fromJSON(responseRaw,
+  responseRaw <- httr::content(httr::POST(queryUrl, body=query, encode="form"))
+  response <- jsonlite::fromJSON(responseRaw,
                        simplifyDataFrame = FALSE,
                        simplifyVector = FALSE,
                        digits=NA)
@@ -80,17 +80,17 @@ esri2sfGeom <- function(jsonFeats, geomType) {
   }
   # attributes
   atts <- lapply(jsonFeats, '[[', 1)
-  af <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE))
+  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE))
   # geometry + attributes
-  df <- st_sf(geoms, af, geom=geoms, crs="+init=epsg:4326")
+  df <- sf::st_sf(geoms, af, geom=geoms, crs="+init=epsg:4326")
   return(df)
 }
 
 esri2sfPoint <- function(features) {
   getPointGeometry <- function(feature) {
-    return(st_point(unlist(feature$geometry)))
+    return(sf::st_point(unlist(feature$geometry)))
   }
-  geoms <- st_sfc(lapply(features, getPointGeometry))
+  geoms <- sf::st_sfc(lapply(features, getPointGeometry))
   return(geoms)
 }
 
@@ -99,12 +99,12 @@ esri2sfPolygon <- function(features) {
     return(do.call(rbind, lapply(ring, unlist)))
   }
   rings2multipoly <- function(rings) {
-    return(st_multipolygon(list(lapply(rings, ring2matrix))))
+    return(sf::st_multipolygon(list(lapply(rings, ring2matrix))))
   }
   getGeometry <- function(feature) {
     return(rings2multipoly(feature$geometry$rings))
   }
-  geoms <- st_sfc(lapply(features, getGeometry))
+  geoms <- sf::st_sfc(lapply(features, getGeometry))
   return(geoms)
 }
 
@@ -113,12 +113,12 @@ esri2sfPolyline <- function(features) {
     return(do.call(rbind, lapply(path, unlist)))
   }
   paths2multiline <- function(paths) {
-    return(st_multilinestring(lapply(paths, path2matrix)))
+    return(sf::st_multilinestring(lapply(paths, path2matrix)))
   }
   getGeometry <- function(feature) {
     return(paths2multiline(feature$geometry$paths))
   }
-  geoms <- st_sfc(lapply(features, getGeometry))
+  geoms <- sf::st_sfc(lapply(features, getGeometry))
   return(geoms)
 }
 
@@ -133,7 +133,7 @@ generateToken <- function(server, uid){
     f="json"
   )
   url <- paste(server, "arcgis/admin/generateToken", sep="/")
-  r <- POST(url, body=query, encode="form")
-  token <- fromJSON(content(r, "parsed"))$token
+  r <- httr::POST(url, body=query, encode="form")
+  token <- jsonlite::fromJSON(httr::content(r, "parsed"))$token
   return(token)
 }

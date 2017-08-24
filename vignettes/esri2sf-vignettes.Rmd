@@ -39,11 +39,11 @@ The key is to get the endpoint of REST service that you want. Once you get the U
 
 ```{r}
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
-outFields <- c('Height', "Leaf_Area")
 df <- esri2sf(url, outFields)
 plot(df)
 ```
 
+### Polygon data
 
 ```{r cars}
 summary(cars)

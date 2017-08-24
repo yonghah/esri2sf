@@ -17,7 +17,7 @@ library(dplyr)
 #' df <- esri2sf(url, outFields=outFields, where=where)
 #' plot(df)
 #' @export
-esri2sf <- function(url, outFields="*", where="1=1", token='') {
+esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
   layerInfo <- jsonlite::fromJSON(httr::content(httr::POST(url, query=list(f="json", token=token), encode="form")))
   print(layerInfo$type)
   geomType <- layerInfo$geometryType

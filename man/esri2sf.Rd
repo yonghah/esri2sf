@@ -16,6 +16,9 @@ esri2sf(url, outFields = c("*"), where = "1=1", token = "")
 
 \item{token.}{string for authentication token if needed.}
 }
+\value{
+sf dataframe
+}
 \description{
 main function
 This function is the interface to the user.

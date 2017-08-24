@@ -1,8 +1,3 @@
-library(httr)
-library(jsonlite)
-library(sf)
-library(dplyr)
-
 #' main function
 #' This function is the interface to the user.
 #' @importFrom jsonlite httr sf dplyr
@@ -10,6 +5,7 @@ library(dplyr)
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows
 #' @param token. string for authentication token if needed.
+#' @return sf dataframe
 #' @examples
 #' url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 #' outFields <- c("POP2007", "POP2000")
@@ -18,6 +14,10 @@ library(dplyr)
 #' plot(df)
 #' @export
 esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
+  library(httr)
+  library(jsonlite)
+  library(sf)
+  library(dplyr)
   layerInfo <- jsonlite::fromJSON(httr::content(httr::POST(url, query=list(f="json", token=token), encode="form")))
   print(layerInfo$type)
   geomType <- layerInfo$geometryType

@@ -1,5 +1,5 @@
 ---
-title: "esri2sf-vignettes"
+title: "Scraping Geographic Features from ArcGIS Server"
 author: "Yongha Hwang"
 date: "August 23, 2017"
 output: rmarkdown::html_vignette
@@ -15,7 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## esri2sf
 
-Still many geographic data is delivered through ESRI's ArcGIS Server. It is not easy to utilize the geographic data in the server. This package enables users to use vector data in ArcGIS Server through the server's REST API. It download geographic features from ArcGIS Server and saves it as Simple Features. 
+Still many geographic data is delivered through ESRI's ArcGIS Server. It is not easy to utilize the geographic data in the GIS servers from data analysis platform like R or Pandas. This package enables users to use vector data in ArcGIS Server from R through the server's REST API. It download geographic features from ArcGIS Server and saves it as Simple Features. 
+
+Git repository is here [https://github.com/yonghah/esri2sf](https://github.com/yonghah/esri2sf)
+
 
 ## How it works
 

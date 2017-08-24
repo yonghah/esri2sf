@@ -5,7 +5,7 @@
 \title{main function
 This function is the interface to the user.}
 \usage{
-esri2sf(url, outFields = "*", where = "1=1", token = "")
+esri2sf(url, outFields = c("*"), where = "1=1", token = "")
 }
 \arguments{
 \item{url}{string for service url. ex) https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}

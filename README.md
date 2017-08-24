@@ -6,8 +6,6 @@ It is not easy to utilize the geographic data in the GIS servers from data analy
 This package enables users to use vector data in ArcGIS Server from R through the server's REST API. 
 It download geographic features from ArcGIS Server and saves it as Simple Features. 
 
-Git repository is here [https://github.com/yonghah/esri2sf](https://github.com/yonghah/esri2sf)
-
 
 ## How it works
 
@@ -19,7 +17,7 @@ creates 500 features per request and send requests until it gets all features.
 
 ## Install
 
-I recommend devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
+Use devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
 
 ```
 devtools::install_github("yonghah/esri2sf")

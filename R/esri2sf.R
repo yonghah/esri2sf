@@ -4,17 +4,19 @@ library(sf)
 library(dplyr)
 
 #' main function
-#' This function is the interface to the user..
+#' This function is the interface to the user.
+#' @importFrom jsonlite httr sf dplyr
 #' @param url string for service url. ex) https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows
 #' @param token. string for authentication token if needed.
-#' @examples 
+#' @examples
 #' url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 #' outFields <- c("POP2007", "POP2000")
-#' where <- "STATE_NAME = 'Michigan'"  
+#' where <- "STATE_NAME = 'Michigan'"
 #' df <- esri2sf(url, where=where)
 #' plot(df)
+#' @export
 esri2sf <- function(url, outFields="*", where="1=1", token='') {
   layerInfo <- fromJSON(content(POST(url, query=list(f="json", token=token), encode="form")))
   print(layerInfo$type)
@@ -46,7 +48,7 @@ getObjectIds <- function(url, where, token=''){
   responseRaw <- content(POST(url, body=query, encode="form"))
   response <- fromJSON(responseRaw)
   return(response$objectIds)
-}  
+}
 
 getEsriFeaturesByIds <- function(ids, url, fields, token=''){
   # create Simple Features from ArcGIS servers json response
@@ -58,13 +60,13 @@ getEsriFeaturesByIds <- function(ids, url, fields, token=''){
     f="json"
   )
   responseRaw <- content(POST(url, body=query, encode="form"))
-  response <- fromJSON(responseRaw, 
-                       simplifyDataFrame = FALSE, 
-                       simplifyVector = FALSE, 
+  response <- fromJSON(responseRaw,
+                       simplifyDataFrame = FALSE,
+                       simplifyVector = FALSE,
                        digits=NA)
   esriJsonFeatures <- response$features
   return(esriJsonFeatures)
-}  
+}
 
 esri2sfGeom <- function(jsonFeats, geomType) {
   # convert esri json to simple feature
@@ -94,7 +96,7 @@ esri2sfPoint <- function(features) {
 }
 
 esri2sfPolygon <- function(features) {
-  ring2matrix <- function(ring) { 
+  ring2matrix <- function(ring) {
     return(do.call(rbind, lapply(ring, unlist)))
   }
   rings2multipoly <- function(rings) {
@@ -107,9 +109,9 @@ esri2sfPolygon <- function(features) {
   geoms <- st_sfc(lapply(features, getGeometry))
   return(geoms)
 }
- 
+
 esri2sfPolyline <- function(features) {
-  path2matrix <- function(path) { 
+  path2matrix <- function(path) {
     return(do.call(rbind, lapply(path, unlist)))
   }
   paths2multiline <- function(paths) {
@@ -122,7 +124,7 @@ esri2sfPolyline <- function(features) {
   geoms <- st_sfc(lapply(features, getGeometry))
   return(geoms)
 }
-   
+
 generateToken <- function(server, uid){
   # generate auth token from GIS server
   pwd <- rstudioapi::askForPassword("pwd")

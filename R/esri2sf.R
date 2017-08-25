@@ -79,7 +79,9 @@ esri2sfGeom <- function(jsonFeats, geomType) {
     geoms <- esri2sfPolyline(jsonFeats)
   }
   # attributes
-  atts <- lapply(jsonFeats, '[[', 1)
+  atts <- lapply(jsonFeats, '[[', 1) %>%
+          lapply(function(att) lapply(att, function(x) return(ifelse(is.null(x), NA, x))))
+  
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE))
   # geometry + attributes
   df <- sf::st_sf(geoms, af, geom=geoms, crs="+init=epsg:4326")

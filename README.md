@@ -4,23 +4,24 @@ Scraping Geographic Features from ArcGIS Server
 Still many geographic data is delivered through ESRI's ArcGIS Server. 
 It is not easy to utilize the geographic data in the GIS servers from data analysis platform like R or Pandas. 
 This package enables users to use vector data in ArcGIS Server from R through the server's REST API. 
-It download geographic features from ArcGIS Server and saves it as Simple Features. 
+It download geographic features from ArcGIS Server and saves it as [Simple Features](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html). 
 
 
 ## How it works
 
-This program sends a request to an ArcGIS Server and gets json responses containing coordinates of geometries. 
-Unfortunately, ESRI's json format is not the same as geojson. So it converts the json into WKT strings first; 
-then creates simple feature geometries from the strings. Then it combines attribute data to the geometries to 
-create sf dataframe. Often ArcGIS servers limits the maximum number of rows in the result set. So this program 
-creates 500 features per request and send requests until it gets all features. 
+This program sends a request to an ArcGIS Server and gets json responses containing coordinates of geometries 
+of which format is not the same as geojson. So it converts the json into simple feature geometries from the response. 
+Then it combines attribute data to the geometries to create sf dataframe. 
+Often ArcGIS servers limits the maximum number of rows in the result set. So this program 
+creates 500 features per request and automatically re-send requests until it gets all features in the dataset. 
 
 ## Install
 
 Use devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
 
 ```
-devtools::install_github("yonghah/esri2sf")
+library(devtools)
+install_github("yonghah/esri2sf")
 library("esri2sf")
 ```
 

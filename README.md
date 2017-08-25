@@ -22,7 +22,6 @@ Use devtools to install this package.This package has dependency on dplyr, sf, h
 ```
 library(devtools)
 install_github("yonghah/esri2sf")
-library("esri2sf")
 ```
 
 ## How to use
@@ -33,6 +32,7 @@ the javascript code of a webpage where it creates a feature layer.
 ### Point data
 
 ```
+library("esri2sf")
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
 df <- esri2sf(url)
 plot(df)

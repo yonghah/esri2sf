@@ -3,7 +3,7 @@ Scraping Geographic Features from ArcGIS Server
 
 Still many geographic data is delivered through ESRI's ArcGIS Server. 
 It is not easy to utilize the geographic data in the GIS servers from data analysis platform like R or Pandas. 
-This package enables users to use vector data in ArcGIS Server from R through the server's REST API. 
+This package enables users to scrape vector data in ArcGIS Server from R through the server's REST API. 
 It download geographic features from ArcGIS Server and saves it as [Simple Features](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html). 
 
 
@@ -27,8 +27,8 @@ library("esri2sf")
 
 ## How to use
 
-What you need is the URL of REST service you want. You can get the URL by asking GIS admin or looking at 
-javascript code creating feature layer.
+What you need is the URL of REST service you want. You can get the URL by asking it to a GIS admin or looking at 
+the javascript code of a webpage where it creates a feature layer.
 
 ### Point data
 

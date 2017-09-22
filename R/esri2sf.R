@@ -154,7 +154,7 @@ generateToken <- function(server, uid, pwd='', expiration=5000){
   query <- list(
     username=uid,
     password=pwd,
-    expiration=,expiration,
+    expiration=expiration,
     client="requestip",
     f="json"
   )

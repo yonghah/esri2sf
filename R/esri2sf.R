@@ -146,7 +146,7 @@ esri2sfPolyline <- function(features) {
   return(geoms)
 }
 
-generateToken <- function(server, uid, pwd=''){
+generateToken <- function(server, uid, pwd='', expiration=5000){
   # generate auth token from GIS server
   if (pwd=='') { 
      pwd <- rstudioapi::askForPassword("pwd")
@@ -154,7 +154,7 @@ generateToken <- function(server, uid, pwd=''){
   query <- list(
     username=uid,
     password=pwd,
-    expiration="5000",
+    expiration=,expiration,
     client="requestip",
     f="json"
   )

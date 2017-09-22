@@ -18,7 +18,16 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
   library(jsonlite)
   library(sf)
   library(dplyr)
-  layerInfo <- jsonlite::fromJSON(httr::content(httr::POST(url, query=list(f="json", token=token), encode="form")))
+  layerInfo <- jsonlite::fromJSON(
+    httr::content(
+      httr::POST(
+        url, 
+        query=list(f="json", token=token), 
+        encode="form",
+        config = httr::config(ssl_verifypeer = FALSE)
+        )
+      )
+    )
   print(layerInfo$type)
   geomType <- layerInfo$geometryType
   print(geomType)
@@ -44,7 +53,13 @@ getObjectIds <- function(queryUrl, where, token=''){
     token=token,
     f="json"
   )
-  responseRaw <- httr::content(httr::POST(queryUrl, body=query, encode="form"))
+  responseRaw <- httr::content(
+    httr::POST(
+      queryUrl, 
+      body=query, 
+      encode="form",
+      config = httr::config(ssl_verifypeer = FALSE))
+    )
   response <- jsonlite::fromJSON(responseRaw)
   return(response$objectIds)
 }
@@ -58,7 +73,14 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token=''){
     outSR='4326',
     f="json"
   )
-  responseRaw <- httr::content(httr::POST(queryUrl, body=query, encode="form"))
+  responseRaw <- httr::content(
+    httr::POST(
+      queryUrl, 
+      body=query, 
+      encode="form",
+      config = httr::config(ssl_verifypeer = FALSE)
+      )
+    )
   response <- jsonlite::fromJSON(responseRaw,
                        simplifyDataFrame = FALSE,
                        simplifyVector = FALSE,
@@ -124,9 +146,11 @@ esri2sfPolyline <- function(features) {
   return(geoms)
 }
 
-generateToken <- function(server, uid){
+generateToken <- function(server, uid, pwd=''){
   # generate auth token from GIS server
-  pwd <- rstudioapi::askForPassword("pwd")
+  if (pwd=='') { 
+     pwd <- rstudioapi::askForPassword("pwd")
+  }
   query <- list(
     username=uid,
     password=pwd,

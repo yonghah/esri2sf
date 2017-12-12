@@ -1,11 +1,17 @@
 #' main function
 #' This function is the interface to the user.
 #' @importFrom jsonlite httr sf dplyr
-#' @param url string for service url. ex) https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3
+#' @param url string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows
 #' @param token. string for authentication token if needed.
 #' @return sf dataframe
+#' @note When accessing services with multiple layers, the layer number must be specified at the end of the service url
+#' (e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
+#'
+#' The list of layers and their respective id numbers can be found by viewing the service's url in a web broswer
+#' and viewing the "Layers" heading
+#' (e.g.,\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/#mapLayerList}).
 #' @examples
 #' url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 #' outFields <- c("POP2007", "POP2000")
@@ -21,8 +27,8 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
   layerInfo <- jsonlite::fromJSON(
     httr::content(
       httr::POST(
-        url, 
-        query=list(f="json", token=token), 
+        url,
+        query=list(f="json", token=token),
         encode="form",
         config = httr::config(ssl_verifypeer = FALSE)
         )
@@ -55,8 +61,8 @@ getObjectIds <- function(queryUrl, where, token=''){
   )
   responseRaw <- httr::content(
     httr::POST(
-      queryUrl, 
-      body=query, 
+      queryUrl,
+      body=query,
       encode="form",
       config = httr::config(ssl_verifypeer = FALSE))
     )
@@ -75,8 +81,8 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token=''){
   )
   responseRaw <- httr::content(
     httr::POST(
-      queryUrl, 
-      body=query, 
+      queryUrl,
+      body=query,
       encode="form",
       config = httr::config(ssl_verifypeer = FALSE)
       )
@@ -103,7 +109,7 @@ esri2sfGeom <- function(jsonFeats, geomType) {
   # attributes
   atts <- lapply(jsonFeats, '[[', 1) %>%
           lapply(function(att) lapply(att, function(x) return(ifelse(is.null(x), NA, x))))
-  
+
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE))
   # geometry + attributes
   df <- sf::st_sf(geoms, af, geom=geoms, crs="+init=epsg:4326")
@@ -148,7 +154,7 @@ esri2sfPolyline <- function(features) {
 
 generateToken <- function(server, uid, pwd='', expiration=5000){
   # generate auth token from GIS server
-  if (pwd=='') { 
+  if (pwd=='') {
      pwd <- rstudioapi::askForPassword("pwd")
   }
   query <- list(

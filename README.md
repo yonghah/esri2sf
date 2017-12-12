@@ -17,7 +17,7 @@ creates 500 features per request and automatically re-send requests until it get
 
 ## Install
 
-Use devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
+Use devtools to install this package. This package has dependency on dplyr, sf, httr, jsonlite
 
 ```
 library(devtools)
@@ -26,8 +26,10 @@ install_github("yonghah/esri2sf")
 
 ## How to use
 
-What you need is the URL of REST service you want. You can get the URL by asking it to a GIS admin or looking at 
-the javascript code of a webpage where it creates a feature layer.
+What you need is the URL of REST service you want. You can get the URL by viewing the URL widget on the service's webpage (see image below), 
+by asking a GIS admin, or looking at the javascript code of a webpage where it creates a feature layer.
+
+![REST Service screenshot](inst/www/images/rest-service-ss.png)
 
 ### Point data
 

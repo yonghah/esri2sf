@@ -8,7 +8,7 @@ This function is the interface to the user.}
 esri2sf(url, outFields = c("*"), where = "1=1", token = "")
 }
 \arguments{
-\item{url}{string for service url. ex) https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}
+\item{url}{string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}}
 
 \item{outFields}{vector of fields you want to include. default is '*' for all fields}
 
@@ -22,6 +22,14 @@ sf dataframe
 \description{
 main function
 This function is the interface to the user.
+}
+\note{
+When accessing services with multiple layers, the layer number must be specified at the end of the service url
+(e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
+
+The list of layers and their respective id numbers can be found by viewing the service's url in a web broswer
+and viewing the "Layers" heading
+(e.g.,\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/#mapLayerList}).
 }
 \examples{
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"

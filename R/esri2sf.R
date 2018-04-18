@@ -132,7 +132,11 @@ esri2sfPolygon <- function(features) {
     return(sf::st_multipolygon(list(lapply(rings, ring2matrix))))
   }
   getGeometry <- function(feature) {
-    return(rings2multipoly(feature$geometry$rings))
+    if(is.null(unlist(feature$geometry$rings))){
+      return(NULL)
+    } else {
+      return(rings2multipoly(feature$geometry$rings))
+    }
   }
   geoms <- sf::st_sfc(lapply(features, getGeometry))
   return(geoms)

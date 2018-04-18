@@ -142,7 +142,7 @@ esri2sfPolygon <- function(features) {
       return(rings2multipoly(feature$geometry$rings))
     }
   }
-  geoms_list <- lapply(esriFeatures, getGeometry)
+  geoms_list <- lapply(features, getGeometry)
   geoms <- sf::st_sfc(geoms_list[lengths(geoms_list)>0])
   return(geoms)
 }

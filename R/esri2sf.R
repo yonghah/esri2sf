@@ -31,8 +31,7 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
         query=list(f="json", token=token),
         encode="form",
         config = httr::config(ssl_verifypeer = FALSE)
-        ),
-      as = "text"
+        )
       )
     )
   print(layerInfo$type)
@@ -69,8 +68,7 @@ getObjectIds <- function(queryUrl, where, token=''){
       queryUrl,
       body=query,
       encode="form",
-      config = httr::config(ssl_verifypeer = FALSE)),
-    as = "text"
+      config = httr::config(ssl_verifypeer = FALSE))
     )
   response <- jsonlite::fromJSON(responseRaw)
   return(response$objectIds)
@@ -91,8 +89,7 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token=''){
       body=query,
       encode="form",
       config = httr::config(ssl_verifypeer = FALSE)
-      ),
-    as = "text"
+      )
     )
   response <- jsonlite::fromJSON(responseRaw,
                        simplifyDataFrame = FALSE,

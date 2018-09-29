@@ -163,6 +163,7 @@ esri2sfPolyline <- function(features) {
   return(geoms)
 }
 
+#' @export
 generateToken <- function(server, uid, pwd='', expiration=5000){
   # generate auth token from GIS server
   if (pwd=='') {

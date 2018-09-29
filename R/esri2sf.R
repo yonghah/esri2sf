@@ -1,6 +1,6 @@
 #' main function
 #' This function is the interface to the user.
-#' @importFrom jsonlite httr sf dplyr
+#' @import jsonlite httr sf dplyr
 #' @param url string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows

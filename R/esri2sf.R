@@ -181,3 +181,23 @@ generateToken <- function(server, uid, pwd='', expiration=5000){
   token <- jsonlite::fromJSON(httr::content(r, "parsed"))$token
   return(token)
 }
+
+#' Generate a OAuth token for Arcgis Online
+#' @param clientId string clientId
+#' @param clientSecret  string clientSecret.
+#' @return string token
+#'
+#' How to obtain clientId and clientSecret is described here:
+#' https://developers.arcgis.com/documentation/core-concepts/security-and-authentication/accessing-arcgis-online-services/
+#' @export
+generateOAuthToken <- function(clientId,clientSecret,expiration=5000) {
+
+    query=list(client_id=clientId,
+               client_secret=clientSecret,
+               expiration=expiration,
+               grant_type="client_credentials")
+    
+    r <- httr::POST("https://www.arcgis.com/sharing/rest/oauth2/token",body=query)
+    token <- content(r,type = "application/json")$access_token
+    return(token)
+}

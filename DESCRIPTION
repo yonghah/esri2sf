@@ -1,11 +1,11 @@
 Package: esri2sf
 Type: Package
 Title: Create Simple Features from ArcGIS Server REST API
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Yongha", "Hwang", email = "yongha.hwang@gmail.com",
                   role = c("aut", "cre"))
 Description: This package enables you to scrape geographic features 
-    directrly from ArcGIS servers REST API into R as simple features. 
+    directly from ArcGIS servers REST API into R as simple features. 
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -17,4 +17,4 @@ Imports:
     sf
 Suggests:
     knitr,
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

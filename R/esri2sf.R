@@ -1,6 +1,6 @@
 #' main function
 #' This function is the interface to the user.
-#' @importFrom jsonlite httr sf dplyr
+#' @import jsonlite httr sf dplyr
 #' @param url string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows
@@ -163,6 +163,7 @@ esri2sfPolyline <- function(features) {
   return(geoms)
 }
 
+#' @export
 generateToken <- function(server, uid, pwd='', expiration=5000){
   # generate auth token from GIS server
   if (pwd=='') {
@@ -179,4 +180,24 @@ generateToken <- function(server, uid, pwd='', expiration=5000){
   r <- httr::POST(url, body=query, encode="form")
   token <- jsonlite::fromJSON(httr::content(r, "parsed"))$token
   return(token)
+}
+
+#' Generate a OAuth token for Arcgis Online
+#' @param clientId string clientId
+#' @param clientSecret  string clientSecret.
+#' @return string token
+#'
+#' How to obtain clientId and clientSecret is described here:
+#' https://developers.arcgis.com/documentation/core-concepts/security-and-authentication/accessing-arcgis-online-services/
+#' @export
+generateOAuthToken <- function(clientId,clientSecret,expiration=5000) {
+
+    query=list(client_id=clientId,
+               client_secret=clientSecret,
+               expiration=expiration,
+               grant_type="client_credentials")
+    
+    r <- httr::POST("https://www.arcgis.com/sharing/rest/oauth2/token",body=query)
+    token <- content(r,type = "application/json")$access_token
+    return(token)
 }

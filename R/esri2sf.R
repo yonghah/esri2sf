@@ -5,6 +5,7 @@
 #' @param outFields vector of fields you want to include. default is '*' for all fields
 #' @param where string for where condition. default is 1=1 for all rows
 #' @param token. string for authentication token if needed.
+#' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if NULL, will try to be infered from the server)
 #' @return sf dataframe
 #' @note When accessing services with multiple layers, the layer number must be specified at the end of the service url
 #' (e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
@@ -19,7 +20,7 @@
 #' df <- esri2sf(url, outFields=outFields, where=where)
 #' plot(df)
 #' @export
-esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
+esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL) {
   library(httr)
   library(jsonlite)
   library(sf)
@@ -36,7 +37,12 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='') {
       )
     )
   print(layerInfo$type)
-  geomType <- layerInfo$geometryType
+  if (is.null(geomType)) {
+    if (is.null(layerInfo$geometryType))
+      stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be infered from server.")
+
+    geomType <- layerInfo$geometryType
+  }
   print(geomType)
   queryUrl <- paste(url, "query", sep="/")
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)
@@ -196,7 +202,7 @@ generateOAuthToken <- function(clientId,clientSecret,expiration=5000) {
                client_secret=clientSecret,
                expiration=expiration,
                grant_type="client_credentials")
-    
+
     r <- httr::POST("https://www.arcgis.com/sharing/rest/oauth2/token",body=query)
     token <- content(r,type = "application/json")$access_token
     return(token)

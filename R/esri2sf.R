@@ -131,7 +131,11 @@ esri2sfGeom <- function(jsonFeats, geomType) {
 
 esri2sfPoint <- function(features) {
   getPointGeometry <- function(feature) {
-    return(sf::st_point(unlist(feature$geometry)))
+    if (is.numeric(unlist(feature$geometry))){
+      return(sf::st_point(unlist(feature$geometry)))
+    } else {
+      return(sf::st_point())
+    }
   }
   geoms <- sf::st_sfc(lapply(features, getPointGeometry))
   return(geoms)

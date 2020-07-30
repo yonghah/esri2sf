@@ -125,7 +125,7 @@ esri2sfGeom <- function(jsonFeats, geomType) {
 
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE))
   # geometry + attributes
-  df <- sf::st_sf(geoms, af, crs="+init=epsg:4326")
+  df <- sf::st_sf(geoms, af, crs=4326)
   return(df)
 }
 

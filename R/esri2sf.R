@@ -6,6 +6,7 @@
 #' @param where string for where condition. default is 1=1 for all rows
 #' @param token. string for authentication token if needed.
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if NULL, will try to be infered from the server)
+#' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe
 #' @note When accessing services with multiple layers, the layer number must be specified at the end of the service url
 #' (e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
@@ -20,7 +21,7 @@
 #' df <- esri2sf(url, outFields=outFields, where=where)
 #' plot(df)
 #' @export
-esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL) {
+esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL, ...) {
   library(httr)
   library(jsonlite)
   library(sf)
@@ -45,30 +46,31 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL)
   }
   print(geomType)
   queryUrl <- paste(url, "query", sep="/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, ...)
   simpleFeatures <- esri2sfGeom(esriFeatures, geomType)
   return(simpleFeatures)
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, token='') {
-  ids <- getObjectIds(queryUrl, where, token)
+getEsriFeatures <- function(queryUrl, fields, where, token='', ...) {
+  ids <- getObjectIds(queryUrl, where, token, ...)
   if(is.null(ids)){
     warning("No records match the search critera")
     return()
   }
   idSplits <- split(ids, ceiling(seq_along(ids)/500))
-  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token)
+  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, ...)
   merged <- unlist(results, recursive=FALSE)
   return(merged)
 }
 
-getObjectIds <- function(queryUrl, where, token=''){
+getObjectIds <- function(queryUrl, where, token='', ...){
   # create Simple Features from ArcGIS servers json response
   query <- list(
     where=where,
     returnIdsOnly="true",
     token=token,
-    f="json"
+    f="json",
+    ...
   )
   responseRaw <- httr::content(
     httr::POST(
@@ -82,14 +84,15 @@ getObjectIds <- function(queryUrl, where, token=''){
   return(response$objectIds)
 }
 
-getEsriFeaturesByIds <- function(ids, queryUrl, fields, token=''){
+getEsriFeaturesByIds <- function(ids, queryUrl, fields, token='', ...){
   # create Simple Features from ArcGIS servers json response
   query <- list(
     objectIds=paste(ids, collapse=","),
     outFields=paste(fields, collapse=","),
     token=token,
     outSR='4326',
-    f="json"
+    f="json",
+    ...
   )
   responseRaw <- httr::content(
     httr::POST(

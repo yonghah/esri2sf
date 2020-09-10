@@ -2,8 +2,9 @@
 % Please edit documentation in R/esri2sf.R
 \name{esri2sf}
 \alias{esri2sf}
-\title{main function
-This function is the interface to the user.}
+\alias{esri2df}
+\title{Main Functions
+These functions are the interface to the user.}
 \usage{
 esri2sf(
   url,
@@ -13,6 +14,8 @@ esri2sf(
   geomType = NULL,
   ...
 )
+
+esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 }
 \arguments{
 \item{url}{string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}}
@@ -28,12 +31,19 @@ esri2sf(
 \item{token.}{string for authentication token if needed.}
 }
 \value{
-sf dataframe
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df})
 }
 \description{
-main function
-This function is the interface to the user.
+Main Functions
+These functions are the interface to the user.
 }
+\section{Functions}{
+\itemize{
+\item \code{esri2sf}: Retrieve spatial object
+
+\item \code{esri2df}: Retrieve table object (no spatial data)
+}}
+
 \note{
 When accessing services with multiple layers, the layer number must be specified at the end of the service url
 (e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).

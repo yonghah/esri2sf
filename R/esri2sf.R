@@ -51,6 +51,33 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL,
   return(simpleFeatures)
 }
 
+#' @export
+esri2df <- function(url, outFields=c("*"), where="1=1", token='', ...) {
+  library(httr)
+  library(jsonlite)
+  library(sf)
+  library(dplyr)
+  layerInfo <- jsonlite::fromJSON(
+    httr::content(
+      httr::POST(
+        url,
+        query=list(f="json", token=token),
+        encode="form",
+        config = httr::config(ssl_verifypeer = FALSE)
+      ),
+      as="text"
+    )
+  )
+  print(layerInfo$type)
+  if (layerInfo$type != 'Table') {
+    stop("Layer type for URL is not 'Table'.")
+  }
+  queryUrl <- paste(url, "query", sep="/")
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)#, ...)
+  esriTable <- getEsriTable(esriFeatures)
+  return(esriTable)
+}
+
 getEsriFeatures <- function(queryUrl, fields, where, token='', ...) {
   ids <- getObjectIds(queryUrl, where, token, ...)
   if(is.null(ids)){
@@ -109,6 +136,13 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token='', ...){
                        digits=NA)
   esriJsonFeatures <- response$features
   return(esriJsonFeatures)
+}
+
+getEsriTable <- function(jsonFeats) {
+  atts <- lapply(jsonFeats, '[[', 1) %>%
+    lapply(function(att) lapply(att, function(x) return(ifelse(is.null(x), NA, x))))
+  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE)) %>% dplyr::as_tibble()
+  return(df)
 }
 
 esri2sfGeom <- function(jsonFeats, geomType) {

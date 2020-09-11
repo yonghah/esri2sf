@@ -1,5 +1,5 @@
-#' main function
-#' This function is the interface to the user.
+#' Main Functions
+#' These functions are the interface to the user.
 #' @import jsonlite httr sf dplyr
 #' @param url string for service url. ex) \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}
 #' @param outFields vector of fields you want to include. default is '*' for all fields
@@ -7,7 +7,8 @@
 #' @param token. string for authentication token if needed.
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if NULL, will try to be infered from the server)
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
-#' @return sf dataframe
+#' @return sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df})
+#' @describeIn esri2sf Retrieve spatial object
 #' @note When accessing services with multiple layers, the layer number must be specified at the end of the service url
 #' (e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
 #'
@@ -33,10 +34,10 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL,
         query=list(f="json", token=token),
         encode="form",
         config = httr::config(ssl_verifypeer = FALSE)
-        ),
+      ),
       as="text"
-      )
     )
+  )
   print(layerInfo$type)
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType))
@@ -49,6 +50,34 @@ esri2sf <- function(url, outFields=c("*"), where="1=1", token='', geomType=NULL,
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, ...)
   simpleFeatures <- esri2sfGeom(esriFeatures, geomType)
   return(simpleFeatures)
+}
+
+#' @describeIn esri2sf Retrieve table object (no spatial data)
+#' @export
+esri2df <- function(url, outFields=c("*"), where="1=1", token='', ...) {
+  library(httr)
+  library(jsonlite)
+  library(sf)
+  library(dplyr)
+  layerInfo <- jsonlite::fromJSON(
+    httr::content(
+      httr::POST(
+        url,
+        query=list(f="json", token=token),
+        encode="form",
+        config = httr::config(ssl_verifypeer = FALSE)
+      ),
+      as="text"
+    )
+  )
+  print(layerInfo$type)
+  if (layerInfo$type != 'Table') {
+    stop("Layer type for URL is not 'Table'.")
+  }
+  queryUrl <- paste(url, "query", sep="/")
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)#, ...)
+  esriTable <- getEsriTable(esriFeatures)
+  return(esriTable)
 }
 
 getEsriFeatures <- function(queryUrl, fields, where, token='', ...) {
@@ -109,6 +138,13 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token='', ...){
                        digits=NA)
   esriJsonFeatures <- response$features
   return(esriJsonFeatures)
+}
+
+getEsriTable <- function(jsonFeats) {
+  atts <- lapply(jsonFeats, '[[', 1) %>%
+    lapply(function(att) lapply(att, function(x) return(ifelse(is.null(x), NA, x))))
+  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors=FALSE)) %>% dplyr::as_tibble()
+  return(df)
 }
 
 esri2sfGeom <- function(jsonFeats, geomType) {

@@ -17,10 +17,10 @@ creates 500 features per request and automatically re-send requests until it get
 
 ## Install
 
-Use devtools to install this package. This package has dependency on dplyr, sf, httr, jsonlite
+Use [remotes](https://cran.r-project.org/web/packages/remotes/index.html) to install this package. This package has dependency on dplyr, sf, httr, jsonlite.
 
 ```
-library(devtools)
+library(remotes)
 install_github("yonghah/esri2sf")
 ```
 
@@ -60,8 +60,8 @@ You can filter rows as well by giving where condition.
 ```
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 df <- esri2sf(url, 
-              where="STATE_NAME = 'Michigan'", 
-              outFields=c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI"))
+              where = "STATE_NAME = 'Michigan'", 
+              outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI"))
 plot(df)
 ```
 ![polygon plot](https://user-images.githubusercontent.com/3218468/29668791-63e66976-88af-11e7-9f6c-5d95bac4a69e.png)

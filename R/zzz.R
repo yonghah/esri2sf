@@ -117,7 +117,7 @@ getEsriFeatures <- function(queryUrl, fields, where, token = "", ...) {
   unlist(results, recursive = FALSE)
 }
 
-esri2sfGeom <- function(jsonFeats, geomType) {
+esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   # convert esri json to simple feature
   geoms <- switch(geomType, 
     esriGeometryPolygon = esri2sfPolygon(jsonFeats),
@@ -131,5 +131,5 @@ esri2sfGeom <- function(jsonFeats, geomType) {
   
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
   # geometry + attributes
-  st_sf(geoms, af, crs = 4326)
+  st_sf(geoms, af, crs = crs)
 }

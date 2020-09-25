@@ -11,26 +11,29 @@ esri2sf(
   where = "1=1",
   token = "",
   geomType = NULL,
+  crs = 4326,
   ...
 )
 
 esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 }
 \arguments{
-\item{url}{string for service url., e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
+\item{url}{chracter string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
 
-\item{outFields}{vector of fields you want to include. default is '*' for all fields"}
+\item{outFields}{vector of fields you want to include. default is '*' for all fields".}
 
-\item{where}{string for where condition. default is 1=1 for all rows"}
+\item{where}{string for where condition. Default is 1=1 for all rows.}
 
 \item{token}{string for authentication token if needed.}
 
-\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if NULL, will try to be inferred from the server)}
+\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to be inferred from the server)}
+
+\item{crs}{coordinates reference system (see \code{\link[sf:sf]{sf::st_sf()}}).}
 
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
 }
 \value{
-sf dataframe \code{esri2sf}) or tibble dataframe \code{esri2sf})
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2sf}).
 }
 \description{
 These functions are the interface to the user.
@@ -43,19 +46,19 @@ These functions are the interface to the user.
 }}
 
 \note{
-When accessing services with multiple layers, the layer number must be specified at the end of the service url
-(e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
-
-The list of layers and their respective id numbers can be found by viewing the service's url in a web broswer
-and viewing the "Layers" heading
-(e.g., \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/#mapLayerList}).
+When accessing services with multiple layers, the layer number must be
+specified at the end of the service url (e.g.,
+\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
+#' The list of layers and their respective id numbers can be found by viewing
+the service's url in a web browser and viewing the "Layers" heading (e.g.,
+\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/#mapLayerList}).
 }
 \examples{
 baseURL <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/"
 url <- paste0(baseURL, "services/Demographics/ESRI_Census_USA/MapServer/3")
-outFields <- c("POP2007", "POP2000")
+outFields <- c("POP2007", "POP2000") 
 where <- "STATE_NAME = 'Michigan'"
-df <- esri2sf(url, outFields=outFields, where=where)
-plot(df)
+df <- esri2sf(url, outFields=outFields, where=where) 
+plot(df) 
 
 }

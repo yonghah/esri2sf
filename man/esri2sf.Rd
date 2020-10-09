@@ -18,13 +18,13 @@ esri2sf(
 esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 }
 \arguments{
-\item{url}{chracter string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
+\item{url}{character string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
 
 \item{outFields}{vector of fields you want to include. default is '*' for all fields".}
 
-\item{where}{string for where condition. Default is 1=1 for all rows.}
+\item{where}{string for where condition. Default is \code{1=1} for all rows.}
 
-\item{token}{string for authentication token if needed.}
+\item{token}{string for authentication token (if needed).}
 
 \item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to be inferred from the server)}
 
@@ -58,7 +58,7 @@ baseURL <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/"
 url <- paste0(baseURL, "services/Demographics/ESRI_Census_USA/MapServer/3")
 outFields <- c("POP2007", "POP2000") 
 where <- "STATE_NAME = 'Michigan'"
-df <- esri2sf(url, outFields=outFields, where=where) 
+df <- esri2sf(url, outFields = outFields, where = where) 
 plot(df) 
 
 }

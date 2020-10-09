@@ -2,9 +2,9 @@
 #'
 #' These functions are the interface to the user.
 #'
-#' @param url chracter string for service url, e.g. <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/>.
+#' @param url character string for service url, e.g. <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/>.
 #' @param outFields vector of fields you want to include. default is '*' for all fields".
-#' @param where string for where condition. Default is 1=1 for all rows.
+#' @param where string for where condition. Default is `1=1` for all rows.
 #' @param token string for authentication token if needed.
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
 #' @param crs coordinates reference system (see [sf::st_sf()]).
@@ -26,7 +26,7 @@
 #' url <- paste0(baseURL, "services/Demographics/ESRI_Census_USA/MapServer/3")
 #' outFields <- c("POP2007", "POP2000") 
 #' where <- "STATE_NAME = 'Michigan'"
-#' df <- esri2sf(url, outFields=outFields, where=where) 
+#' df <- esri2sf(url, outFields = outFields, where = where) 
 #' plot(df) 
 #'
 #' @export
@@ -39,7 +39,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", token = "",
   print(layerInfo$type)
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType)) 
-      stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be infered from server.")
+      stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
     
     geomType <- layerInfo$geometryType
   }

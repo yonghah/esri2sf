@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^vignettes/rsconnect/documents/esri2sf-vignettes\.Rmd/rpubs\.com/rpubs/Document\.dcf$
+^vignettes/rsconnect/documents/esri2sf-vignettes\.Rmd/rpubs\.com/rpubs/Publish Document\.dcf$
+README_files
+README.Rmd

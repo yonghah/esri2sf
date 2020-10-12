@@ -1,12 +1,12 @@
 ---
 title: "Scraping Geographic Features from ArcGIS Server"
 author: "Yongha Hwang"
-date: "August 23, 2017"
+date: "September 25, 2020"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{esri2sf-vignettes}
+  %\VignetteIndexEntry{Get started with esri2sf}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -26,11 +26,15 @@ This program sends a request to an ArcGIS Server and gets json responses contain
 
 ## Install
 
-I recommend devtools to install this package.This package has dependency on dplyr, sf, httr, jsonlite
+I recommend devtools to install this package. This package has dependency on dplyr, sf, httr, jsonlite and rstudioapi.
 
-```{r}
+```r
 devtools::install_github("yonghah/esri2sf")
-library("esri2sf")
+library(esri2sf)
+```
+
+```{r, include = FALSE}
+library(esri2sf)
 ```
 
 ## How to use
@@ -60,6 +64,7 @@ plot(df)
 ### Polygon data
 
 You can filter rows as well by giving where condition.
+
 ```{r}
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 where <- "STATE_NAME = 'Michigan'"

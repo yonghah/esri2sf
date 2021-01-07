@@ -9,6 +9,7 @@ esri2sf(
   url,
   outFields = c("*"),
   where = "1=1",
+  bbox = NULL,
   token = "",
   geomType = NULL,
   crs = 4326,
@@ -24,11 +25,13 @@ esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 
 \item{where}{string for where condition. Default is \code{1=1} for all rows.}
 
+\item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}}.}
+
 \item{token}{string for authentication token (if needed).}
 
 \item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to be inferred from the server)}
 
-\item{crs}{coordinates reference system (see \code{\link[sf:sf]{sf::st_sf()}}).}
+\item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}).}
 
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
 }
@@ -56,9 +59,9 @@ the service's url in a web browser and viewing the "Layers" heading (e.g.,
 \examples{
 baseURL <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/"
 url <- paste0(baseURL, "services/Demographics/ESRI_Census_USA/MapServer/3")
-outFields <- c("POP2007", "POP2000") 
+outFields <- c("POP2007", "POP2000")
 where <- "STATE_NAME = 'Michigan'"
-df <- esri2sf(url, outFields = outFields, where = where) 
-plot(df) 
+df <- esri2sf(url, outFields = outFields, where = where)
+plot(df)
 
 }

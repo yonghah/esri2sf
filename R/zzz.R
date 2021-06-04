@@ -144,9 +144,14 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   st_sf(geoms, af, crs = crs)
 }
 
-getWKT <- function(wktID) {
-  url <- paste0("https://epsg.io/", wktID, ".wkt")
-  html <- read_html(url)
-  wkt <- html_text(html_element(html, "p"))
+getWKT <- function(wktID, esri = FALSE) {
+  if (esri) {
+    url <- paste0("https://epsg.io/", wktID, ".esriwkt")
+    wkt <- readLines(con = url, warn = FALSE)
+  } else {
+    url <- paste0("https://epsg.io/", wktID, ".wkt")
+    html <- read_html(url)
+    wkt <- html_text(html_element(html, "p"))
+  }
   wkt
 }

@@ -10,7 +10,7 @@
 #' @param crs coordinate reference system (see [sf::st_sf()]).
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
-#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2sf`).
+#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`).
 #'
 #' @describeIn esri2sf Retrieve spatial object
 #'

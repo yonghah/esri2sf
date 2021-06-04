@@ -41,8 +41,9 @@ generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
 getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
 
   # create Simple Features from ArcGIS servers json response
-  query <- list(where = where, geometryType = "esriGeometryEnvelope", geometry = bbox, returnIdsOnly = "true", token = token, f = "json",
-                ...)
+  query <- list(where = where, geometryType = "esriGeometryEnvelope",
+                geometry = bbox, returnIdsOnly = "true", token = token,
+                f = "json", ...)
 
   responseRaw <- content(POST(queryUrl, body = query, encode = "form",
                               config = config(ssl_verifypeer = FALSE)), as = "text")
@@ -62,8 +63,9 @@ getEsriTable <- function(jsonFeats) {
 
 getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", ...) {
   # create Simple Features from ArcGIS servers json response
-  query <- list(objectIds = paste(ids, collapse = ","), outFields = paste(fields,
-                                                                          collapse = ","), token = token, outSR = "4326", f = "json", ...)
+  query <- list(objectIds = paste(ids, collapse = ","),
+                outFields = paste(fields, collapse = ","),
+                token = token, outSR = "4326", f = "json", ...)
 
   responseRaw <- content(POST(queryUrl, body = query, encode = "form",
                               config = config(ssl_verifypeer = FALSE)), as = "text")

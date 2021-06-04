@@ -46,8 +46,18 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   print(geomType)
 
-  if (!is.null(layerInfo$extent$spatialReference$latestWkid))
+  if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
+    layerCRS <- layerInfo$extent$spatialReference$latestWkid
     print(paste0("Coordinate Reference System: ", layerInfo$extent$spatialReference$latestWkid))
+  } else if (!is.null(layerInfo$extent$spatialReference$wkid)) {
+    layerCRS <- layerInfo$extent$spatialReference$wkid
+    print(paste0("Coordinate Reference System: ", layerInfo$extent$spatialReference$wkid))
+  } else if (!is.null(layerInfo$extent$spatialReference$wkt)) {
+    layerCRS <- layerInfo$extent$spatialReference$wkt
+    print(paste0("Coordinate Reference System: ", layerInfo$extent$spatialReference$wkt))
+  } else {
+    layerCRS <- 4326L
+  }
 
   if (class(bbox) == "bbox") {
     if ((sf::st_crs(bbox)$input != layerInfo$extent$spatialReference$latestWkid) && !is.null(layerInfo$extent$spatialReference$latestWkid)) {

@@ -70,7 +70,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, crs, ...)
   esri2sfGeom(esriFeatures, geomType, crs)
 }
 

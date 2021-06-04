@@ -61,11 +61,11 @@ getEsriTable <- function(jsonFeats) {
 }
 
 
-getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", ...) {
+getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, ...) {
   # create Simple Features from ArcGIS servers json response
   query <- list(objectIds = paste(ids, collapse = ","),
                 outFields = paste(fields, collapse = ","),
-                token = token, outSR = "4326", f = "json", ...)
+                token = token, outSR = crs, f = "json", ...)
 
   responseRaw <- content(POST(queryUrl, body = query, encode = "form",
                               config = config(ssl_verifypeer = FALSE)), as = "text")
@@ -107,7 +107,7 @@ esri2sfPolyline <- function(features) {
   st_sfc(lapply(features, getGeometry))
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", ...) {
+getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, ...) {
   ids <- getObjectIds(queryUrl, where, bbox, token, ...)
   if (is.null(ids)) {
     warning("No records match the search criteria.")
@@ -115,7 +115,15 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", ...) {
   }
   idSplits <- split(ids, seq_along(ids) %/% 500)
 
-  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, ...)
+  if (is.null(crs)) {
+    crs <- ""
+  } else if (is.numeric(crs)) {
+    crs <- as.character(crs)
+  } else {
+    stop("'crs' should either be NULL or numeric")
+  }
+
+  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
   unlist(results, recursive = FALSE)
 }
 

@@ -2,6 +2,7 @@
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
 #' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring
+#' @importFrom rvest read_html html_element html_text
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
@@ -131,4 +132,11 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
   # geometry + attributes
   st_sf(geoms, af, crs = crs)
+}
+
+getWKT <- function(wktID) {
+  url <- paste0("https://epsg.io/", wktID, ".wkt")
+  html <- read_html(url)
+  wkt <- html_text(html_element(html, "p"))
+  wkt
 }

@@ -36,7 +36,7 @@ esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
 }
 \value{
-sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2sf}).
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}).
 }
 \description{
 These functions are the interface to the user.

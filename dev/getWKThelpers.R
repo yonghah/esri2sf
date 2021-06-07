@@ -6,6 +6,20 @@ wktID <- "ESRI:102698"
 wktID <- "ESRI:4326"
 wktID <- "SR-ORG:6861"
 
+
+getWKT <- function(wktID, esri = FALSE) {
+  if (esri) {
+    url <- paste0("https://epsg.io/", wktID, ".esriwkt")
+    wkt <- readLines(con = url, warn = FALSE)
+  } else {
+    url <- paste0("https://epsg.io/", wktID, ".wkt")
+    html <- read_html(url)
+    wkt <- html_text(html_element(html, "p"))
+  }
+  wkt
+}
+
+
 getWKT2 <- function(wktID, esri = FALSE) {
 
   urlbase <- "https://spatialreference.org/ref"

@@ -58,8 +58,8 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   print(paste0("Coordinate Reference System: ", layerCRS))
 
   if (class(bbox) == "bbox") {
-    if ((sf::st_crs(bbox)$input != layerInfo$extent$spatialReference$latestWkid) && !is.null(layerInfo$extent$spatialReference$latestWkid)) {
-      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerInfo$extent$spatialReference$latestWkid))
+    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")

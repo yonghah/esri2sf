@@ -69,3 +69,15 @@ getWKTidAuthority <- function(wktID) {
 }
 
 getWKTidAuthority(wktID)
+
+
+
+
+CPL_crs_from_input <- utils::getFromNamespace("CPL_crs_from_input", "sf")
+CPL_crs_parameters <- utils::getFromNamespace("CPL_crs_parameters", "sf")
+x <- "EPSG:4326"
+test <- CPL_crs_from_input(x)
+CPL_crs_parameters(test)
+str(test)
+test$proj4string
+

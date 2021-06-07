@@ -2,7 +2,6 @@
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
 #' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths
-#' @importFrom rvest read_html html_element html_text
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 

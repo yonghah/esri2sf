@@ -18,7 +18,6 @@ Imports:
     httr,
     rstudioapi,
     sf,
-    rvest,
     DBI,
     RSQLite
 Suggests:

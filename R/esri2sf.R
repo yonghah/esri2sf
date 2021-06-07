@@ -69,6 +69,11 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   queryUrl <- paste(url, "query", sep = "/")
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, crs, ...)
+
+  if (is.null(crs)) {
+    crs <- layerCRS
+  }
+
   esri2sfGeom(esriFeatures, geomType, crs)
 }
 

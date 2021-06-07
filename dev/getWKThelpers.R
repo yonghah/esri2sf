@@ -56,32 +56,6 @@ isWktID <- function(crs) {
 isWktID(crs)
 
 
-getWKTidAuthority <- function(wktID) {
-
-  projPaths <- file.path(sf::sf_proj_search_paths(), "proj.db")
-  projDB <- projPaths[file.exists(projPaths)]
-  # projDB <- file.path(getwd(), "proj.db")
-
-  con <- DBI::dbConnect(RSQLite::SQLite(), projDB)
-
-  crsData <- DBI::dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
-
-  DBI::dbDisconnect(con)
-
-  if (nrow(crsData) == 0) {
-    stop(paste0("WKTid: ", wktID, " not found in proj.db"))
-  }
-
-  if (nrow(crsData) > 1) {
-    stop(paste0("WKTid: ", wktID, " has multiple entries in proj.db. Please specify authority (EPSG|ESRI) in crs argument"))
-  }
-
-  wktID <- paste0(crsData$auth_name, ":", crsData$code)
-
-  wktID
-
-}
-
 getWKTidAuthority(wktID)
 
 

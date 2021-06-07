@@ -138,6 +138,13 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
                   esriGeometryPolyline = esri2sfPolyline(jsonFeats)
   )
 
+
+  #Format CRS
+  if (isWktID(crs)) {
+    crs <- getWKTidAuthority(crs)
+  }
+
+
   # attributes
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))

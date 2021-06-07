@@ -4,7 +4,6 @@ wktID <- 4326
 wktID <- "EPSG:4326"
 wktID <- "ESRI:102698"
 wktID <- "ESRI:4326"
-wktID <- "SR-ORG:6861"
 
 
 getWKT <- function(wktID, esri = FALSE) {
@@ -47,12 +46,11 @@ crs <- "EPSG:4326"
 crs <- 4326
 crs <- "ESRI:4326"
 crs <- "ESRI:102698"
-crs <- "SR-ORG:6861"
-isWktID <- function(crs) {
-
-  is.numeric(crs) | stringr::str_detect(crs, "^(EPSG|ESRI|SR-ORG):[:digit:]+")
-
-}
+# isWktID <- function(crs) {
+#
+#   is.numeric(crs) | stringr::str_detect(crs, "^(EPSG|ESRI):[:digit:]+")
+#
+# }
 isWktID(crs)
 
 

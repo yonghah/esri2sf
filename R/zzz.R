@@ -171,3 +171,9 @@ getWKTidAuthority <- function(wktID) {
 
 }
 
+isWktID <- function(crs) {
+
+  is.numeric(crs) | stringr::str_detect(crs, "^(EPSG|ESRI):[:digit:]+")
+
+}
+

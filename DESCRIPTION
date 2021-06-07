@@ -22,7 +22,8 @@ Imports:
     DBI,
     RSQLite
 Suggests:
-    knitr,
+    rmarkdown,
+    knitr
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

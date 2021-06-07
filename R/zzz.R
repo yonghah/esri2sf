@@ -1,8 +1,10 @@
 #' @importFrom dplyr %>%
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring
+#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths
 #' @importFrom rvest read_html html_element html_text
+#' @importFrom DBI dbConnect dbGetQuery dbDisconnect
+#' @importFrom RSQLite SQLite
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
@@ -147,14 +149,14 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
 
 getWKTidAuthority <- function(wktID) {
 
-  projPaths <- file.path(sf::sf_proj_search_paths(), "proj.db")
+  projPaths <- file.path(sf_proj_search_paths(), "proj.db")
   projDB <- projPaths[file.exists(projPaths)][1]
 
-  con <- DBI::dbConnect(RSQLite::SQLite(), projDB)
+  con <- dbConnect(SQLite(), projDB)
 
-  crsData <- DBI::dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
+  crsData <- dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
 
-  DBI::dbDisconnect(con)
+  dbDisconnect(con)
 
   if (nrow(crsData) == 0) {
     stop(paste0("WKTid: ", wktID, " not found in proj.db"))

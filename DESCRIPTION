@@ -18,7 +18,9 @@ Imports:
     httr,
     rstudioapi,
     sf,
-    rvest
+    rvest,
+    DBI,
+    RSQLite
 Suggests:
     knitr,
 RoxygenNote: 7.1.1

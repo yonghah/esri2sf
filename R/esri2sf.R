@@ -55,7 +55,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   } else {
     stop("No crs found. Check that layer at url has a Spatial Reference.")
   }
-  print(paste0("Coordinate Reference System: ", layerCRS))
+  print(paste0("Service Coordinate Reference System: ", layerCRS))
 
   if (class(bbox) == "bbox") {
     if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {

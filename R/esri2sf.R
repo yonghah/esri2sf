@@ -7,7 +7,7 @@
 #' @param where string for where condition. Default is `1=1` for all rows.
 #' @param token string for authentication token (if needed).
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
-#' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server. The handling of custom projstiring or WKT CRS's needs additional functionality built in from the GDAL package.
+#' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`).

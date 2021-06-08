@@ -123,7 +123,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (isWktID(crs)) {
     crs <- stringr::str_remove(crs, "^(EPSG|ESRI):")
   } else {
-    stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstiring or WKT CRS's needs additional functionality built in from the GDAL package.")
+    stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.")
   }
 
   results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)

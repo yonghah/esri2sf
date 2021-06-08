@@ -121,7 +121,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (is.numeric(crs)) {
     crs <- as.character(crs)
   } else if (isWktID(crs)) {
-    crs <- stringr::str_remove(crs, "^(EPSG|ESRI):")
+    crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
     stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.")
   }
@@ -182,7 +182,7 @@ getWKTidAuthority <- function(wktID) {
 
 isWktID <- function(crs) {
 
-  is.numeric(crs) | stringr::str_detect(crs, "^(EPSG|ESRI):[:digit:]+")
+  is.numeric(crs) | grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
 
 }
 

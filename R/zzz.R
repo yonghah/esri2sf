@@ -182,7 +182,7 @@ getWKTidAuthority <- function(wktID) {
 
 isWktID <- function(crs) {
 
-  is.numeric(crs) | grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
+  is.numeric(crs) || grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
 
 }
 

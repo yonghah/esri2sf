@@ -72,6 +72,8 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   if (is.null(crs)) {
     crs <- layerCRS
+  } else {
+    print(paste0("Output Coordinate Reference System: ", crs))
   }
 
   esri2sfGeom(esriFeatures, geomType, crs)

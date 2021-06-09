@@ -1,7 +1,9 @@
 #' @importFrom dplyr %>%
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring
+#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths
+#' @importFrom DBI dbConnect dbGetQuery dbDisconnect
+#' @importFrom RSQLite SQLite
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
@@ -40,8 +42,9 @@ generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
 getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
 
   # create Simple Features from ArcGIS servers json response
-  query <- list(where = where, geometryType = "esriGeometryEnvelope", geometry = bbox, returnIdsOnly = "true", token = token, f = "json",
-                ...)
+  query <- list(where = where, geometryType = "esriGeometryEnvelope",
+                geometry = bbox, returnIdsOnly = "true", token = token,
+                f = "json", ...)
 
   responseRaw <- content(POST(queryUrl, body = query, encode = "form",
                               config = config(ssl_verifypeer = FALSE)), as = "text")
@@ -59,10 +62,11 @@ getEsriTable <- function(jsonFeats) {
 }
 
 
-getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", ...) {
+getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, ...) {
   # create Simple Features from ArcGIS servers json response
-  query <- list(objectIds = paste(ids, collapse = ","), outFields = paste(fields,
-                                                                          collapse = ","), token = token, outSR = "4326", f = "json", ...)
+  query <- list(objectIds = paste(ids, collapse = ","),
+                outFields = paste(fields, collapse = ","),
+                token = token, outSR = crs, f = "json", ...)
 
   responseRaw <- content(POST(queryUrl, body = query, encode = "form",
                               config = config(ssl_verifypeer = FALSE)), as = "text")
@@ -104,7 +108,7 @@ esri2sfPolyline <- function(features) {
   st_sfc(lapply(features, getGeometry))
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", ...) {
+getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, ...) {
   ids <- getObjectIds(queryUrl, where, bbox, token, ...)
   if (is.null(ids)) {
     warning("No records match the search criteria.")
@@ -112,7 +116,17 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", ...) {
   }
   idSplits <- split(ids, seq_along(ids) %/% 500)
 
-  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, ...)
+  if (is.null(crs)) {
+    crs <- ""
+  } else if (is.numeric(crs)) {
+    crs <- as.character(crs)
+  } else if (isWktID(crs)) {
+    crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
+  } else {
+    stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.")
+  }
+
+  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
   unlist(results, recursive = FALSE)
 }
 
@@ -124,6 +138,13 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
                   esriGeometryPolyline = esri2sfPolyline(jsonFeats)
   )
 
+
+  #Format CRS
+  if (isWktID(crs)) {
+    crs <- getWKTidAuthority(crs)
+  }
+
+
   # attributes
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
@@ -132,3 +153,36 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   # geometry + attributes
   st_sf(geoms, af, crs = crs)
 }
+
+
+getWKTidAuthority <- function(wktID) {
+
+  projPaths <- file.path(sf_proj_search_paths(), "proj.db")
+  projDB <- projPaths[file.exists(projPaths)][1]
+
+  con <- dbConnect(SQLite(), projDB)
+
+  crsData <- dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
+
+  dbDisconnect(con)
+
+  if (nrow(crsData) == 0) {
+    stop(paste0("WKTid: ", wktID, " not found in proj.db"))
+  }
+
+  if (nrow(crsData) > 1) {
+    stop(paste0("WKTid: ", wktID, " has multiple entries in proj.db. Please specify authority (EPSG|ESRI) in crs argument"))
+  }
+
+  wktID <- paste0(crsData$auth_name, ":", crsData$code)
+
+  wktID
+
+}
+
+isWktID <- function(crs) {
+
+  is.numeric(crs) || grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
+
+}
+

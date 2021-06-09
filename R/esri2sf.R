@@ -7,10 +7,10 @@
 #' @param where string for where condition. Default is `1=1` for all rows.
 #' @param token string for authentication token (if needed).
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
-#' @param crs coordinate reference system (see [sf::st_sf()]).
+#' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
-#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2sf`).
+#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`).
 #'
 #' @describeIn esri2sf Retrieve spatial object
 #'
@@ -46,12 +46,20 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   print(geomType)
 
-  if (!is.null(layerInfo$extent$spatialReference$latestWkid))
-    print(paste0("Coordinate Reference System: ", layerInfo$extent$spatialReference$latestWkid))
+  if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
+    layerCRS <- layerInfo$extent$spatialReference$latestWkid
+  } else if (!is.null(layerInfo$extent$spatialReference$wkid)) {
+    layerCRS <- layerInfo$extent$spatialReference$wkid
+  } else if (!is.null(layerInfo$extent$spatialReference$wkt)) {
+    layerCRS <- layerInfo$extent$spatialReference$wkt
+  } else {
+    stop("No crs found. Check that layer at url has a Spatial Reference.")
+  }
+  print(paste0("Service Coordinate Reference System: ", layerCRS))
 
   if (class(bbox) == "bbox") {
-    if ((sf::st_crs(bbox)$input != layerInfo$extent$spatialReference$latestWkid) && !is.null(layerInfo$extent$spatialReference$latestWkid)) {
-      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerInfo$extent$spatialReference$latestWkid))
+    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")
@@ -60,7 +68,14 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, crs, ...)
+
+  if (is.null(crs)) {
+    crs <- layerCRS
+  } else {
+    print(paste0("Output Coordinate Reference System: ", crs))
+  }
+
   esri2sfGeom(esriFeatures, geomType, crs)
 }
 

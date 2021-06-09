@@ -14,12 +14,15 @@ LazyData: true
 Depends: R (>= 3.1.0)
 Imports:
     dplyr,
-    jsonlite, 
-    httr, 
+    jsonlite,
+    httr,
     rstudioapi,
-    sf
+    sf,
+    DBI,
+    RSQLite
 Suggests:
-    knitr,
+    rmarkdown,
+    knitr
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

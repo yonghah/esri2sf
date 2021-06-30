@@ -71,3 +71,14 @@ plot(df)
 ```
 
 <!-- ![polygon plot](https://user-images.githubusercontent.com/3218468/29668791-63e66976-88af-11e7-9f6c-5d95bac4a69e.png) -->
+
+
+### Tabular data
+
+You can download non-spatial tables of the 'Table' layer type using `esri2df()`.
+
+```{r tables}
+df <- esri2df('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5', objectIds = paste(1:50, collapse = ","))
+df
+```
+

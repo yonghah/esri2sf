@@ -104,3 +104,29 @@ You can filter rows as well by giving a `where` condition.
 ![](README_files/figure-markdown_strict/polygon-1.png)
 
 <!-- ![polygon plot](https://user-images.githubusercontent.com/3218468/29668791-63e66976-88af-11e7-9f6c-5d95bac4a69e.png) -->
+
+### Tabular data
+
+You can download non-spatial tables of the ‘Table’ layer type using
+`esri2df()`.
+
+    df <- esri2df('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5', objectIds = paste(1:50, collapse = ","))
+
+    ## Layer Type: Table
+
+    df
+
+    ## # A tibble: 50 x 6
+    ##    OBJECTID FACILITYID FCLASS ASSETCOND CONDDATE REPLSCORE
+    ##       <int> <chr>      <chr>  <lgl>     <lgl>        <int>
+    ##  1        1 1          wMain  NA        NA               0
+    ##  2        2 2          wMain  NA        NA              45
+    ##  3        3 3          wMain  NA        NA              45
+    ##  4        4 4          wMain  NA        NA              45
+    ##  5        5 5          wMain  NA        NA              15
+    ##  6        6 6          wMain  NA        NA              15
+    ##  7        7 1          wMain  NA        NA               0
+    ##  8        8 2          wMain  NA        NA              45
+    ##  9        9 3          wMain  NA        NA              45
+    ## 10       10 4          wMain  NA        NA              45
+    ## # … with 40 more rows

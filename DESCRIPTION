@@ -18,7 +18,7 @@ Imports:
     jsonlite,
     httr,
     rstudioapi,
-    sf,
+    sf (>= 1.0.1),
     DBI,
     RSQLite,
     crayon

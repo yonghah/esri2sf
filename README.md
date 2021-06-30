@@ -130,3 +130,145 @@ You can download non-spatial tables of the ‘Table’ layer type using
     ##  9        9 3          wMain  NA        NA              45
     ## 10       10 4          wMain  NA        NA              45
     ## # … with 40 more rows
+
+### `crs` parameter example
+
+When specifying the CRS parameter, any transformation that happens will
+be done within ESRI’s REST API. Caution should be taken when specifying
+an output `crs` that requires a datum transformation as ESRI will
+automatically apply a default transformation (with no feedback as to
+which one) which could end up adding small unexpected errors into your
+data. By default, `esri2sf()` will transform any datasource to WGS 1984
+(EPSG:4326), but it may be safer to set `crs = NULL` which will return
+the data in the same CRS as it is being hosted as in the Feature/Map
+Service. That way you can control any transformation manually in a
+known, reproducible manner.
+
+    url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+    where <- "STATE_NAME = 'Michigan'"
+    outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
+
+    #default crs = 4326
+    esri2sf(url, where = where, outFields = outFields) 
+
+    ## Layer Type: Feature Layer
+
+    ## Geometry Type: esriGeometryPolygon
+
+    ## Service Coordinate Reference System: 4269
+
+    ## Output Coordinate Reference System: 4326
+
+    ## Simple feature collection with 83 features and 4 fields
+    ## Geometry type: MULTIPOLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -90.4082 ymin: 41.69749 xmax: -82.41984 ymax: 48.1738
+    ## Geodetic CRS:  WGS 84
+    ## First 10 features:
+    ##    POP2000 POP2007 POP00_SQMI POP07_SQMI                          geoms
+    ## 1     2301    2324        4.1        4.2 MULTIPOLYGON (((-88.49753 4...
+    ## 2    36016   36791       34.6       35.3 MULTIPOLYGON (((-88.50068 4...
+    ## 3     7818    7444        5.9        5.6 MULTIPOLYGON (((-88.98743 4...
+    ## 4     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.67172 4...
+    ## 5    64634   64904       34.6       34.7 MULTIPOLYGON (((-87.6137 45...
+    ## 6    17370   17057       15.2       14.9 MULTIPOLYGON (((-88.9853 46...
+    ## 7     7024    7159        7.6        7.7 MULTIPOLYGON (((-85.85923 4...
+    ## 8     9862   10188       10.5       10.9 MULTIPOLYGON (((-87.11047 4...
+    ## 9     8903    8781        7.3        7.2 MULTIPOLYGON (((-86.45828 4...
+    ## 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
+
+    #No transformation (recommended)
+    esri2sf(url, where = where, outFields = outFields, crs = NULL)
+
+    ## Layer Type: Feature Layer
+
+    ## Geometry Type: esriGeometryPolygon
+
+    ## Service Coordinate Reference System: 4269
+
+    ## Simple feature collection with 83 features and 4 fields
+    ## Geometry type: MULTIPOLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -90.4082 ymin: 41.69749 xmax: -82.41984 ymax: 48.1738
+    ## Geodetic CRS:  NAD83
+    ## First 10 features:
+    ##    POP2000 POP2007 POP00_SQMI POP07_SQMI                          geoms
+    ## 1     2301    2324        4.1        4.2 MULTIPOLYGON (((-88.49753 4...
+    ## 2    36016   36791       34.6       35.3 MULTIPOLYGON (((-88.50068 4...
+    ## 3     7818    7444        5.9        5.6 MULTIPOLYGON (((-88.98743 4...
+    ## 4     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.67172 4...
+    ## 5    64634   64904       34.6       34.7 MULTIPOLYGON (((-87.6137 45...
+    ## 6    17370   17057       15.2       14.9 MULTIPOLYGON (((-88.9853 46...
+    ## 7     7024    7159        7.6        7.7 MULTIPOLYGON (((-85.85923 4...
+    ## 8     9862   10188       10.5       10.9 MULTIPOLYGON (((-87.11047 4...
+    ## 9     8903    8781        7.3        7.2 MULTIPOLYGON (((-86.45828 4...
+    ## 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
+
+Also since the addition of the `WKT1_ESRI` output from sf::st\_crs() in
+sf version 1.0-1, you can enter common CRS format (any that
+sf::st\_crs() can handle) into the `crs` parameters and it will be able
+to convert to the ESRI formatted WKT needed for the outSR field in the
+REST query.
+
+    #Variety of inputs types that sf::st_crs() will accept as examples (all related to ESRI:102690 )
+    #ESRI Authority Code
+    df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
+
+    ## Layer Type: Feature Layer
+
+    ## Geometry Type: esriGeometryPolygon
+
+    ## Service Coordinate Reference System: 4269
+
+    ## Output Coordinate Reference System: ESRI:102690
+
+    #PROJ string
+    df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
+
+    ## Layer Type: Feature Layer
+
+    ## Geometry Type: esriGeometryPolygon
+
+    ## Service Coordinate Reference System: 4269
+
+    ## Output Coordinate Reference System: +proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs
+
+    #OGC WKT
+    df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
+
+    ## Layer Type: Feature Layer
+
+    ## Geometry Type: esriGeometryPolygon
+
+    ## Service Coordinate Reference System: 4269
+
+    ## Output Coordinate Reference System: PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]
+
+While the given output CRS was different for each they all are just
+different standard CRS formulations of ESRI:102690. This can be proven
+by the following function that calculated the mean difference in X-Y
+coordinates at each point. All are very close to 0.
+
+    #Difference in coordinates are all basically 0 
+    coord_diff <- function(df1, df2) {
+      suppressWarnings({
+        c(
+          "x" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[,1] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[,1]),
+          "y" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[,2] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[,2])
+        )
+      })
+    }
+    coord_diff(df1, df2)
+
+    ##             x             y 
+    ##  1.827251e-08 -1.191372e-09
+
+    coord_diff(df1, df3)
+
+    ##             x             y 
+    ##  1.827251e-08 -1.191372e-09
+
+    coord_diff(df2, df3)
+
+    ## x y 
+    ## 0 0

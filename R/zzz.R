@@ -1,4 +1,5 @@
 #' @importFrom dplyr bind_rows as_tibble
+#' @importFrom rstudioapi askForPassword
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
 #' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs
@@ -7,7 +8,7 @@
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
-  if (pwd == "") pwd <- rstudioapi::askForPassword("pwd")
+  if (pwd == "") pwd <- askForPassword("pwd")
 
   query <- list(
     username = uid,

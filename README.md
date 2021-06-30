@@ -208,9 +208,10 @@ Also since the addition of the `WKT1_ESRI` output from sf::st\_crs() in
 sf version 1.0-1, you can enter common CRS format (any that
 sf::st\_crs() can handle) into the `crs` parameters and it will be able
 to convert to the ESRI formatted WKT needed for the outSR field in the
-REST query.
+REST query. Below are examples of the variety of input types that you
+can use with the `crs` parameters. All examples are just different
+formulations of the ESRI:102690 CRS.
 
-    #Variety of inputs types that sf::st_crs() will accept as examples (all related to ESRI:102690 )
     #ESRI Authority Code
     df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
 
@@ -244,12 +245,10 @@ REST query.
 
     ## Output Coordinate Reference System: PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]
 
-While the given output CRS was different for each they all are just
-different standard CRS formulations of ESRI:102690. This can be proven
-by the following function that calculated the mean difference in X-Y
-coordinates at each point. All are very close to 0.
+Their similarity on the output CRS can be proven by the following
+function that calculates the mean difference in X-Y coordinates at each
+point. All are very close to 0.
 
-    #Difference in coordinates are all basically 0 
     coord_diff <- function(df1, df2) {
       suppressWarnings({
         c(

@@ -58,8 +58,8 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
-  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
-  dplyr::as_tibble(df)
+  df <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  as_tibble(df)
 }
 
 
@@ -124,7 +124,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (isWktID(crs)) {
     crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
-    crs <- jsonlite::toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
+    crs <- toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
   }
 
   results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
@@ -150,7 +150,7 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
 
-  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  af <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
   # geometry + attributes
   st_sf(geoms, af, crs = crs)
 }

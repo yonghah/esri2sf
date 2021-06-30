@@ -33,7 +33,7 @@
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
                     geomType = NULL, crs = 4326, ...) {
-  layerInfo <- jsonlite::fromJSON(content(POST(url, query = list(f = "json",
+  layerInfo <- fromJSON(content(POST(url, query = list(f = "json",
                                                                  token = token), encode = "form", config = config(ssl_verifypeer = FALSE)),
                                           as = "text"))
   print(layerInfo$type)
@@ -58,7 +58,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   print(paste0("Service Coordinate Reference System: ", layerCRS))
 
   if (class(bbox) == "bbox") {
-    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+    if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
       bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
@@ -93,6 +93,6 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", ...) {
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)  #, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, ...)
   getEsriTable(esriFeatures)
 }

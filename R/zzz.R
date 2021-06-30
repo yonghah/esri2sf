@@ -1,7 +1,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths
+#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 
@@ -123,7 +123,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (isWktID(crs)) {
     crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
-    stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.")
+    crs <- jsonlite::toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
   }
 
   results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
@@ -186,3 +186,8 @@ isWktID <- function(crs) {
 
 }
 
+WKTunPretty <- function(wkt) {
+
+  gsub("\\n[[:blank:]]*", "", wkt)
+
+}

@@ -26,10 +26,10 @@ This program sends a request to an ArcGIS Server and gets json responses contain
 
 ## Install
 
-I recommend devtools to install this package. This package has dependency on dplyr, sf, httr, jsonlite and rstudioapi.
+I recommend remotes to install this package. This package has dependency on dplyr, sf, httr, jsonlite, rstudioapi, DBI, RSQLite, crayon.
 
 ```r
-devtools::install_github("yonghah/esri2sf")
+remotes::install_github("yonghah/esri2sf")
 library(esri2sf)
 ```
 

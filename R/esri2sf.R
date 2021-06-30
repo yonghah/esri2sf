@@ -59,7 +59,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   if (class(bbox) == "bbox") {
     if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
-      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
+      bbox <- st_bbox(st_transform(st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")

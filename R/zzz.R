@@ -2,7 +2,7 @@
 #' @importFrom rstudioapi askForPassword
 #' @importFrom httr POST GET content config
 #' @importFrom jsonlite fromJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs
+#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs st_bbox st_as_sfc st_transform
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 

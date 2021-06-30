@@ -4,7 +4,7 @@ author: "Yongha Hwang"
 date: "September 25, 2020"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Get started with esri2sf}
+  %\VignetteIndexEntry{Scraping Geographic Features from ArcGIS Server}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

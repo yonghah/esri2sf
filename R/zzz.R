@@ -143,6 +143,7 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
 
   #Format CRS
   if (isWktID(crs)) {
+    crs <- gsub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
     crs <- getWKTidAuthority(crs)
   }
 

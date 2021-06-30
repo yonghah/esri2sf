@@ -36,7 +36,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   layerInfo <- fromJSON(content(POST(url, query = list(f = "json",
                                                                  token = token), encode = "form", config = config(ssl_verifypeer = FALSE)),
                                           as = "text"))
-  print(layerInfo$type)
+  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType))
       stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
@@ -44,7 +44,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     geomType <- layerInfo$geometryType
   }
 
-  print(geomType)
+  message(paste0(blue("Geometry Type: "), magenta(geomType)))
 
   if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
     layerCRS <- layerInfo$extent$spatialReference$latestWkid
@@ -55,7 +55,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   } else {
     stop("No crs found. Check that layer at url has a Spatial Reference.")
   }
-  print(paste0("Service Coordinate Reference System: ", layerCRS))
+  message(paste0(blue("Service Coordinate Reference System: "), magenta(layerCRS)))
 
   if (class(bbox) == "bbox") {
     if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
@@ -73,7 +73,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   if (is.null(crs)) {
     crs <- layerCRS
   } else {
-    print(paste0("Output Coordinate Reference System: ", crs))
+    message(paste0(blue("Output Coordinate Reference System: "), magenta(crs)))
   }
 
   esri2sfGeom(esriFeatures, geomType, crs)
@@ -89,7 +89,7 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", ...) {
          config = config(ssl_verifypeer = FALSE)
     ), as = "text"))
 
-  print(layerInfo$type)
+  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")

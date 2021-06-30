@@ -19,7 +19,8 @@ Imports:
     rstudioapi,
     sf,
     DBI,
-    RSQLite
+    RSQLite,
+    crayon
 Suggests:
     rmarkdown,
     knitr

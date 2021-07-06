@@ -1,13 +1,15 @@
-#' @importFrom dplyr %>%
+#' @importFrom dplyr bind_rows as_tibble
+#' @importFrom rstudioapi askForPassword
 #' @importFrom httr POST GET content config
-#' @importFrom jsonlite fromJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths
+#' @importFrom jsonlite fromJSON toJSON
+#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs st_bbox st_as_sfc st_transform
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
+#' @importFrom crayon blue magenta
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
-  if (pwd == "") pwd <- rstudioapi::askForPassword("pwd")
+  if (pwd == "") pwd <- askForPassword("pwd")
 
   query <- list(
     username = uid,
@@ -57,8 +59,8 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
-  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
-  dplyr::as_tibble(df)
+  df <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  as_tibble(df)
 }
 
 
@@ -123,7 +125,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (isWktID(crs)) {
     crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
-    stop("'crs' should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.")
+    crs <- toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
   }
 
   results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
@@ -141,6 +143,7 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
 
   #Format CRS
   if (isWktID(crs)) {
+    crs <- gsub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
     crs <- getWKTidAuthority(crs)
   }
 
@@ -149,7 +152,7 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
 
-  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  af <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
   # geometry + attributes
   st_sf(geoms, af, crs = crs)
 }
@@ -186,3 +189,8 @@ isWktID <- function(crs) {
 
 }
 
+WKTunPretty <- function(wkt) {
+
+  gsub("\\n[[:blank:]]*", "", wkt)
+
+}

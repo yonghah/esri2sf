@@ -31,7 +31,7 @@ esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 
 \item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to be inferred from the server)}
 
-\item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.}
+\item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.}
 
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
 }

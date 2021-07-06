@@ -7,7 +7,7 @@
 #' @param where string for where condition. Default is `1=1` for all rows.
 #' @param token string for authentication token (if needed).
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
-#' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL, a numeric WKTid, or a 'EPSG:' or 'ESRI:' prefixed WKTid. Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server. The handling of custom projstring or WKT CRS's needs additional functionality built in from the GDAL package.
+#' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`).
@@ -33,10 +33,10 @@
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
                     geomType = NULL, crs = 4326, ...) {
-  layerInfo <- jsonlite::fromJSON(content(POST(url, query = list(f = "json",
+  layerInfo <- fromJSON(content(POST(url, query = list(f = "json",
                                                                  token = token), encode = "form", config = config(ssl_verifypeer = FALSE)),
                                           as = "text"))
-  print(layerInfo$type)
+  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType))
       stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
@@ -44,7 +44,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     geomType <- layerInfo$geometryType
   }
 
-  print(geomType)
+  message(paste0(blue("Geometry Type: "), magenta(geomType)))
 
   if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
     layerCRS <- layerInfo$extent$spatialReference$latestWkid
@@ -55,11 +55,11 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   } else {
     stop("No crs found. Check that layer at url has a Spatial Reference.")
   }
-  print(paste0("Service Coordinate Reference System: ", layerCRS))
+  message(paste0(blue("Service Coordinate Reference System: "), magenta(layerCRS)))
 
   if (class(bbox) == "bbox") {
-    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
-      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
+    if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+      bbox <- st_bbox(st_transform(st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")
@@ -73,7 +73,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   if (is.null(crs)) {
     crs <- layerCRS
   } else {
-    print(paste0("Output Coordinate Reference System: ", crs))
+    message(paste0(blue("Output Coordinate Reference System: "), magenta(crs)))
   }
 
   esri2sfGeom(esriFeatures, geomType, crs)
@@ -89,10 +89,10 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", ...) {
          config = config(ssl_verifypeer = FALSE)
     ), as = "text"))
 
-  print(layerInfo$type)
+  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)  #, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, ...)
   getEsriTable(esriFeatures)
 }

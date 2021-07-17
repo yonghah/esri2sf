@@ -55,6 +55,21 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
   response$objectIds
 }
 
+getMaxRecordsCount <- function(queryUrl, token) {
+
+  url <- sub("/query$", "", queryUrl)
+
+  query <- list(f = "json", token = token)
+
+  responseRaw <- content(POST(url, body = query, encode = "form",
+                              config = config(ssl_verifypeer = FALSE)), as = "text")
+  response <- fromJSON(responseRaw)
+
+  maxRC <- if (!is.null(response[['maxRecordCount']])) response[['maxRecordCount']] else 500L
+
+  maxRC
+
+}
 
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
@@ -116,7 +131,8 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
     warning("No records match the search criteria.")
     return()
   }
-  idSplits <- split(ids, seq_along(ids) %/% 500)
+  maxRC <- getMaxRecordsCount(queryUrl, token)
+  idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
   if (is.null(crs)) {
     crs <- ""

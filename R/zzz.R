@@ -55,7 +55,7 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
   response$objectIds
 }
 
-getMaxRecordsCount <- function(queryUrl, token) {
+getMaxRecordsCount <- function(queryUrl, token, upperLimit = FALSE) {
 
   url <- sub("/query$", "", queryUrl)
 
@@ -65,7 +65,15 @@ getMaxRecordsCount <- function(queryUrl, token) {
                               config = config(ssl_verifypeer = FALSE)), as = "text")
   response <- fromJSON(responseRaw)
 
-  maxRC <- if (!is.null(response[['maxRecordCount']])) response[['maxRecordCount']] else 500L
+  if (!is.null(response[['maxRecordCount']])) {
+    if (response[['maxRecordCount']] > 25000 & upperLimit) {
+      maxRC <- 25000L
+    } else {
+      maxRC <- response[['maxRecordCount']]
+    }
+  } else {
+    maxRC <- 500L
+  }
 
   maxRC
 
@@ -148,7 +156,7 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
     warning("No records match the search criteria.")
     return()
   }
-  maxRC <- getMaxRecordsCount(queryUrl, token)
+  maxRC <- getMaxRecordsCount(queryUrl, token, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
   if (is.null(crs)) {

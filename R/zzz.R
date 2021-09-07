@@ -71,6 +71,18 @@ getMaxRecordsCount <- function(queryUrl, token) {
 
 }
 
+getRecordsCount <- function(queryUrl, where, token = "", ...) {
+
+  query <- list(where = where, returnCountOnly = 'true', token = token, f = "json", ...)
+
+  responseRaw <- content(POST(queryUrl, body = query, encode = "form",
+                              config = config(ssl_verifypeer = FALSE)), as = "text")
+  response <- fromJSON(responseRaw)
+
+  response[['count']]
+
+}
+
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))

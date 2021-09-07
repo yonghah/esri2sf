@@ -104,7 +104,7 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, 
                        digits = NA)
 
   if ('error' %in% names(response)) {
-    stop(paste0("There was an error running 'getEsriFeaturesByIds()'.\nError code: ", response$error$code, ".\nMessage: ", response$error$message, "\nDetails: ", response$error$details))
+    stop(paste0("There was an error running getEsriFeaturesByIds.\nError code: ", response$error$code, ".\nMessage: ", response$error$message, "\nDetails: ", response$error$details))
   }
 
   response$features

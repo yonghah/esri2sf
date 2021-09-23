@@ -2,6 +2,7 @@
 
 export(esri2df)
 export(esri2sf)
+export(esrimeta)
 importFrom(DBI,dbConnect)
 importFrom(DBI,dbDisconnect)
 importFrom(DBI,dbGetQuery)

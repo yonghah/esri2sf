@@ -9,8 +9,10 @@
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
 #' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()].
+#' @param progress Show progress bar with [pbapply::pblapply()] if TRUE. Default FALSE.
+#' @param fields `esrimeta` returns dataframe with fields if TRUE. Default FALSE.
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
-#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`).
+#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`) or list or dataframe (`esrimeta`).
 #'
 #' @describeIn esri2sf Retrieve spatial object
 #'
@@ -32,14 +34,14 @@
 #' @export
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
-                    geomType = NULL, crs = 4326, ...) {
-  layerInfo <- fromJSON(content(POST(url, query = list(f = "json",
-                                                                 token = token), encode = "form", config = config(ssl_verifypeer = FALSE)),
-                                          as = "text"))
+                    geomType = NULL, crs = 4326, progress = FALSE, ...) {
+  layerInfo <- esrimeta(url, token)
+
   message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (is.null(geomType)) {
-    if (is.null(layerInfo$geometryType))
+    if (is.null(layerInfo$geometryType)) {
       stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
+    }
 
     geomType <- layerInfo$geometryType
   }
@@ -65,10 +67,10 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     stop("The provided bbox must be a class bbox object.")
   }
 
-  bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
+  bbox <- paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, crs, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, crs, progress, ...)
 
   if (is.null(crs)) {
     crs <- layerCRS
@@ -81,18 +83,37 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", ...) {
-  layerInfo <- fromJSON(content(
-    POST(url,
-         query = list(f = "json", token = token),
-         encode = "form",
-         config = config(ssl_verifypeer = FALSE)
-    ), as = "text"))
+esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, ...) {
+  layerInfo <- esrimeta(url, token)
 
   message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, progress, ...)
   getEsriTable(esriFeatures)
+}
+
+
+
+#' @describeIn esri2sf Retrieve layer metadata
+#' @export
+esrimeta <- function(url, token = "", fields = FALSE) {
+  layerInfo <- jsonlite::fromJSON(
+    content(
+      POST(
+        url,
+        query = list(f = "json", token = token),
+        encode = "form",
+        config = config(ssl_verifypeer = FALSE)
+      ),
+      as = "text"
+    )
+  )
+
+  if (fields) {
+    return(layerInfo$fields)
+  } else {
+    return(layerInfo)
+  }
 }

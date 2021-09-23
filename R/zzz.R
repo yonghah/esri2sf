@@ -6,6 +6,7 @@
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom crayon blue magenta
+#' @importFrom pbapply pblapply
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
@@ -150,7 +151,7 @@ esri2sfPolyline <- function(features) {
   st_sfc(lapply(features, getGeometry))
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, ...) {
+getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, progress = FALSE, ...) {
   ids <- getObjectIds(queryUrl, where, bbox, token, ...)
   if (is.null(ids)) {
     warning("No records match the search criteria.")
@@ -169,7 +170,12 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
     crs <- toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
   }
 
-  results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
+  if (progress) {
+    results <- pbapply::pblapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
+  } else {
+    results <- lapply(idSplits, getEsriFeaturesByIds, queryUrl, fields, token, crs, ...)
+  }
+
   unlist(results, recursive = FALSE)
 }
 

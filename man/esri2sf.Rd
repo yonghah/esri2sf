@@ -51,7 +51,7 @@ esrimeta(url, token = "", fields = FALSE)
 \item{fields}{\code{esrimeta} returns dataframe with fields if TRUE. Default FALSE.}
 }
 \value{
-sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or json or dataframe (\code{esrimeta}).
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or dataframe (\code{esrimeta}).
 }
 \description{
 These functions are the interface to the user.

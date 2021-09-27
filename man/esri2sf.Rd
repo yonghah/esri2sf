@@ -3,6 +3,7 @@
 \name{esri2sf}
 \alias{esri2sf}
 \alias{esri2df}
+\alias{esrimeta}
 \title{Import data from ESRI's ArcGIS Server}
 \usage{
 esri2sf(
@@ -13,10 +14,20 @@ esri2sf(
   token = "",
   geomType = NULL,
   crs = 4326,
+  progress = FALSE,
   ...
 )
 
-esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
+esri2df(
+  url,
+  outFields = c("*"),
+  where = "1=1",
+  token = "",
+  progress = FALSE,
+  ...
+)
+
+esrimeta(url, token = "", fields = FALSE)
 }
 \arguments{
 \item{url}{character string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
@@ -33,10 +44,14 @@ esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.}
 
+\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if TRUE. Default FALSE.}
+
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
+
+\item{fields}{\code{esrimeta} returns dataframe with fields if TRUE. Default FALSE.}
 }
 \value{
-sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}).
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or dataframe (\code{esrimeta}).
 }
 \description{
 These functions are the interface to the user.
@@ -46,6 +61,8 @@ These functions are the interface to the user.
 \item \code{esri2sf}: Retrieve spatial object
 
 \item \code{esri2df}: Retrieve table object (no spatial data).
+
+\item \code{esrimeta}: Retrieve layer metadata
 }}
 
 \note{

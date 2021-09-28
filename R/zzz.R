@@ -6,7 +6,6 @@
 #' @importFrom DBI dbConnect dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom crayon blue magenta
-#' @importFrom pbapply pblapply
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
@@ -168,6 +167,13 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
     crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
     crs <- toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
+  }
+
+  #Check if pbapply progress bar can be used
+  if (!requireNamespace("pbapply", quietly = TRUE) & progress) {
+    warning("Package \"pbapply\" needed to use the progress argument. Please install it. Setting `progress` to FALSE.",
+         call. = FALSE)
+    progress <- FALSE
   }
 
   if (progress) {

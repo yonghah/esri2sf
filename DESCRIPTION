@@ -24,7 +24,8 @@ Imports:
     crayon
 Suggests:
     rmarkdown,
-    knitr
+    knitr,
+    pbapply
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

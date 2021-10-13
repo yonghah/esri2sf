@@ -38,7 +38,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
                     geomType = NULL, crs = 4326, progress = FALSE, replaceDomainInfo = TRUE, ...) {
   layerInfo <- esrimeta(url, token)
 
-  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
+  message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType)) {
       stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
@@ -47,7 +47,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     geomType <- layerInfo$geometryType
   }
 
-  message(paste0(blue("Geometry Type: "), magenta(geomType)))
+  message(paste0(crayon::blue("Geometry Type: "), crayon::magenta(geomType)))
 
   if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
     layerCRS <- layerInfo$extent$spatialReference$latestWkid
@@ -58,11 +58,11 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   } else {
     stop("No crs found. Check that layer at url has a Spatial Reference.")
   }
-  message(paste0(blue("Service Coordinate Reference System: "), magenta(layerCRS)))
+  message(paste0(crayon::blue("Service Coordinate Reference System: "), crayon::magenta(layerCRS)))
 
   if (class(bbox) == "bbox") {
-    if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
-      bbox <- st_bbox(st_transform(st_as_sfc(bbox), layerCRS))
+    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")
@@ -76,7 +76,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   if (is.null(crs)) {
     crs <- layerCRS
   } else {
-    message(paste0(blue("Output Coordinate Reference System: "), magenta(crs)))
+    message(paste0(crayon::blue("Output Coordinate Reference System: "), crayon::magenta(crs)))
   }
 
   sfdf <- esri2sfGeom(esriFeatures, geomType, crs)
@@ -91,7 +91,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, replaceDomainInfo = TRUE, ...) {
   layerInfo <- esrimeta(url, token)
 
-  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
+  message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
@@ -109,19 +109,19 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
 #' @export
 esrimeta <- function(url, token = "", fields = FALSE) {
   layerInfo <- jsonlite::fromJSON(
-    content(
-      POST(
+    httr::content(
+      httr::POST(
         url,
         query = list(f = "json", token = token),
         encode = "form",
-        config = config(ssl_verifypeer = FALSE)
+        config = httr::config(ssl_verifypeer = FALSE)
       ),
       as = "text"
     )
   )
 
   if (fields) {
-    return(as_tibble(layerInfo$fields))
+    return(dplyr::as_tibble(layerInfo$fields))
   } else {
     return(layerInfo)
   }

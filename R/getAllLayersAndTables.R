@@ -20,8 +20,8 @@ getAllLayersAndTables <- function(urlServer) {
     returnDomainNames = TRUE
   )
 
-  r <- POST(paste(urlServer, "layers", sep = "/"),
+  r <- httr::POST(paste(urlServer, "layers", sep = "/"),
             body = query, encode = "form")
-  response <- fromJSON(content(r, "text"))
+  response <- jsonlite::fromJSON(httr::content(r, "text"))
   return(response)
 }

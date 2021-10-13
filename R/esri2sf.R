@@ -10,6 +10,7 @@
 #' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param progress Show progress bar with [pbapply::pblapply()] if TRUE. Default FALSE.
+#' @param replaceDomainInfo add domain information to the return dataframe? Default TRUE.
 #' @param fields `esrimeta` returns dataframe with fields if TRUE. Default FALSE.
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`) or list or dataframe (`esrimeta`).
@@ -34,7 +35,7 @@
 #' @export
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
-                    geomType = NULL, crs = 4326, progress = FALSE, ...) {
+                    geomType = NULL, crs = 4326, progress = FALSE, replaceDomainInfo = TRUE, ...) {
   layerInfo <- esrimeta(url, token)
 
   message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
@@ -78,12 +79,16 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     message(paste0(blue("Output Coordinate Reference System: "), magenta(crs)))
   }
 
-  esri2sfGeom(esriFeatures, geomType, crs)
+  sfdf <- esri2sfGeom(esriFeatures, geomType, crs)
+  if (replaceDomainInfo) {
+    sfdf <- addDomainInfo(sfdf, url)
+  }
+  sfdf
 }
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, ...) {
+esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, replaceDomainInfo = TRUE, ...) {
   layerInfo <- esrimeta(url, token)
 
   message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
@@ -91,7 +96,11 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
 
   queryUrl <- paste(url, "query", sep = "/")
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, progress, ...)
-  getEsriTable(esriFeatures)
+  df <- getEsriTable(esriFeatures)
+  if (replaceDomainInfo) {
+    df <- addDomainInfo(df, url)
+  }
+  df
 }
 
 

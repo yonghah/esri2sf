@@ -12,8 +12,6 @@
 #' @param urlServer The url for the Map/Feature server. Ends in 'MapServer' or
 #'   'FeatureServer'.
 #'
-#' @md
-#'
 #' @return A list from the JSON return.
 #' @export
 getAllLayersAndTables <- function(urlServer) {

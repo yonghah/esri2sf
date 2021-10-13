@@ -7,11 +7,12 @@
 #'
 #' @param df The returned (sf) df from esri2sf/esri2df.
 #' @param url The url for the Map/Feature server layer/table.
-#'#'
+#' @param token string for authentication token (if needed).
+#'
 #' @return An {sf} dataframe
-addDomainInfo <- function(df, url) {
+addDomainInfo <- function(df, url, token = "") {
   #Get Field Metadata
-  layerTableFields <- esrimeta(url, fields = TRUE)
+  layerTableFields <- esrimeta(url, token = token, fields = TRUE)
 
   #Check for domain column
   if (!('domain' %in% names(layerTableFields))) {

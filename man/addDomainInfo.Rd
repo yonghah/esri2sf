@@ -4,13 +4,14 @@
 \alias{addDomainInfo}
 \title{Add domain information to the return (sf) dataframe}
 \usage{
-addDomainInfo(df, url)
+addDomainInfo(df, url, token = "")
 }
 \arguments{
 \item{df}{The returned (sf) df from esri2sf/esri2df.}
 
-\item{url}{The url for the Map/Feature server layer/table.
-#'}
+\item{url}{The url for the Map/Feature server layer/table.}
+
+\item{token}{string for authentication token (if needed).}
 }
 \value{
 An {sf} dataframe

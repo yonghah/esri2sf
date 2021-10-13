@@ -81,7 +81,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
   sfdf <- esri2sfGeom(esriFeatures, geomType, crs)
   if (replaceDomainInfo) {
-    sfdf <- addDomainInfo(sfdf, url)
+    sfdf <- addDomainInfo(sfdf, url = url, token = token)
   }
   sfdf
 }
@@ -98,7 +98,7 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, progress, ...)
   df <- getEsriTable(esriFeatures)
   if (replaceDomainInfo) {
-    df <- addDomainInfo(df, url)
+    df <- addDomainInfo(df, url = url, token = token)
   }
   df
 }

@@ -24,8 +24,9 @@ dataset.
 
 Use
 [remotes](https://cran.r-project.org/web/packages/remotes/index.html) to
-install this package. This package has dependency on dplyr, sf, httr,
-jsonlite, rstudioapi, DBI, RSQLite, crayon.
+install this package. This package has dependencies on dplyr, sf, httr,
+jsonlite, rstudioapi, DBI, RSQLite, crayon and rmarkdown, knitr, and
+pbapply are suggested.
 
     library(remotes)
     install_github("yonghah/esri2sf")
@@ -116,7 +117,7 @@ You can download non-spatial tables of the ‘Table’ layer type using
 
     df
 
-    ## # A tibble: 50 x 6
+    ## # A tibble: 50 × 6
     ##    OBJECTID FACILITYID FCLASS ASSETCOND CONDDATE REPLSCORE
     ##       <int> <chr>      <chr>  <lgl>     <lgl>        <int>
     ##  1        1 1          wMain  NA        NA               0

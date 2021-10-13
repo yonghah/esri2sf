@@ -22,7 +22,7 @@ creates 500 features per request and automatically re-send requests until it get
 
 ## Install
 
-Use [remotes](https://cran.r-project.org/web/packages/remotes/index.html) to install this package. This package has dependency on dplyr, sf, httr, jsonlite, rstudioapi, DBI, RSQLite, crayon.
+Use [remotes](https://cran.r-project.org/web/packages/remotes/index.html) to install this package. This package has dependencies on dplyr, sf, httr, jsonlite, rstudioapi, DBI, RSQLite, crayon and rmarkdown, knitr, and pbapply are suggested.
 
 ```R
 library(remotes)

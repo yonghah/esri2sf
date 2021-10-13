@@ -48,11 +48,18 @@ addDomainInfo <- function(df, url) {
     #replace values in df with domain information (codedValue domains)
     codedFields <- layerTableFields[!is.na(layerTableFields[['domain_type']]) & layerTableFields[['domain_type']] == 'codedValue',]
     if (nrow(codedFields) > 0) {
-      row = split(codedFields,codedFields$name)[[1]]
+      # row = split(codedFields,codedFields$name)[[1]]
       for (row in split(codedFields,codedFields$name)) {
+        #Get coded values df
         codedValues <- row[['domain_codedValues']][[1]]
         names(codedValues) <- paste0('domain_codedValues_', names(codedValues))
+
+        #Join dataframes
+        df[[row[['name']]]] = as.character(df[[row[['name']]]])
+        codedValues[['domain_codedValues_code']] = as.character(codedValues[['domain_codedValues_code']])
         df <- dplyr::left_join(df, codedValues, by = `names<-`('domain_codedValues_code', row[['name']]))
+
+        #Clean up join an insert updated column to the same place as original
         oldLocation <- which(names(df) == row[['name']])
         df <- df[,-oldLocation]
         df <- dplyr::rename(df, `names<-`('domain_codedValues_name', row[['name']]))

@@ -25,10 +25,3 @@ forms:
 \item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/layers}
 }
 }
-\details{
-text describing parameter inputs in more detail.
-\itemize{
-\item parameter 1 stuff
-\item parameter 2 stuff
-}
-}

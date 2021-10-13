@@ -5,7 +5,7 @@ Version: 0.1.1
 Authors@R: c(
     person("Yongha", "Hwang", email = "yongha.hwang@gmail.com", role = c("aut", "cre")), 
     person("Cazelles", "Kevin", role = c("aut", "ctb")),
-    person("Peterson", "Jacob", role = c("ctb"))
+    person("Peterson", "Jacob", role = c("aut", "ctb"))
     )
 Description: This package enables you to scrape geographic features 
     directly from ArcGIS servers REST API into R as simple features. 

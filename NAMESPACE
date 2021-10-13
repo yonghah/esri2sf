@@ -3,6 +3,7 @@
 export(esri2df)
 export(esri2sf)
 export(esrimeta)
+export(getAllLayersAndTables)
 importFrom(DBI,dbConnect)
 importFrom(DBI,dbDisconnect)
 importFrom(DBI,dbGetQuery)

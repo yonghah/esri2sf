@@ -112,7 +112,7 @@ esrimeta <- function(url, token = "", fields = FALSE) {
   )
 
   if (fields) {
-    return(layerInfo$fields)
+    return(as_tibble(layerInfo$fields))
   } else {
     return(layerInfo)
   }

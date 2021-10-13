@@ -32,6 +32,15 @@ Character string of the request part of the url.
 A collection of functions that pull select parts out of a
 Map/Feature Server URL.
 }
+\details{
+The url should be formatted similar to these examples:
+\itemize{
+\item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>}
+\item \verb{https://<host>/<instance>/rest/services/serviceName>/MapServer}
+\item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
+\item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
+}
+}
 \section{Functions}{
 \itemize{
 \item \code{urlParts_urlServer}: Full Map/Feature Server URL

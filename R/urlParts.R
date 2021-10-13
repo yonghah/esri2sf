@@ -6,6 +6,12 @@
 #' @param url The url for a Map/Feature server or for a layer/table in a
 #'   Map/Feature Server.
 #'
+#' @details The url should be formatted similar to these examples:
+#' * `https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>`
+#' * `https://<host>/<instance>/rest/services/serviceName>/MapServer`
+#' * `https://<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer`
+#' * `https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>`
+#'
 #' @return Character string of the request part of the url.
 #'
 #' @describeIn urlParts Full Map/Feature Server URL

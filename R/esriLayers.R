@@ -1,4 +1,4 @@
-#' @title Get All Layers and Tables
+#' @title Get All Layers and Tables for the whole server
 #'
 #' @description Retrieve JSON for all layers and tables as specified in
 #' [https://si-pweb-vecmap.si.edu/vectormap/sdk/rest/index.html#/All_Layers_and_Tables/02ss0000005t000000/](https://si-pweb-vecmap.si.edu/vectormap/sdk/rest/index.html#/All_Layers_and_Tables/02ss0000005t000000/).
@@ -9,12 +9,15 @@
 #' * `https://<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer/layers`
 #' * `https://<host>/<instance>/rest/services/serviceName>/FeatureServer/layers`
 #'
-#' @param urlServer The url for the Map/Feature server. Ends in 'MapServer' or
-#'   'FeatureServer'.
+#' @param url The url for the Map/Feature server. If given a url specifying a
+#' layer or table ID it will truncate it.
 #'
 #' @return A list from the JSON return.
 #' @export
-getAllLayersAndTables <- function(urlServer) {
+esriLayers <- function(urlServer) {
+  #Format url (remove layer.table ID and check it is valid)
+  urlServer <- esriUrl_ServerUrl(urlServer)
+
   query <- list(
     f = "json",
     returnDomainNames = TRUE

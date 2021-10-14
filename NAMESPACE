@@ -2,10 +2,10 @@
 
 export(esri2df)
 export(esri2sf)
+export(esriLayers)
 export(esriUrl_ServerUrl)
 export(esriUrl_isValid)
 export(esriUrl_isValidID)
 export(esriUrl_isValidService)
 export(esriUrl_parseUrl)
 export(esrimeta)
-export(getAllLayersAndTables)

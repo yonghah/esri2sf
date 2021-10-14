@@ -19,6 +19,7 @@
 #'
 #' @param url The url for a Map/Feature server or for a layer/table in a
 #'   Map/Feature Server.
+#' @param displayReason `esriUrl_isValid` Should the reason for why a url is not valid be displayed.
 #'
 #' @return Character string of the request part of the url.
 #'
@@ -98,5 +99,5 @@ esriUrl_isValid <- function(url, displayReason = FALSE) {
   return(out)
 }
 
-# urlParts_isValidID
-# urlParts_isValidService
+# esriUrl_isValidID
+# esriUrl_isValidService

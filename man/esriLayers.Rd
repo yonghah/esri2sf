@@ -4,7 +4,7 @@
 \alias{esriLayers}
 \title{Get All Layers and Tables for the whole server}
 \usage{
-esriLayers(urlServer)
+esriLayers(url)
 }
 \arguments{
 \item{url}{The url for the Map/Feature server. If given a url specifying a

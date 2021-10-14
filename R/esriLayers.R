@@ -14,9 +14,9 @@
 #'
 #' @return A list from the JSON return.
 #' @export
-esriLayers <- function(urlServer) {
+esriLayers <- function(url) {
   #Format url (remove layer.table ID and check it is valid)
-  urlServer <- esriUrl_ServerUrl(urlServer)
+  urlServer <- esriUrl_ServerUrl(url)
 
   query <- list(
     f = "json",

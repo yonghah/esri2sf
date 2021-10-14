@@ -26,8 +26,18 @@
 #' @describeIn esriUrl Full Map/Feature Server URL
 #' @export
 esriUrl_ServerUrl <- function(url) {
+  #Cut off layerID if present
   urlNoLayerID <- sub("/[[:digit:]]+$|/$", '', url)
-  if (!grepl(".*/MapServer$|.*/FeatureServer$", urlNoLayerID)) stop("Url does not end in '/MapServer' or '/FeatureServer'.")
+
+  #make sure url is valid service and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValidService(urlNoLayerID, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   return(urlNoLayerID)
 }
 

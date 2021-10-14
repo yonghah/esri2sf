@@ -22,7 +22,8 @@ Imports:
     DBI,
     RSQLite,
     crayon,
-    stats
+    stats,
+    rvest
 Suggests:
     rmarkdown,
     knitr,

@@ -93,6 +93,9 @@ esriUrl_isValid <- function(url, displayReason = FALSE) {
   } else if (!grepl("/MapServer|/FeatureServer", url)) {
     reason <- "'/MapServer' or '/FeatureServer' not found in the url."
     out <- FALSE
+  } else if (!grepl("/MapServer$|/FeatureServer$|/[[:digit:]]+$", url)) {
+    reason <- "Url does not end in '/MapServer' or '/FeatureServer' or a layer/table ID."
+    out <- FALSE
   } else if (urlError) {
     reason <- "Could not access url with {httr}."
     out <- FALSE

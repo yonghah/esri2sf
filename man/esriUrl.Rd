@@ -4,6 +4,8 @@
 \alias{esriUrl_ServerUrl}
 \alias{esriUrl_parseUrl}
 \alias{esriUrl_isValid}
+\alias{esriUrl_isValidID}
+\alias{esriUrl_isValidService}
 \title{Get parts of the Map/Feature Server URL}
 \usage{
 esriUrl_ServerUrl(url)
@@ -11,12 +13,16 @@ esriUrl_ServerUrl(url)
 esriUrl_parseUrl(url)
 
 esriUrl_isValid(url, displayReason = FALSE)
+
+esriUrl_isValidID(url, displayReason = FALSE)
+
+esriUrl_isValidService(url, displayReason = FALSE)
 }
 \arguments{
 \item{url}{The url for a Map/Feature server or for a layer/table in a
 Map/Feature Server.}
 
-\item{displayReason}{\code{esriUrl_isValid} Should the reason for why a url is not valid be displayed.}
+\item{displayReason}{Should the reason for why a url is not valid be displayed.}
 }
 \value{
 Character string of the request part of the url.
@@ -46,6 +52,10 @@ And having these rules:
 
 \item \code{esriUrl_parseUrl}: Parse Url into parts.
 
-\item \code{esriUrl_isValid}: Check if url is valid for an ESRI REST Service
+\item \code{esriUrl_isValid}: Check if url is valid for an ESRI REST Service. General to include potential layer id too.
+
+\item \code{esriUrl_isValidID}: Check if url is valid for an ESRI REST Service Layer or Table
+
+\item \code{esriUrl_isValidService}: Check if url is valid for an ESRI REST Service. No layer ID.
 }}
 

@@ -19,7 +19,7 @@
 #'
 #' @param url The url for a Map/Feature server or for a layer/table in a
 #'   Map/Feature Server.
-#' @param displayReason `esriUrl_isValid` Should the reason for why a url is not valid be displayed.
+#' @param displayReason Should the reason for why a url is not valid be displayed.
 #'
 #' @return Character string of the request part of the url.
 #'
@@ -56,6 +56,7 @@ esriUrl_parseUrl <- function(url) {
   layerID <- as.integer(regmatches(url, regexpr("[0-9]+$",url)))
 
   out <- list(
+    "url"=url,
     "scheme"=scheme,
     "host"=host,
     "instance"=instance,
@@ -68,7 +69,7 @@ esriUrl_parseUrl <- function(url) {
 }
 
 
-#' @describeIn esriUrl Check if url is valid for an ESRI REST Service
+#' @describeIn esriUrl Check if url is valid for an ESRI REST Service. General to include potential layer id too.
 #' @export
 esriUrl_isValid <- function(url, displayReason = FALSE) {
   # check url succeeds
@@ -99,5 +100,30 @@ esriUrl_isValid <- function(url, displayReason = FALSE) {
   return(out)
 }
 
-# esriUrl_isValidID
-# esriUrl_isValidService
+#' @describeIn esriUrl Check if url is valid for an ESRI REST Service Layer or Table
+#' @export
+esriUrl_isValidID <- function(url, displayReason = FALSE) {
+  #make sure url is valid
+  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
+
+  out <- grepl("/[[:digit:]]+$", url)
+  if (!out & displayReason) {
+    message('Url does not end in a layer ID.')
+  }
+
+  return(out)
+}
+
+#' @describeIn esriUrl Check if url is valid for an ESRI REST Service. No layer ID.
+#' @export
+esriUrl_isValidService <- function(url, displayReason = FALSE) {
+  #make sure url is valid
+  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
+
+  out <- grepl("/MapServer$|/FeatureServer$", url)
+  if (!out & displayReason) {
+    message("Url does not end in a '/MapServer' or '/FeatureServer'.")
+  }
+
+  return(out)
+}

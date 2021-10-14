@@ -21,3 +21,22 @@ test_that("esriUrl_isValid checks", {
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGI/rest/services/Demographics/ESRI_Census_USA/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Map or Feature Service Url.\nCould not access url with {httr}.", fixed = TRUE)
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGI/rest/services/Demographics/ESRI_Census_USA/MapServer/3"))
 })
+
+
+test_that("esriUrl_isValidID checks", {
+  expect_true(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"))
+
+  expect_false(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/"))
+  expect_message(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/", displayReason = TRUE), "Url does not end in a layer ID.")
+  expect_message(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer", displayReason = TRUE), "Url does not end in a layer ID.")
+})
+
+
+test_that("esriUrl_isValidService checks", {
+  expect_true(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer"))
+
+  expect_false(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/"))
+  expect_false(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/0"))
+  expect_message(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/", displayReason = TRUE), "Url does not end in a '/MapServer' or '/FeatureServer'.")
+  expect_message(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/0", displayReason = TRUE), "Url does not end in a '/MapServer' or '/FeatureServer'.")
+})

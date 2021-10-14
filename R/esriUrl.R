@@ -6,6 +6,7 @@
 #' * `http://<host>/<instance>/rest/services/serviceName>/MapServer`
 #' * `<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer`
 #' * `https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>`
+#'
 #' And having these rules:
 #'  * The scheme: `https://` or `http://` part is optional
 #'  * The `host` part is the domain of the url.

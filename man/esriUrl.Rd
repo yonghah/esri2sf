@@ -35,7 +35,10 @@ Map/Feature Server URL. All urls should be a form similar to:
 \item \verb{http://<host>/<instance>/rest/services/serviceName>/MapServer}
 \item \verb{<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
 \item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
+}
+
 And having these rules:
+\itemize{
 \item The scheme: \verb{https://} or \verb{http://} part is optional
 \item The \code{host} part is the domain of the url.
 \item The \code{instance}  is the first subpage after the domain in the url.

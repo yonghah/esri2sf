@@ -25,7 +25,9 @@ Imports:
 Suggests:
     rmarkdown,
     knitr,
-    pbapply
+    pbapply,
+    testthat (>= 3.0.0)
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

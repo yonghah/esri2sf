@@ -4,9 +4,10 @@
 \alias{urlParts_urlServer}
 \alias{urlParts_host}
 \alias{urlParts_instance}
-\alias{urlParts_folder}
+\alias{urlParts_folderName}
 \alias{urlParts_service}
 \alias{urlParts_layerID}
+\alias{urlParts_isValid}
 \title{Get parts of the Map/Feature Server URL}
 \usage{
 urlParts_urlServer(url)
@@ -15,11 +16,13 @@ urlParts_host(url)
 
 urlParts_instance(url)
 
-urlParts_folder(url)
+urlParts_folderName(url)
 
 urlParts_service(url)
 
 urlParts_layerID(url)
+
+urlParts_isValid(url)
 }
 \arguments{
 \item{url}{The url for a Map/Feature server or for a layer/table in a
@@ -30,15 +33,21 @@ Character string of the request part of the url.
 }
 \description{
 A collection of functions that pull select parts out of a
-Map/Feature Server URL.
-}
-\details{
-The url should be formatted similar to these examples:
+Map/Feature Server URL. All urls should be a form similar to:
 \itemize{
 \item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>}
-\item \verb{https://<host>/<instance>/rest/services/serviceName>/MapServer}
-\item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
+\item \verb{http://<host>/<instance>/rest/services/serviceName>/MapServer}
+\item \verb{<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
 \item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
+And having these rules:
+\item The \verb{https://} or \verb{http://} part is optional
+\item The \code{host} part is the domain of the url.
+\item The \code{instance}  is the first subpage after the domain in the url.
+\item The \verb{/rest/services} is the second and third subpage in the url. These are standard for all ESRI REST Services.
+\item The \code{folderName} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
+\item The \code{serviceName} part is the last subpage betore the \verb{/Mapserver} or \verb{/FeatureServer} in the url.
+\item \verb{/Mapserver} or \verb{/FeatureServer} specifies whether the file is a map or feature service.
+\item The \code{id} is optional and specifies the layer or table in the map service.
 }
 }
 \section{Functions}{
@@ -49,10 +58,12 @@ The url should be formatted similar to these examples:
 
 \item \code{urlParts_instance}: URL instance
 
-\item \code{urlParts_folder}: URL folder(s)
+\item \code{urlParts_folderName}: URL folder(s)
 
 \item \code{urlParts_service}: URL service
 
 \item \code{urlParts_layerID}: Layer/Table ID
+
+\item \code{urlParts_isValid}: Check if url is valid for an ESRI REST Service
 }}
 

@@ -19,8 +19,13 @@ addDomainInfo <- function(df, url, token = "") {
     return(df)
   }
 
+  #Check that domain column is logical (all NA so domains to handle)
+  if ('logical' %in% class(layerTableFields[['domain']])) {
+    return(df)
+  }
+
   #Check that domain column is a dataframe
-  if (!('data.frame' %in% class(layerTableFields['domain']))) {
+  if (!('data.frame' %in% class(layerTableFields[['domain']]))) {
     stop("The domain field in the layerTableFields is not a dataframe. Edits need to be made to the addDomainInfo() function. Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the issue can be fixed.")
   }
 
@@ -36,14 +41,14 @@ addDomainInfo <- function(df, url, token = "") {
 
   #Check handled domain types
   handledDomainTypes <- c('codedValue', 'range')
-  domainTypes <- na.omit(layerTableFields[['domain_type']])
+  domainTypes <- stats::na.omit(layerTableFields[['domain_type']])
   if (!all(domainTypes %in% handledDomainTypes)) {
     newDomainTypes <- domainTypes[!(domainTypes %in% handledDomainTypes)]
     stop(paste0("Field domain of type(s): ", paste0("'", newDomainTypes, "'", collapse = ", "), " found in the function esri2sf:::getDomainInfo(). Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the novel domain type can be handled by the package."))
   }
 
 
-  if (length(na.omit(layerTableFields[['domain_type']])) == 0) {
+  if (length(stats::na.omit(layerTableFields[['domain_type']])) == 0) {
     return(df)
   } else {
     #replace values in df with domain information (codedValue domains)

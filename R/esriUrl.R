@@ -91,7 +91,7 @@ esriUrl_isValid <- function(url, displayReason = FALSE) {
     reason <- "'/rest/services' not found in the url."
     out <- FALSE
   } else if (!grepl("/MapServer|/FeatureServer", url)) {
-    reason <- "'/MapServer' or '/FeatureServer not found in the url."
+    reason <- "'/MapServer' or '/FeatureServer' not found in the url."
     out <- FALSE
   } else if (urlError) {
     reason <- "Could not access url with {httr}."

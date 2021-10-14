@@ -21,7 +21,8 @@ Imports:
     sf (>= 1.0.1),
     DBI,
     RSQLite,
-    crayon
+    crayon,
+    rvest
 Suggests:
     rmarkdown,
     knitr,

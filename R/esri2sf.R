@@ -36,6 +36,16 @@
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
                     geomType = NULL, crs = 4326, progress = FALSE, replaceDomainInfo = TRUE, ...) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValidID(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- esrimeta(url, token)
 
   message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
@@ -89,6 +99,16 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
 esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, replaceDomainInfo = TRUE, ...) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValidID(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- esrimeta(url, token)
 
   message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
@@ -108,6 +128,16 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
 #' @describeIn esri2sf Retrieve layer metadata
 #' @export
 esrimeta <- function(url, token = "", fields = FALSE) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValid(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- jsonlite::fromJSON(
     httr::content(
       httr::POST(

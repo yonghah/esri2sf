@@ -1,16 +1,7 @@
-#' @importFrom dplyr bind_rows as_tibble
-#' @importFrom rstudioapi askForPassword
-#' @importFrom httr POST GET content config
-#' @importFrom jsonlite fromJSON toJSON
-#' @importFrom sf st_sf st_sfc st_point st_multipolygon st_multilinestring sf_proj_search_paths st_crs st_bbox st_as_sfc st_transform
-#' @importFrom DBI dbConnect dbGetQuery dbDisconnect
-#' @importFrom RSQLite SQLite
-#' @importFrom crayon blue magenta
-#' @importFrom pbapply pblapply
 
 generateToken <- function(server, uid, pwd = "", expiration = 5000) {
   # generate auth token from GIS server
-  if (pwd == "") pwd <- askForPassword("pwd")
+  if (pwd == "") pwd <- rstudioapi::askForPassword("pwd")
 
   query <- list(
     username = uid,
@@ -20,9 +11,9 @@ generateToken <- function(server, uid, pwd = "", expiration = 5000) {
     f = "json"
   )
 
-  r <- POST(paste(server, "arcgis/admin/generateToken", sep = "/"),
+  r <- httr::POST(paste(server, "arcgis/admin/generateToken", sep = "/"),
             body = query, encode = "form")
-  fromJSON(content(r, "parsed"))$token
+  jsonlite::fromJSON(httr::content(r, "parsed"))$token
 }
 
 # Generate a OAuth token for Arcgis Online
@@ -37,8 +28,8 @@ generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
     grant_type = "client_credentials"
   )
 
-  r <- POST("https://www.arcgis.com/sharing/rest/oauth2/token", body = query)
-  content(r, type = "application/json")$access_token
+  r <- httr::POST("https://www.arcgis.com/sharing/rest/oauth2/token", body = query)
+  httr::content(r, type = "application/json")$access_token
 }
 
 
@@ -49,10 +40,10 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
                 geometry = bbox, returnIdsOnly = "true", token = token,
                 f = "json", ...)
 
-  responseRaw <- content(POST(queryUrl, body = query, encode = "form",
-                              config = config(ssl_verifypeer = FALSE)), as = "text")
+  responseRaw <- httr::content(httr::POST(queryUrl, body = query, encode = "form",
+                              config = httr::config(ssl_verifypeer = FALSE)), as = "text")
 
-  response <- fromJSON(responseRaw)
+  response <- jsonlite::fromJSON(responseRaw)
   response$objectIds
 }
 
@@ -62,9 +53,9 @@ getMaxRecordsCount <- function(queryUrl, token, upperLimit = FALSE) {
 
   query <- list(f = "json", token = token)
 
-  responseRaw <- content(POST(url, body = query, encode = "form",
-                              config = config(ssl_verifypeer = FALSE)), as = "text")
-  response <- fromJSON(responseRaw)
+  responseRaw <- httr::content(httr::POST(url, body = query, encode = "form",
+                              config = httr::config(ssl_verifypeer = FALSE)), as = "text")
+  response <- jsonlite::fromJSON(responseRaw)
 
   if (!is.null(response[['maxRecordCount']])) {
     if (response[['maxRecordCount']] > 25000 & upperLimit) {
@@ -84,9 +75,9 @@ getRecordsCount <- function(queryUrl, where, token = "", ...) {
 
   query <- list(where = where, returnCountOnly = 'true', token = token, f = "json", ...)
 
-  responseRaw <- content(POST(queryUrl, body = query, encode = "form",
-                              config = config(ssl_verifypeer = FALSE)), as = "text")
-  response <- fromJSON(responseRaw)
+  responseRaw <- httr::content(httr::POST(queryUrl, body = query, encode = "form",
+                              config = httr::config(ssl_verifypeer = FALSE)), as = "text")
+  response <- jsonlite::fromJSON(responseRaw)
 
   response[['count']]
 
@@ -95,8 +86,8 @@ getRecordsCount <- function(queryUrl, where, token = "", ...) {
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
-  df <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
-  as_tibble(df)
+  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  dplyr::as_tibble(df)
 }
 
 
@@ -106,10 +97,10 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, 
                 outFields = paste(fields, collapse = ","),
                 token = token, outSR = crs, f = "json", ...)
 
-  responseRaw <- content(POST(queryUrl, body = query, encode = "form",
-                              config = config(ssl_verifypeer = FALSE)), as = "text")
+  responseRaw <- httr::content(httr::POST(queryUrl, body = query, encode = "form",
+                              config = httr::config(ssl_verifypeer = FALSE)), as = "text")
 
-  response <- fromJSON(responseRaw, simplifyDataFrame = FALSE, simplifyVector = FALSE,
+  response <- jsonlite::fromJSON(responseRaw, simplifyDataFrame = FALSE, simplifyVector = FALSE,
                        digits = NA)
 
   if ('error' %in% names(response)) {
@@ -122,33 +113,33 @@ getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, 
 esri2sfPoint <- function(features) {
   getPointGeometry <- function(feature) {
     if (is.numeric(unlist(feature$geometry))) {
-      st_point(unlist(feature$geometry))
-    } else st_point()
+      sf::st_point(unlist(feature$geometry))
+    } else sf::st_point()
   }
-  st_sfc(lapply(features, getPointGeometry))
+  sf::st_sfc(lapply(features, getPointGeometry))
 }
 
 esri2sfPolygon <- function(features) {
   ring2matrix <- function(ring) do.call(rbind, lapply(ring, unlist))
   rings2multipoly <- function(rings)
-    st_multipolygon(list(lapply(rings, ring2matrix)))
+    sf::st_multipolygon(list(lapply(rings, ring2matrix)))
 
   getGeometry <- function(feature) {
     if (is.null(unlist(feature$geometry$rings))) {
-      st_multipolygon()
+      sf::st_multipolygon()
     } else rings2multipoly(feature$geometry$rings)
   }
 
-  st_sfc(lapply(features, getGeometry))
+  sf::st_sfc(lapply(features, getGeometry))
 }
 
 esri2sfPolyline <- function(features) {
   path2matrix <- function(path) do.call(rbind, lapply(path, unlist))
-  paths2multiline <- function(paths) st_multilinestring(lapply(paths, path2matrix))
+  paths2multiline <- function(paths) sf::st_multilinestring(lapply(paths, path2matrix))
 
   getGeometry <- function(feature) paths2multiline(feature$geometry$paths)
 
-  st_sfc(lapply(features, getGeometry))
+  sf::st_sfc(lapply(features, getGeometry))
 }
 
 getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, progress = FALSE, ...) {
@@ -167,7 +158,14 @@ getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 432
   } else if (isWktID(crs)) {
     crs <- sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
   } else {
-    crs <- toJSON(list("wkt" = WKTunPretty(st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
+    crs <- jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox=TRUE)
+  }
+
+  #Check if pbapply progress bar can be used
+  if (!requireNamespace("pbapply", quietly = TRUE) & progress) {
+    warning("Package \"pbapply\" needed to use the progress argument. Please install it. Setting `progress` to FALSE.",
+         call. = FALSE)
+    progress <- FALSE
   }
 
   if (progress) {
@@ -199,22 +197,22 @@ esri2sfGeom <- function(jsonFeats, geomType, crs = 4326) {
   atts <- lapply(lapply(jsonFeats, `[[`, 1),
                  function(att) lapply(att, function(x) ifelse(is.null(x), NA, x)))
 
-  af <- bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
   # geometry + attributes
-  st_sf(geoms, af, crs = crs)
+  sf::st_sf(geoms, af, crs = crs)
 }
 
 
 getWKTidAuthority <- function(wktID) {
 
-  projPaths <- file.path(sf_proj_search_paths(), "proj.db")
+  projPaths <- file.path(sf::sf_proj_search_paths(), "proj.db")
   projDB <- projPaths[file.exists(projPaths)][1]
 
-  con <- dbConnect(SQLite(), projDB)
+  con <- DBI::dbConnect(RSQLite::SQLite(), projDB)
 
-  crsData <- dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
+  crsData <- DBI::dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
 
-  dbDisconnect(con)
+  DBI::dbDisconnect(con)
 
   if (nrow(crsData) == 0) {
     stop(paste0("WKTid: ", wktID, " not found in proj.db"))

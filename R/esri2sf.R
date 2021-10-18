@@ -10,6 +10,7 @@
 #' @param crs coordinate reference system (see [sf::st_sf()]). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()].
 #' @param progress Show progress bar with [pbapply::pblapply()] if TRUE. Default FALSE.
+#' @param replaceDomainInfo add domain information to the return dataframe? Default TRUE.
 #' @param fields `esrimeta` returns dataframe with fields if TRUE. Default FALSE.
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`) or list or dataframe (`esrimeta`).
@@ -34,10 +35,20 @@
 #' @export
 
 esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
-                    geomType = NULL, crs = 4326, progress = FALSE, ...) {
+                    geomType = NULL, crs = 4326, progress = FALSE, replaceDomainInfo = TRUE, ...) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValidID(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- esrimeta(url, token)
 
-  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
+  message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType)) {
       stop("geomType is NULL and layer geometry type ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline') could not be inferred from server.")
@@ -46,7 +57,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
     geomType <- layerInfo$geometryType
   }
 
-  message(paste0(blue("Geometry Type: "), magenta(geomType)))
+  message(paste0(crayon::blue("Geometry Type: "), crayon::magenta(geomType)))
 
   if (!is.null(layerInfo$extent$spatialReference$latestWkid)) {
     layerCRS <- layerInfo$extent$spatialReference$latestWkid
@@ -57,11 +68,11 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   } else {
     stop("No crs found. Check that layer at url has a Spatial Reference.")
   }
-  message(paste0(blue("Service Coordinate Reference System: "), magenta(layerCRS)))
+  message(paste0(crayon::blue("Service Coordinate Reference System: "), crayon::magenta(layerCRS)))
 
   if (class(bbox) == "bbox") {
-    if ((st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
-      bbox <- st_bbox(st_transform(st_as_sfc(bbox), layerCRS))
+    if ((sf::st_crs(bbox)$input != layerCRS) && !is.null(layerCRS)) {
+      bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
     }
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object.")
@@ -75,23 +86,41 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   if (is.null(crs)) {
     crs <- layerCRS
   } else {
-    message(paste0(blue("Output Coordinate Reference System: "), magenta(crs)))
+    message(paste0(crayon::blue("Output Coordinate Reference System: "), crayon::magenta(crs)))
   }
 
-  esri2sfGeom(esriFeatures, geomType, crs)
+  sfdf <- esri2sfGeom(esriFeatures, geomType, crs)
+  if (replaceDomainInfo) {
+    sfdf <- addDomainInfo(sfdf, url = url, token = token)
+  }
+  sfdf
 }
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, ...) {
+esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress = FALSE, replaceDomainInfo = TRUE, ...) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValidID(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- esrimeta(url, token)
 
-  message(paste0(blue("Layer Type: "), magenta(layerInfo$type)))
+  message(paste0(crayon::blue("Layer Type: "), crayon::magenta(layerInfo$type)))
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, progress, ...)
-  getEsriTable(esriFeatures)
+  df <- getEsriTable(esriFeatures)
+  if (replaceDomainInfo) {
+    df <- addDomainInfo(df, url = url, token = token)
+  }
+  df
 }
 
 
@@ -99,20 +128,30 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
 #' @describeIn esri2sf Retrieve layer metadata
 #' @export
 esrimeta <- function(url, token = "", fields = FALSE) {
+
+  #make sure url is valid and error otherwise
+  tryCatch(
+    {
+      esriUrl_isValid(url, displayReason = TRUE)
+    }, message = function(m) {
+      stop(m$message)
+    }
+  )
+
   layerInfo <- jsonlite::fromJSON(
-    content(
-      POST(
+    httr::content(
+      httr::POST(
         url,
         query = list(f = "json", token = token),
         encode = "form",
-        config = config(ssl_verifypeer = FALSE)
+        config = httr::config(ssl_verifypeer = FALSE)
       ),
       as = "text"
     )
   )
 
   if (fields) {
-    return(layerInfo$fields)
+    return(dplyr::as_tibble(layerInfo$fields))
   } else {
     return(layerInfo)
   }

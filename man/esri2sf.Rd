@@ -15,6 +15,7 @@ esri2sf(
   geomType = NULL,
   crs = 4326,
   progress = FALSE,
+  replaceDomainInfo = TRUE,
   ...
 )
 
@@ -24,6 +25,7 @@ esri2df(
   where = "1=1",
   token = "",
   progress = FALSE,
+  replaceDomainInfo = TRUE,
   ...
 )
 
@@ -45,6 +47,8 @@ esrimeta(url, token = "", fields = FALSE)
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.}
 
 \item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if TRUE. Default FALSE.}
+
+\item{replaceDomainInfo}{add domain information to the return dataframe? Default TRUE.}
 
 \item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
 

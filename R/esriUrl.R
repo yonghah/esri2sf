@@ -85,7 +85,7 @@ esriUrl_parseUrl <- function(url) {
 esriUrl_isValid <- function(url, displayReason = FALSE) {
   # check url succeeds
   urlError <- tryCatch({
-    httr::http_error(url)
+    httr::http_error(httr::GET(url))
   }, error = function(cond) {TRUE})
 
   if (!grepl("/rest/services", url)) {

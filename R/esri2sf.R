@@ -90,7 +90,7 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token, progress, ...)
+  esriFeatures <- getEsriFeatures(queryUrl = queryUrl, fields = outFields, where = where, token = token, progress = progress, ...)
   getEsriTable(esriFeatures)
 }
 

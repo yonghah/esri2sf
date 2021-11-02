@@ -151,7 +151,7 @@ esri2sfPolyline <- function(features) {
   st_sfc(lapply(features, getGeometry))
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, progress = FALSE, ...) {
+getEsriFeatures <- function(queryUrl, fields, where, bbox = NULL, token = "", crs = 4326, progress = FALSE, ...) {
   ids <- getObjectIds(queryUrl, where, bbox, token, ...)
   if (is.null(ids)) {
     warning("No records match the search criteria.")

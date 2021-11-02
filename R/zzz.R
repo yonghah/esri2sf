@@ -33,13 +33,12 @@ generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
 }
 
 
-getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
+getObjectIds <- function(queryUrl, where = "1=1", bbox = NULL, token = "", ...) {
 
   # create Simple Features from ArcGIS servers json response
   query <- list(where = where, geometryType = "esriGeometryEnvelope",
                 geometry = bbox, returnIdsOnly = "true", token = token,
                 f = "json", ...)
-
   responseRaw <- httr::content(httr::POST(queryUrl, body = query, encode = "form",
                               config = httr::config(ssl_verifypeer = FALSE)), as = "text")
 
@@ -47,7 +46,7 @@ getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
   response$objectIds
 }
 
-getMaxRecordsCount <- function(queryUrl, token, upperLimit = FALSE) {
+getMaxRecordsCount <- function(queryUrl, token = "", upperLimit = FALSE) {
 
   url <- sub("/query$", "", queryUrl)
 
@@ -71,7 +70,7 @@ getMaxRecordsCount <- function(queryUrl, token, upperLimit = FALSE) {
 
 }
 
-getRecordsCount <- function(queryUrl, where, token = "", ...) {
+getRecordsCount <- function(queryUrl, where = "1=1", token = "", ...) {
 
   query <- list(where = where, returnCountOnly = 'true', token = token, f = "json", ...)
 
@@ -91,7 +90,7 @@ getEsriTable <- function(jsonFeats) {
 }
 
 
-getEsriFeaturesByIds <- function(ids, queryUrl, fields, token = "", crs = 4326, ...) {
+getEsriFeaturesByIds <- function(ids, queryUrl, fields = c("*"), token = "", crs = 4326, ...) {
   # create Simple Features from ArcGIS servers json response
   query <- list(objectIds = paste(ids, collapse = ","),
                 outFields = paste(fields, collapse = ","),
@@ -142,7 +141,7 @@ esri2sfPolyline <- function(features) {
   sf::st_sfc(lapply(features, getGeometry))
 }
 
-getEsriFeatures <- function(queryUrl, fields, where, bbox, token = "", crs = 4326, progress = FALSE, ...) {
+getEsriFeatures <- function(queryUrl, fields = c("*"), where = "1=1", bbox = NULL, token = "", crs = 4326, progress = FALSE, ...) {
   ids <- getObjectIds(queryUrl, where, bbox, token, ...)
   if (is.null(ids)) {
     warning("No records match the search criteria.")

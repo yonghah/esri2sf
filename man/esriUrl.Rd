@@ -2,6 +2,7 @@
 % Please edit documentation in R/esriUrl.R
 \name{esriUrl_ServerUrl}
 \alias{esriUrl_ServerUrl}
+\alias{esriUrl_serverUrl}
 \alias{esriUrl_parseUrl}
 \alias{esriUrl_isValid}
 \alias{esriUrl_isValidID}
@@ -9,6 +10,8 @@
 \title{Get parts of the Map/Feature Server URL}
 \usage{
 esriUrl_ServerUrl(url)
+
+esriUrl_serverUrl(url)
 
 esriUrl_parseUrl(url)
 
@@ -51,7 +54,9 @@ And having these rules:
 }
 \section{Functions}{
 \itemize{
-\item \code{esriUrl_ServerUrl}: Full Map/Feature Server URL
+\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serverUrl
+
+\item \code{esriUrl_serverUrl}: Full Map/Feature Server URL
 
 \item \code{esriUrl_parseUrl}: Parse Url into parts.
 

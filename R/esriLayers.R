@@ -16,7 +16,7 @@
 #' @export
 esriLayers <- function(url) {
   #Format url (remove layer.table ID and check it is valid)
-  urlServer <- esriUrl_ServerUrl(url)
+  urlServer <- esriUrl_serverUrl(url)
 
   query <- list(
     f = "json",

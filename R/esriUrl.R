@@ -24,9 +24,16 @@
 #'
 #' @return Character string of the request part of the url.
 #'
-#' @describeIn esriUrl Full Map/Feature Server URL
+#' @describeIn esriUrl DEPRECATED Use esriUrl_serverUrl
 #' @export
 esriUrl_ServerUrl <- function(url) {
+  .Deprecated("esriUrl_serverUrl")
+  esriUrl_serverUrl(url)
+}
+
+#' @describeIn esriUrl Full Map/Feature Server URL
+#' @export
+esriUrl_serverUrl <- function(url) {
   #Cut off layerID if present
   urlNoLayerID <- sub("/[[:digit:]]+$|/$", '', url)
 

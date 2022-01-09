@@ -84,7 +84,7 @@ esriUrl_isValidService <- function(url, displayReason = FALSE) {
   #make sure url is valid
   if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("/MapServer$|/FeatureServer$", url)
+  out <- grepl("/MapServer/*$|/FeatureServer/*$", url)
   if (!out & displayReason) {
     message("Url does not end in a '/MapServer' or '/FeatureServer'.")
   }

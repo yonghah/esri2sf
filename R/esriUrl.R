@@ -59,7 +59,7 @@ esriUrl_isValidRoot <- function(url, displayReason = FALSE) {
   #make sure url is valid
   if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("/rest/services$", url)
+  out <- grepl("/rest/services/?$", url)
   if (!out & displayReason) {
     message("Url does not end in '/rest/services'.")
   }
@@ -84,7 +84,7 @@ esriUrl_isValidService <- function(url, displayReason = FALSE) {
   #make sure url is valid
   if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("/MapServer/*$|/FeatureServer/*$", url)
+  out <- grepl("/MapServer/?$|/FeatureServer/?$", url)
   if (!out & displayReason) {
     message("Url does not end in a '/MapServer' or '/FeatureServer'.")
   }
@@ -98,7 +98,7 @@ esriUrl_isValidID <- function(url, displayReason = FALSE) {
   #make sure url is valid
   if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("(/MapServer|/FeatureServer)/[[:digit:]]+$", url)
+  out <- grepl("(/MapServer|/FeatureServer)/[[:digit:]]+/?$", url)
   if (!out & displayReason) {
     message('Url does not end in a feature ID.')
   }
@@ -118,7 +118,7 @@ esriUrl_ServerUrl <- function(url) {
 #' @export
 esriUrl_serverUrl <- function(url) {
   #Cut off layerID if present
-  urlNoLayerID <- sub("/[[:digit:]]+$|/$", '', url)
+  urlNoLayerID <- sub("/[[:digit:]]+/?$|/$", '', url)
 
   #make sure url is valid service and error otherwise
   tryCatch(

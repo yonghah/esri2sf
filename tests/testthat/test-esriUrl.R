@@ -2,6 +2,7 @@ test_that("esriUrl_serverUrl returns correct substring", {
   skip_if_offline_url(url = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3")
 
   expect_identical(esriUrl_serverUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"), "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
+  expect_identical(esriUrl_serverUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3/"), "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
   expect_identical(esriUrl_serverUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer"), "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
   expect_identical(esriUrl_serverUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/"), "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
   expect_error(esriUrl_serverUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/"), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
@@ -14,6 +15,10 @@ test_that("esriUrl_isValid checks", {
   expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer"))
   expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics"))
   expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"))
+  expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3/"))
+  expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/"))
+  expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/"))
+  expect_true(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/"))
 
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/Demographics/ESRI_Census_USA/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\n'/rest/services' not found in the url.")
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/Demographics/ESRI_Census_USA/MapServer/3"))
@@ -24,7 +29,7 @@ test_that("esriUrl_isValid checks", {
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test"))
 
-  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\n.*")
+  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nService 'Demographics/ESRI_Census' of type 'MapServer' does not exist or is inaccessible..*")
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3"))
 
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGI/rest/services/Demographics/ESRI_Census_USA/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed = TRUE)
@@ -36,6 +41,7 @@ test_that("esriUrl_isValidID checks", {
   skip_if_offline_url(url = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3")
 
   expect_true(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"))
+  expect_true(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3/"))
 
   expect_false(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/"))
   expect_message(esriUrl_isValidID("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/", displayReason = TRUE), "Url does not end in a feature ID.")
@@ -52,6 +58,31 @@ test_that("esriUrl_isValidService checks", {
   expect_false(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/0"))
   expect_message(esriUrl_isValidService("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/0", displayReason = TRUE), "Url does not end in a '/MapServer' or '/FeatureServer'.")
 })
+
+
+test_that("esriUrl_isValidRoot checks", {
+  skip_if_offline_url(url = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics")
+
+  expect_true(esriUrl_isValidRoot("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"))
+  expect_true(esriUrl_isValidRoot("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/"))
+
+  expect_false(esriUrl_isValidRoot("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics"))
+  expect_message(esriUrl_isValidRoot("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics", displayReason = TRUE), "Url does not end in '/rest/services'.")
+})
+
+
+test_that("esriUrl_isValidFolder checks", {
+  skip_if_offline_url(url = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
+
+  expect_true(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"))
+  expect_true(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/"))
+  expect_true(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics"))
+  expect_true(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/"))
+
+  expect_false(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer"))
+  expect_message(esriUrl_isValidFolder("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer", displayReason = TRUE), "Url is not a 'Folder' endpoint.")
+})
+
 
 test_that("esriUrl_parseUrl", {
   skip_if_offline_url(url = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3")

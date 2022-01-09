@@ -63,6 +63,8 @@ esriUrl_isValidRoot <- function(url, displayReason = FALSE) {
   if (!out & displayReason) {
     message("Url does not end in '/rest/services'.")
   }
+
+  return(out)
 }
 
 #' @describeIn esriUrl Check if url is valid for a folder of an ESRI REST Server.
@@ -76,6 +78,8 @@ esriUrl_isValidFolder <- function(url, displayReason = FALSE) {
   if (!out & displayReason) {
     message("Url is not a 'Folder' endpoint.")
   }
+
+  return(out)
 }
 
 #' @describeIn esriUrl Check if url is valid for a Service of an ESRI REST Server. No feature ID.

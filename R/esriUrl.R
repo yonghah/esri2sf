@@ -123,9 +123,19 @@ esriUrl_isValidService <- function(url, displayReason = FALSE) {
   return(out)
 }
 
-#' @describeIn esriUrl Check if url is valid for a feature of an ESRI REST Service.
+#' @describeIn esriUrl DEPRECATED Use esriUrl_isValidFeature
 #' @export
 esriUrl_isValidID <- function(url, displayReason = FALSE) {
+
+  .Deprecated("esriUrl_isValidFeature")
+  out <- esriUrl_isValidFeature(url, displayReason = displayReason)
+
+  return(out)
+}
+
+#' @describeIn esriUrl Check if url is valid for a feature of an ESRI REST Service.
+#' @export
+esriUrl_isValidFeature <- function(url, displayReason = FALSE) {
 
   out <- esriUrl_isValidType(url=url, type = 'Feature', displayReason = displayReason, returnType = FALSE)
 

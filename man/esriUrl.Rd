@@ -6,6 +6,7 @@
 \alias{esriUrl_isValidFolder}
 \alias{esriUrl_isValidService}
 \alias{esriUrl_isValidID}
+\alias{esriUrl_isValidFeature}
 \alias{esriUrl_ServerUrl}
 \alias{esriUrl_serverUrl}
 \alias{esriUrl_parseUrl}
@@ -20,6 +21,8 @@ esriUrl_isValidFolder(url, displayReason = FALSE)
 esriUrl_isValidService(url, displayReason = FALSE)
 
 esriUrl_isValidID(url, displayReason = FALSE)
+
+esriUrl_isValidFeature(url, displayReason = FALSE)
 
 esriUrl_ServerUrl(url)
 
@@ -68,7 +71,9 @@ And having these rules:
 
 \item \code{esriUrl_isValidService}: Check if url is valid for a Service of an ESRI REST Server. No feature ID.
 
-\item \code{esriUrl_isValidID}: Check if url is valid for a feature of an ESRI REST Service.
+\item \code{esriUrl_isValidID}: DEPRECATED Use esriUrl_isValidFeature
+
+\item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST Service.
 
 \item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serverUrl
 

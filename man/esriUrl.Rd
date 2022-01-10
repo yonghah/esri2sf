@@ -43,9 +43,9 @@ Character string of the request part of the url.
 A collection of functions that pull select parts out of a
 Map/Feature Server URL. All urls should be a form similar to:
 \itemize{
-\item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>}
+\item \verb{https://<host>/<instance>/rest/services/<folderPath>/serviceName>/MapServer/<id>}
 \item \verb{http://<host>/<instance>/rest/services/serviceName>/MapServer}
-\item \verb{<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
+\item \verb{<host>/<instance>/rest/services/<folderPath>/serviceName>/FeatureServer}
 \item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
 }
 
@@ -55,7 +55,7 @@ And having these rules:
 \item The \code{host} part is the domain of the url.
 \item The \code{instance}  is the first subpage after the domain in the url.
 \item The \verb{/rest/services} is the second and third subpage in the url. These are standard for all ESRI REST Services.
-\item The \code{folderName} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
+\item The \code{folderPath} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
 \item The \code{serviceName} part is the last subpage betore the \verb{/Mapserver} or \verb{/FeatureServer} in the url.
 \item \verb{/Mapserver} or \verb{/FeatureServer} specifies whether the file is a map or feature service.
 \item The \code{id} is optional and specifies the layer or table in the map service.

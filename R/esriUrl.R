@@ -1,7 +1,8 @@
+serviceTypes <- c("MapServer", "FeatureServer", "GPServer", "GeocodeServer", "GeometryServer", "ImageServer")
+
 esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "Service", "Feature"), displayReason = FALSE, returnType = FALSE) {
 
   type <- match.arg(type)
-  serviceTypes <- c("MapServer", "FeatureServer", "GPServer", "GeocodeServer", "GeometryServer", "ImageServer")
 
   # check url succeeds
   urlError <- tryCatch({
@@ -64,9 +65,9 @@ esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "
 #'
 #' @description A collection of functions that pull select parts out of a
 #'   Map/Feature Server URL. All urls should be a form similar to:
-#' * `https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>`
+#' * `https://<host>/<instance>/rest/services/<folderPath>/serviceName>/MapServer/<id>`
 #' * `http://<host>/<instance>/rest/services/serviceName>/MapServer`
-#' * `<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer`
+#' * `<host>/<instance>/rest/services/<folderPath>/serviceName>/FeatureServer`
 #' * `https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>`
 #'
 #' And having these rules:
@@ -74,7 +75,7 @@ esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "
 #'  * The `host` part is the domain of the url.
 #'  * The `instance`  is the first subpage after the domain in the url.
 #'  * The `/rest/services` is the second and third subpage in the url. These are standard for all ESRI REST Services.
-#'  * The `folderName` part is optional and indicates the file structure in the REST Service. It consists of all subpages between `/rest/services/` and the `serviceName` part.
+#'  * The `folderPath` part is optional and indicates the file structure in the REST Service. It consists of all subpages between `/rest/services/` and the `serviceName` part.
 #'  * The `serviceName` part is the last subpage betore the `/Mapserver` or `/FeatureServer` in the url.
 #'  * `/Mapserver` or `/FeatureServer` specifies whether the file is a map or feature service.
 #'  * The `id` is optional and specifies the layer or table in the map service.
@@ -186,18 +187,32 @@ esriUrl_parseUrl <- function(url) {
   #Find type of URL
   urlType <- esriUrl_isValidType(url, type = NA_character_, displayReason = FALSE, returnType = TRUE)
 
-  if (urlType == "Root") {}
-
-
-  folderService <- unlist(strsplit(sub("/MapServer.*|/FeatureServer.*", "", sub(".*/rest/services/", "", url)), "/"))
-  if (length(folderService) > 1) {
-    folderName <- paste0(folderService[-length(folderService)], collapse = "/")
-  } else {
-    folderName <- ""
+  if (urlType == "Root") {
+    folderPath = ""
+    serviceName = ""
+    serviceType = ""
+    featureID = integer(0)
+  } else if (urlType == "Folder") {
+    folderPath = sub("/$", "", sub(".*/rest/services/", "", url))
+    serviceName = ""
+    serviceType = ""
+    featureID = integer(0)
+  } else if (urlType %in% c("Service", "Feature")) {
+    folderService <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", sub(".*/rest/services/", "", url)), "/"))
+    if (length(folderService) > 1) {
+      folderPath <- paste0(folderService[-length(folderService)], collapse = "/")
+    } else {
+      folderPath <- ""
+    }
+    serviceSplit <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", url), "/"))
+    serviceName <- serviceSplit[length(serviceSplit)]
+    serviceType <- gsub("/", "", regmatches(url, regexpr(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?"),url)))
+    if (urlType == "Service") {
+      featureID = integer(0)
+    } else if (urlType == "Feature") {
+      featureID = as.integer(gsub("/", "", regmatches(url, regexpr("/[0-9]+/?$",url))))
+    }
   }
-  serviceSplit <- unlist(strsplit(sub("/MapServer.*|/FeatureServer.*", "", url), "/"))
-  serviceName <- serviceSplit[length(serviceSplit)]
-  layerID <- as.integer(regmatches(url, regexpr("[0-9]+$",url)))
 
   out <- list(
     "url"=url,
@@ -205,9 +220,10 @@ esriUrl_parseUrl <- function(url) {
     "host"=host,
     "instance"=instance,
     "restIndicator" = "rest/services",
-    "folderName"=folderName,
+    "folderPath"=folderPath,
     "serviceName"=serviceName,
-    "layerID"=layerID
+    "serviceType"=serviceType,
+    "featureID"=featureID
   )
   return(out)
 }

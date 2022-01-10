@@ -211,7 +211,10 @@ test_that("esriUrl_parseUrl", {
 
   expect_snapshot(esriUrl_parseUrl('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3'))
   expect_snapshot(esriUrl_parseUrl('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer'))
-  expect_snapshot(esriUrl_parseUrl('https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0'))
+  expect_snapshot(esriUrl_parseUrl('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics'))
+  expect_snapshot(esriUrl_parseUrl('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services'))
+  expect_snapshot(esriUrl_parseUrl('https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0/'))
+
 
   expect_error(esriUrl_parseUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/"), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed = TRUE)
 })

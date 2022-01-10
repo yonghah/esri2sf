@@ -8,7 +8,7 @@
 \alias{esriUrl_isValidID}
 \alias{esriUrl_isValidFeature}
 \alias{esriUrl_ServerUrl}
-\alias{esriUrl_serverUrl}
+\alias{esriUrl_serviceUrl}
 \alias{esriUrl_parseUrl}
 \title{Get parts of the Map/Feature Server URL}
 \usage{
@@ -26,7 +26,7 @@ esriUrl_isValidFeature(url, displayReason = FALSE)
 
 esriUrl_ServerUrl(url)
 
-esriUrl_serverUrl(url)
+esriUrl_serviceUrl(url)
 
 esriUrl_parseUrl(url)
 }
@@ -75,9 +75,9 @@ And having these rules:
 
 \item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST Service.
 
-\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serverUrl
+\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serviceUrl
 
-\item \code{esriUrl_serverUrl}: Retrieve Map/Feature Server URL
+\item \code{esriUrl_serviceUrl}: Retrieve Map/Feature Server URL
 
 \item \code{esriUrl_parseUrl}: Parse Url into parts.
 }}

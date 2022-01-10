@@ -143,16 +143,16 @@ esriUrl_isValidFeature <- function(url, displayReason = FALSE) {
 }
 
 
-#' @describeIn esriUrl DEPRECATED Use esriUrl_serverUrl
+#' @describeIn esriUrl DEPRECATED Use esriUrl_serviceUrl
 #' @export
 esriUrl_ServerUrl <- function(url) {
-  .Deprecated("esriUrl_serverUrl")
-  esriUrl_serverUrl(url)
+  .Deprecated("esriUrl_serviceUrl")
+  esriUrl_serviceUrl(url)
 }
 
 #' @describeIn esriUrl Retrieve Map/Feature Server URL
 #' @export
-esriUrl_serverUrl <- function(url) {
+esriUrl_serviceUrl <- function(url) {
   #Cut off layerID if present
   urlNoLayerID <- sub("/[[:digit:]]+/?$|/$", '', url)
 
@@ -182,6 +182,13 @@ esriUrl_parseUrl <- function(url) {
   scheme <- regmatches(url, regexpr("^https://|^http://",url))
   host <- unlist(strsplit(sub(scheme, "", url), "/"))[1]
   instance <- sub("/rest/services.*", "", sub(paste0(".*",host, '/'), "", url))
+
+  #Find type of URL
+  urlType <- esriUrl_isValidType(url, type = NA_character_, displayReason = FALSE, returnType = TRUE)
+
+  if (urlType == "Root") {}
+
+
   folderService <- unlist(strsplit(sub("/MapServer.*|/FeatureServer.*", "", sub(".*/rest/services/", "", url)), "/"))
   if (length(folderService) > 1) {
     folderName <- paste0(folderService[-length(folderService)], collapse = "/")

@@ -90,27 +90,8 @@ esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "
 #' @describeIn esriUrl Check if url is valid for an ESRI REST Service. General to include potential layer id too.
 #' @export
 esriUrl_isValid <- function(url, displayReason = FALSE) {
-  # check url succeeds
-  urlError <- tryCatch({
-    httr::http_error(httr::GET(url))
-  }, error = function(cond) {TRUE})
 
-  if (!grepl("/rest/services", url)) {
-    reason <- "'/rest/services' not found in the url."
-    out <- FALSE
-  } else if (urlError) {
-    reason <- "Could not access url with {httr}."
-    out <- FALSE
-  } else if (!is.na(rvest::html_element(rvest::read_html(url), 'div.restErrors'))) {
-    reason <- sub("^[[:space:]]*", "", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restErrors')))
-    out <- FALSE
-  } else {
-    out <- TRUE
-  }
-
-  if (!out & displayReason) {
-    message(paste0("Url is not a valid ESRI Service Url.\n", reason))
-  }
+  out <- esriUrl_isValidType(url=url, type = NA_character_, displayReason = displayReason, returnType = FALSE)
 
   return(out)
 }
@@ -118,13 +99,8 @@ esriUrl_isValid <- function(url, displayReason = FALSE) {
 #' @describeIn esriUrl Check if url is valid for the root of an ESRI REST Server.
 #' @export
 esriUrl_isValidRoot <- function(url, displayReason = FALSE) {
-  #make sure url is valid
-  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("/rest/services/?$", url)
-  if (!out & displayReason) {
-    message("Url does not end in '/rest/services'.")
-  }
+  out <- esriUrl_isValidType(url=url, type = 'Root', displayReason = displayReason, returnType = FALSE)
 
   return(out)
 }
@@ -132,14 +108,8 @@ esriUrl_isValidRoot <- function(url, displayReason = FALSE) {
 #' @describeIn esriUrl Check if url is valid for a folder of an ESRI REST Server.
 #' @export
 esriUrl_isValidFolder <- function(url, displayReason = FALSE) {
-  #make sure url is valid
-  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("^Folder:", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restHeader h2')))
-
-  if (!out & displayReason) {
-    message("Url is not a 'Folder' endpoint.")
-  }
+  out <- esriUrl_isValidType(url=url, type = 'Folder', displayReason = displayReason, returnType = FALSE)
 
   return(out)
 }
@@ -147,13 +117,8 @@ esriUrl_isValidFolder <- function(url, displayReason = FALSE) {
 #' @describeIn esriUrl Check if url is valid for a Service of an ESRI REST Server. No feature ID.
 #' @export
 esriUrl_isValidService <- function(url, displayReason = FALSE) {
-  #make sure url is valid
-  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("/MapServer/?$|/FeatureServer/?$", url)
-  if (!out & displayReason) {
-    message("Url does not end in a '/MapServer' or '/FeatureServer'.")
-  }
+  out <- esriUrl_isValidType(url=url, type = 'Service', displayReason = displayReason, returnType = FALSE)
 
   return(out)
 }
@@ -161,13 +126,8 @@ esriUrl_isValidService <- function(url, displayReason = FALSE) {
 #' @describeIn esriUrl Check if url is valid for a feature of an ESRI REST Service.
 #' @export
 esriUrl_isValidID <- function(url, displayReason = FALSE) {
-  #make sure url is valid
-  if (!esriUrl_isValid(url, displayReason = displayReason)) return(FALSE)
 
-  out <- grepl("(/MapServer|/FeatureServer)/[[:digit:]]+/?$", url)
-  if (!out & displayReason) {
-    message('Url does not end in a feature ID.')
-  }
+  out <- esriUrl_isValidType(url=url, type = 'Feature', displayReason = displayReason, returnType = FALSE)
 
   return(out)
 }

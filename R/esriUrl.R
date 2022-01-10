@@ -1,3 +1,65 @@
+esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "Service", "Feature"), displayReason = FALSE, returnType = FALSE) {
+
+  type <- match.arg(type)
+  serviceTypes <- c("MapServer", "FeatureServer", "GPServer", "GeocodeServer", "GeometryServer", "ImageServer")
+
+  # check url succeeds
+  urlError <- tryCatch({
+    httr::http_error(httr::GET(url))
+  }, error = function(cond) {TRUE})
+
+  if (!grepl("/rest/services", url)) {
+    reason <- "'/rest/services' not found in the url."
+    out <- FALSE
+  } else if (urlError) {
+    reason <- "Could not access url with {httr}."
+    out <- FALSE
+  } else if (!is.na(rvest::html_element(rvest::read_html(url), 'div.restErrors'))) {
+    reason <- sub("^[[:space:]]*", "", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restErrors')))
+    out <- FALSE
+  } else {
+    out <- TRUE
+  }
+
+  if (out) {
+
+    isType <- c(
+      "Root" = grepl("/rest/services/?$", url),
+      "Folder" = grepl("^Folder:", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restHeader h2'))),
+      "Service" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?$"), url),
+      "Feature" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)
+    )
+
+    if (!is.na(type) & !(type %in% names(which(isType))) & !returnType) {
+      if (type == "Root") {
+        reason <- "Url does not end in '/rest/services'."
+      } else if (type == "Folder") {
+        reason <- "Url is not a 'Folder' endpoint."
+      } else if (type == "Service") {
+        reason <- "Url does not end in a '/MapServer' or '/FeatureServer'."
+      } else if (type == "Feature") {
+        reason <- "Url does not end in a feature ID."
+      }
+      out <- FALSE
+    } else {
+      out <- TRUE
+    }
+
+  }
+
+  if (!out & displayReason) {
+    message(paste0("Url is not a valid ESRI Service Url.\n", reason))
+  }
+
+  if (out & returnType) {
+    out <- names(isType[which(isType)[1]])
+  } else if (!out & returnType) {
+    out <- NA_character_
+  }
+
+  return(out)
+}
+
 #' @title Get parts of the Map/Feature Server URL
 #'
 #' @description A collection of functions that pull select parts out of a

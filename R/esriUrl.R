@@ -61,24 +61,26 @@ esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "
   return(out)
 }
 
-#' @title Get parts of the Map/Feature Server URL
+#' @title Validate or parse the parts of a ESRI REST Server URL
 #'
 #' @description A collection of functions that pull select parts out of a
-#'   Map/Feature Server URL. All urls should be a form similar to:
-#' * `https://<host>/<instance>/rest/services/<folderPath>/serviceName>/MapServer/<id>`
-#' * `http://<host>/<instance>/rest/services/serviceName>/MapServer`
-#' * `<host>/<instance>/rest/services/<folderPath>/serviceName>/FeatureServer`
-#' * `https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>`
+#'   ESRI Service URL. All urls should be a form similar to:
+#' * `https://<host>/<instance>/rest/services/<folderPath>/serviceName>/<serviceType>/<featureID>`
+#' * `http://<host>/<instance>/rest/services/serviceName>/<serviceType>`
+#' * `<host>/<instance>/rest/services/<folderPath>/serviceName>/<serviceType>`
+#' * `https://<host>/<instance>/rest/services/serviceName>/<serviceType>/<featureID>`
+#' * `https://<host>/<instance>/rest/services/<folderPath>`
+#' * `https://<host>/<instance>/rest/services`
 #'
 #' And having these rules:
 #'  * The scheme: `https://` or `http://` part is optional
 #'  * The `host` part is the domain of the url.
 #'  * The `instance`  is the first subpage after the domain in the url.
 #'  * The `/rest/services` is the second and third subpage in the url. These are standard for all ESRI REST Services.
-#'  * The `folderPath` part is optional and indicates the file structure in the REST Service. It consists of all subpages between `/rest/services/` and the `serviceName` part.
-#'  * The `serviceName` part is the last subpage betore the `/Mapserver` or `/FeatureServer` in the url.
-#'  * `/Mapserver` or `/FeatureServer` specifies whether the file is a map or feature service.
-#'  * The `id` is optional and specifies the layer or table in the map service.
+#'  * The `folderPath` part is optional and indicates the file structure in the REST Service. It consists of all subpages between `/rest/services/` and the `serviceName` part (if available).
+#'  * The `serviceName` part is the last subpage betore the `<serviceType>` in the url.
+#'  * The `serviceType` specifies the type of service. Currently this package works to manage the following serviceTypes: 'MapServer', 'FeatureServer', 'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
+#'  * The `featureID` is optional and specifies the layer or table in the map service.
 #'
 #'
 #' @param url The url for a Map/Feature server or for a layer/table in a

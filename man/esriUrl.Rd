@@ -10,7 +10,7 @@
 \alias{esriUrl_ServerUrl}
 \alias{esriUrl_serviceUrl}
 \alias{esriUrl_parseUrl}
-\title{Get parts of the Map/Feature Server URL}
+\title{Validate or parse the parts of a ESRI REST Server URL}
 \usage{
 esriUrl_isValid(url, displayReason = FALSE)
 
@@ -41,12 +41,14 @@ Character string of the request part of the url.
 }
 \description{
 A collection of functions that pull select parts out of a
-Map/Feature Server URL. All urls should be a form similar to:
+ESRI Service URL. All urls should be a form similar to:
 \itemize{
-\item \verb{https://<host>/<instance>/rest/services/<folderPath>/serviceName>/MapServer/<id>}
-\item \verb{http://<host>/<instance>/rest/services/serviceName>/MapServer}
-\item \verb{<host>/<instance>/rest/services/<folderPath>/serviceName>/FeatureServer}
-\item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
+\item \verb{https://<host>/<instance>/rest/services/<folderPath>/serviceName>/<serviceType>/<featureID>}
+\item \verb{http://<host>/<instance>/rest/services/serviceName>/<serviceType>}
+\item \verb{<host>/<instance>/rest/services/<folderPath>/serviceName>/<serviceType>}
+\item \verb{https://<host>/<instance>/rest/services/serviceName>/<serviceType>/<featureID>}
+\item \verb{https://<host>/<instance>/rest/services/<folderPath>}
+\item \verb{https://<host>/<instance>/rest/services}
 }
 
 And having these rules:
@@ -55,10 +57,10 @@ And having these rules:
 \item The \code{host} part is the domain of the url.
 \item The \code{instance}  is the first subpage after the domain in the url.
 \item The \verb{/rest/services} is the second and third subpage in the url. These are standard for all ESRI REST Services.
-\item The \code{folderPath} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
-\item The \code{serviceName} part is the last subpage betore the \verb{/Mapserver} or \verb{/FeatureServer} in the url.
-\item \verb{/Mapserver} or \verb{/FeatureServer} specifies whether the file is a map or feature service.
-\item The \code{id} is optional and specifies the layer or table in the map service.
+\item The \code{folderPath} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part (if available).
+\item The \code{serviceName} part is the last subpage betore the \verb{<serviceType>} in the url.
+\item The \code{serviceType} specifies the type of service. Currently this package works to manage the following serviceTypes: 'MapServer', 'FeatureServer', 'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
+\item The \code{featureID} is optional and specifies the layer or table in the map service.
 }
 }
 \section{Functions}{

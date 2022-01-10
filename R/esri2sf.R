@@ -40,7 +40,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   #make sure url is valid and error otherwise
   tryCatch(
     {
-      esriUrl_isValidID(url, displayReason = TRUE)
+      esriUrl_isValidFeature(url, displayReason = TRUE)
     }, message = function(m) {
       stop(m$message)
     }
@@ -103,7 +103,7 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", progress
   #make sure url is valid and error otherwise
   tryCatch(
     {
-      esriUrl_isValidID(url, displayReason = TRUE)
+      esriUrl_isValidFeature(url, displayReason = TRUE)
     }, message = function(m) {
       stop(m$message)
     }

@@ -6,8 +6,9 @@
 \alias{esriUrl_isValidFolder}
 \alias{esriUrl_isValidService}
 \alias{esriUrl_isValidID}
+\alias{esriUrl_isValidFeature}
 \alias{esriUrl_ServerUrl}
-\alias{esriUrl_serverUrl}
+\alias{esriUrl_serviceUrl}
 \alias{esriUrl_parseUrl}
 \title{Get parts of the Map/Feature Server URL}
 \usage{
@@ -21,9 +22,11 @@ esriUrl_isValidService(url, displayReason = FALSE)
 
 esriUrl_isValidID(url, displayReason = FALSE)
 
+esriUrl_isValidFeature(url, displayReason = FALSE)
+
 esriUrl_ServerUrl(url)
 
-esriUrl_serverUrl(url)
+esriUrl_serviceUrl(url)
 
 esriUrl_parseUrl(url)
 }
@@ -40,9 +43,9 @@ Character string of the request part of the url.
 A collection of functions that pull select parts out of a
 Map/Feature Server URL. All urls should be a form similar to:
 \itemize{
-\item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/<id>}
+\item \verb{https://<host>/<instance>/rest/services/<folderPath>/serviceName>/MapServer/<id>}
 \item \verb{http://<host>/<instance>/rest/services/serviceName>/MapServer}
-\item \verb{<host>/<instance>/rest/services/<folderName>/serviceName>/FeatureServer}
+\item \verb{<host>/<instance>/rest/services/<folderPath>/serviceName>/FeatureServer}
 \item \verb{https://<host>/<instance>/rest/services/serviceName>/FeatureServer/<id>}
 }
 
@@ -52,7 +55,7 @@ And having these rules:
 \item The \code{host} part is the domain of the url.
 \item The \code{instance}  is the first subpage after the domain in the url.
 \item The \verb{/rest/services} is the second and third subpage in the url. These are standard for all ESRI REST Services.
-\item The \code{folderName} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
+\item The \code{folderPath} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part.
 \item The \code{serviceName} part is the last subpage betore the \verb{/Mapserver} or \verb{/FeatureServer} in the url.
 \item \verb{/Mapserver} or \verb{/FeatureServer} specifies whether the file is a map or feature service.
 \item The \code{id} is optional and specifies the layer or table in the map service.
@@ -68,11 +71,13 @@ And having these rules:
 
 \item \code{esriUrl_isValidService}: Check if url is valid for a Service of an ESRI REST Server. No feature ID.
 
-\item \code{esriUrl_isValidID}: Check if url is valid for a feature of an ESRI REST Service.
+\item \code{esriUrl_isValidID}: DEPRECATED Use esriUrl_isValidFeature
 
-\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serverUrl
+\item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST Service.
 
-\item \code{esriUrl_serverUrl}: Retrieve Map/Feature Server URL
+\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serviceUrl
+
+\item \code{esriUrl_serviceUrl}: Retrieve Map/Feature Server URL
 
 \item \code{esriUrl_parseUrl}: Parse Url into parts.
 }}

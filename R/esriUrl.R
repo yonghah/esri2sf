@@ -18,6 +18,12 @@ esriUrl_isValidType <- function(url, type = c(NA_character_, "Root", "Folder", "
   } else if (!is.na(rvest::html_element(rvest::read_html(url), 'div.restErrors'))) {
     reason <- sub("^[[:space:]]*", "", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restErrors')))
     out <- FALSE
+    if (reason == "Invalid URL") {
+      url_encoded <- utils::URLencode(url)
+      if (is.na(rvest::html_element(rvest::read_html(url_encoded), 'div.restErrors'))) {
+        reason <- "Invalid URL: Check encoding of supplied URL."
+      }
+    }
   } else {
     out <- TRUE
   }

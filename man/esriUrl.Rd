@@ -12,27 +12,29 @@
 \alias{esriUrl_parseUrl}
 \title{Validate or parse the parts of a ESRI REST Server URL}
 \usage{
-esriUrl_isValid(url, displayReason = FALSE)
+esriUrl_isValid(url, token = "", displayReason = FALSE)
 
-esriUrl_isValidRoot(url, displayReason = FALSE)
+esriUrl_isValidRoot(url, token = "", displayReason = FALSE)
 
-esriUrl_isValidFolder(url, displayReason = FALSE)
+esriUrl_isValidFolder(url, token = "", displayReason = FALSE)
 
-esriUrl_isValidService(url, displayReason = FALSE)
+esriUrl_isValidService(url, token = "", displayReason = FALSE)
 
-esriUrl_isValidID(url, displayReason = FALSE)
+esriUrl_isValidID(url, token = "", displayReason = FALSE)
 
-esriUrl_isValidFeature(url, displayReason = FALSE)
+esriUrl_isValidFeature(url, token = "", displayReason = FALSE)
 
-esriUrl_ServerUrl(url)
+esriUrl_ServerUrl(url, token = "")
 
-esriUrl_serviceUrl(url)
+esriUrl_serviceUrl(url, token = "")
 
-esriUrl_parseUrl(url)
+esriUrl_parseUrl(url, token = "")
 }
 \arguments{
 \item{url}{The url for a Map/Feature server or for a layer/table in a
 Map/Feature Server.}
+
+\item{token}{String for authentication token (if needed).}
 
 \item{displayReason}{Should the reason for why a url is not valid be displayed.}
 }

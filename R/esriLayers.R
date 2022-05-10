@@ -12,12 +12,13 @@
 #'
 #' @param url The url for the Map/Feature server. If given a url specifying a
 #' layer or table ID it will truncate it.
+#' @param token String for authentication token (if needed).
 #'
 #' @return A list from the JSON return.
 #' @export
-esriLayers <- function(url) {
+esriLayers <- function(url, token = "") {
   #Format url (remove layer.table ID and check it is valid)
-  urlServer <- esriUrl_serviceUrl(url)
+  urlServer <- esriUrl_serviceUrl(url, token = token)
 
   if (!grepl("/(FeatureServer|MapServer)/?$", urlServer)) {
     stop("Url is not valid.\n Service type is not either 'MapServer' or 'FeatureServer'")
@@ -25,6 +26,7 @@ esriLayers <- function(url) {
 
   query <- list(
     f = "json",
+    token = token,
     returnDomainNames = TRUE
   )
 

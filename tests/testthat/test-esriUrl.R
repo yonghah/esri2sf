@@ -18,7 +18,7 @@ test_that("esriUrl_isValidType checks", {
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA"))
   expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test"))
-  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
 
   #General Successes
   expect_true(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"))
@@ -41,7 +41,7 @@ test_that("esriUrl_isValidType checks", {
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Feature'))
   expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Feature', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test", type = 'Feature'))
-  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Feature', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Feature', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
 
   #Valid Service
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3", type = 'Service'))
@@ -57,7 +57,7 @@ test_that("esriUrl_isValidType checks", {
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Service'))
   expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Service', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test", type = 'Service'))
-  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Service', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Service', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
 
   #Valid Folder
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3", type = 'Folder'))
@@ -72,7 +72,7 @@ test_that("esriUrl_isValidType checks", {
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Folder'))
   expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Folder', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test", type = 'Folder'))
-  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Folder', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Folder', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
 
   #Valid Root
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3", type = 'Root'))
@@ -88,7 +88,7 @@ test_that("esriUrl_isValidType checks", {
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Root'))
   expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", type = 'Root', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test", type = 'Root'))
-  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Root', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", type = 'Root', displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
 
   #Test returnType - no type
   expect_identical(esriUrl_isValidType("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3", returnType = TRUE), "Feature")
@@ -147,10 +147,10 @@ test_that("esriUrl_isValid checks", {
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed=TRUE)
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA"))
 
-  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nInvalid URL")
+  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/test", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation.")
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/test"))
 
-  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nService 'Demographics/ESRI_Census' of type 'MapServer' does not exist or is inaccessible..*")
+  expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 400\nMessage: Unable to complete  operation")
   expect_false(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census/MapServer/3"))
 
   expect_message(esriUrl_isValid("https://sampleserver1.arcgisonline.com/ArcGI/rest/services/Demographics/ESRI_Census_USA/MapServer/3", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nCould not access url with {httr}.", fixed = TRUE)
@@ -164,10 +164,10 @@ test_that("esriUrl_isValid requires token", {
   tokenUrl <- paste0("https://", creds[['servername']], "/arcgis/rest/services/PublicSafety/PublicSafetyMapService/MapServer")
   skip_if_offline_url(url = tokenUrl)
 
-  expect_message(esri2sf::esriUrl_isValid(url = tokenUrl, token = "", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nLogin Token Required")
-  expect_false(esri2sf::esriUrl_isValid(url = tokenUrl, token = ""))
+  expect_message(esriUrl_isValid(url = tokenUrl, token = "", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nError code: 499\nMessage: Token Required")
+  expect_false(esriUrl_isValid(url = tokenUrl, token = ""))
 
-  expect_true(esri2sf::esriUrl_isValid(url = tokenUrl, token = token))
+  expect_true(esriUrl_isValid(url = tokenUrl, token = token))
 
 })
 

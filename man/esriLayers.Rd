@@ -2,7 +2,7 @@
 % Please edit documentation in R/esriLayers.R
 \name{esriLayers}
 \alias{esriLayers}
-\title{Get All Layers and Tables for the whole server}
+\title{Get All Layers and Tables for the whole service}
 \usage{
 esriLayers(url)
 }
@@ -16,6 +16,7 @@ A list from the JSON return.
 \description{
 Retrieve JSON for all layers and tables as specified in
 \url{https://si-pweb-vecmap.si.edu/vectormap/sdk/rest/index.html#/All_Layers_and_Tables/02ss0000005t000000/}.
+Service type must either be a MapServer or FeatureServer.
 Performs a POST request towards the server url in one of the following the
 forms:
 \itemize{

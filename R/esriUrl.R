@@ -4,12 +4,15 @@ esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root",
 
   type <- match.arg(type)
 
-  #Manage token
-  url_token <- if (token != "") paste0(url, "?token=", token) else url
+  #Add query parameters
+  query <- list(
+    f = "json",
+    token = token
+  )
 
   # check url succeeds
   urlError <- tryCatch({
-    httr::http_error(httr::GET(url_token))
+    httr::http_error(httr::POST(url, body = query))
   }, error = function(cond) {TRUE})
 
   if (!grepl("/rest/services", url)) {
@@ -18,27 +21,24 @@ esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root",
   } else if (urlError) {
     reason <- "Could not access url with {httr}."
     out <- FALSE
-  } else if (!is.na(rvest::html_element(rvest::read_html(url_token), 'div.restErrors'))) {
-    reason <- sub("^[[:space:]]*", "", rvest::html_text(rvest::html_element(rvest::read_html(url), 'div.restErrors')))
+  } else if ('error' %in% names(jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = 'text')))) {
+    error <- jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = 'text'))[['error']]
+    reason <- paste0("Error code: ", error[['code']], "\nMessage: ", error[['message']])
     out <- FALSE
     if (grepl("Invalid URL", reason)) {
-      url_encoded <- utils::URLencode(url_token)
-      if (is.na(rvest::html_element(rvest::read_html(url_encoded), 'div.restErrors'))) {
+      url_encoded <- utils::URLencode(url)
+      if (!('error' %in% names(jsonlite::fromJSON(httr::content(httr::POST(url_encoded, body = query), as = 'text'))))) {
         reason <- "Invalid URL: Check encoding of supplied URL."
       }
     }
-  } else if (grepl("ArcGIS Server REST API Login", rvest::html_text(rvest::html_element(rvest::read_html(url_token), 'head title')))) {
-    reason <- "Login Token Required"
-    out <- FALSE
   } else {
     out <- TRUE
   }
 
   if (out) {
-
     isType <- c(
       "Root" = grepl("/rest/services/?$", url),
-      "Folder" = grepl("^Folder:", rvest::html_text(rvest::html_element(rvest::read_html(url_token), 'head title'))),
+      "Folder" = 'folders' %in% names(jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = 'text'))),
       "Service" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?$"), url),
       "Feature" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)
     )

@@ -4,11 +4,13 @@
 \alias{esriLayers}
 \title{Get All Layers and Tables for the whole service}
 \usage{
-esriLayers(url)
+esriLayers(url, token = "")
 }
 \arguments{
 \item{url}{The url for the Map/Feature server. If given a url specifying a
 layer or table ID it will truncate it.}
+
+\item{token}{String for authentication token (if needed).}
 }
 \value{
 A list from the JSON return.

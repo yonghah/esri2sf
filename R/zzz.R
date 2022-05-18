@@ -1,38 +1,4 @@
 
-generateToken <- function(server, uid, pwd = "", expiration = 5000) {
-  # generate auth token from GIS server
-  if (pwd == "") pwd <- rstudioapi::askForPassword("pwd")
-
-  query <- list(
-    username = uid,
-    password = pwd,
-    expiration = expiration,
-    client = "requestip",
-    f = "json"
-  )
-
-  r <- httr::POST(paste(server, "arcgis/admin/generateToken", sep = "/"),
-            body = query, encode = "form")
-  jsonlite::fromJSON(httr::content(r, "parsed"))$token
-}
-
-# Generate a OAuth token for Arcgis Online
-# How to obtain clientId and clientSecret is described here:
-# https://developers.arcgis.com/documentation/core-concepts/security-and-authentication/accessing-arcgis-online-services/
-generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
-
-  query = list(
-    client_id = clientId,
-    client_secret = clientSecret,
-    expiration = expiration,
-    grant_type = "client_credentials"
-  )
-
-  r <- httr::POST("https://www.arcgis.com/sharing/rest/oauth2/token", body = query)
-  httr::content(r, type = "application/json")$access_token
-}
-
-
 getObjectIds <- function(queryUrl, where = "1=1", bbox = NULL, token = "", ...) {
 
   # create Simple Features from ArcGIS servers json response

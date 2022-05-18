@@ -45,7 +45,7 @@ generateToken <- function(server, uid, pwd = "", type = c("tokens", "admin"), ex
     f = "json"
   )
 
-  r <- httr::POST(paste(server, "arcgis/", type, "/generateToken", sep = "/"),
+  r <- httr::POST(paste(server, "arcgis", type, "generateToken", sep = "/"),
                   body = query, encode = "form")
   jsonlite::fromJSON(httr::content(r, "parsed"))$token
 }

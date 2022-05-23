@@ -21,13 +21,17 @@ Imports:
     sf (>= 1.0.1),
     DBI,
     RSQLite,
-    crayon,
-    stats
+    stats,
+    cli,
+    xml2,
+    httr2
 Suggests:
     rmarkdown,
     knitr,
     pbapply,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    magick,
+    purrr
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

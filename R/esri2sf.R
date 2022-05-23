@@ -87,12 +87,11 @@ esri2sf <- function(url,
 
   # Use bbox to set geometry and geometryType
   if (!is.null(bbox)) {
-    geometryType <- "esriGeometryEnvelope"
-    geometry <- bbox
-
     if ((class(bbox) != "bbox") & !("sf" %in% class(bbox))) {
       cli::cli_abort("The provided bbox is not a {.code bbox} or {.code sf} class object.")
     }
+
+    geometry <- bbox
   }
 
   if (!is.null(geometry)) {

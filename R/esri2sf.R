@@ -87,27 +87,26 @@ esri2sf <- function(url,
   # Use bbox to set geometry and geometryType
   if (!is.null(bbox)) {
     geometryType <- "esriGeometryEnvelope"
-    geometry <- bbox2geometry(bbox = bbox, layerCRS = layerCRS)
-  } else if (!is.null(geometry)) {
+    geometry <- bbox
 
-    # Set geometryType based on geometry type of simple feature
-    if (class(geometry) == "bbox") {
-      geometryType <- "esriGeometryEnvelope"
-      geometry <- bbox2geometry(bbox = bbox, layerCRS = layerCRS)
-    } else if ("sf" %in% class(geometry)) {
-      geometryType <- sf::st_geometry_type(geometry, by_geometry = FALSE)
-
-      geometryType <-
-        switch(geometryType,
-          "POINT" = "esriGeometryPoint",
-          "MULTIPOLYGON" = "esriGeometryPolygon",
-          "MULTIPOINT" = "esriGeometryMultipoint",
-          "LINESTRING" = "esriGeometryPolyline",
-          "MULTILINESTRING" = "esriGeometryPolyline"
-        )
-
-      geometry <- sf2geometry(x = geometry, geometryType = geometryType, layerCRS = layerCRS)
+    if ((class(bbox) != "bbox") & !("sf" %in% class(bbox))) {
+      cli::cli_abort("The provided bbox is not a {.code bbox} or {.code sf} class object.")
     }
+  }
+
+  if (!is.null(geometry)) {
+    # Set geometryType based on geometry type of simple feature
+    geometryType <-
+      sf2geometryType(
+        x = geometry
+      )
+
+    geometry <-
+      sf2geometry(
+        x = geometry,
+        geometryType = geometryType,
+        layerCRS = layerCRS
+      )
   }
 
   # Alert user with basic layer information
@@ -156,7 +155,7 @@ esri2sf <- function(url,
 #' @export
 #' @importFrom cli cli_alert_warning cli_rule cli_alert_success cli_dl
 esri2df <- function(url,
-                    outFields = c("*"),
+                    outFields = NULL,
                     where = NULL,
                     token = NULL,
                     progress = FALSE,
@@ -203,7 +202,7 @@ esri2df <- function(url,
 #'   `FALSE`.
 #' @export
 #' @importFrom dplyr bind_rows
-esrimeta <- function(url, token = "", fields = FALSE, ...) {
+esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
 
   # FIXME: esriRequest should be able to handle url error messages so url checks should be simplified.
   # make sure url is valid and error otherwise
@@ -226,60 +225,13 @@ esrimeta <- function(url, token = "", fields = FALSE, ...) {
 }
 
 
-#' Helper function for converting bounding box to geometry parameter for spatial filter
-#'
-#' Supports conversion of simple feature to bounding box objects
-#'
-#' @noRd
-#' @importFrom sf st_bbox st_union st_crs st_transform st_as_sfc
-#' @importFrom cli cli_abort
-bbox2geometry <- function(bbox, layerCRS) {
-  if ("sf" %in% class(bbox)) {
-    bbox <- sf::st_bbox(sf::st_union(bbox))
-  }
-
-  if (class(bbox) != "bbox") {
-    cli::cli_abort("The provided bbox is not a {.code bbox} class object.")
-  }
-
-  if (sf::st_crs(bbox) != layerCRS) {
-    bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
-  }
-
-  geometry <- paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
-
-  return(geometry)
-}
-
-
-#' Helper function for converting simple feature object to geometry parameter for spatial filter
-#'
-#' Currently only supports sf objects with POINT geometry.
-#'
-#' @noRd
-#' @importFrom sf st_transform st_coordinates
-#' @importFrom cli cli_abort
-sf2geometry <- function(x, geometryType, layerCRS) {
-  x <- sf::st_transform(x, layerCRS)
-
-  if (geometryType == "esriGeometryPoint") {
-    x <- sf::st_coordinates(x)
-    geometry <- paste0(x, collapse = ",")
-  } else {
-    cli::cli_abort("The {.arg geometry} parameter currently only supports bounding boxes or simple feature POINT objects.")
-  }
-
-  return(geometry)
-}
 
 #' Helper function for getting layer CRS based on spatialReference
 #'
 #' @noRd
 #' @importFrom cli cli_abort
-getLayerCRS <- function(spatialReference) {
+getLayerCRS <- function(spatialReference, layerCRS = NULL) {
   # Get the layer CRS from the layer spatial reference
-  layerCRS <- NULL
-
   if ("latestWkid" %in% names(spatialReference)) {
     layerCRS <- spatialReference$latestWkid
   } else if ("wkid" %in% names(spatialReference)) {
@@ -293,4 +245,71 @@ getLayerCRS <- function(spatialReference) {
   }
 
   return(layerCRS)
+}
+
+sf2geometryType <- function(x, by_geometry = FALSE) {
+  if (class(geometry) == "bbox") {
+    geometryType <- "esriGeometryEnvelope"
+  } else if ("sf" %in% class(geometry)) {
+    geometryType <- sf::st_geometry_type(geometry, by_geometry = by_geometry)
+
+    geometryType <-
+      switch(geometryType,
+        "POINT" = "esriGeometryPoint",
+        "MULTIPOLYGON" = "esriGeometryPolygon",
+        "MULTIPOINT" = "esriGeometryMultipoint",
+        "LINESTRING" = "esriGeometryPolyline",
+        "MULTILINESTRING" = "esriGeometryPolyline"
+      )
+  } else {
+    cli::cli_abort("geometry must be a sf or bbox object")
+  }
+}
+
+#' Helper function for converting simple feature object to geometry parameter for spatial filter
+#'
+#' Currently only supports sf objects with POINT geometry.
+#'
+#' @noRd
+#' @importFrom sf st_transform st_coordinates
+#' @importFrom cli cli_abort
+sf2geometry <- function(x, geometryType, layerCRS = NULL) {
+  if (class(x) == "bbox") {
+    x <- sf::st_sf(sf::st_as_sfc(x))
+  }
+
+  x <- sf::st_transform(x, layerCRS)
+
+  if (geometryType == "esriGeometryEnvelope") {
+    geometry <- paste0(unlist(as.list(x), use.names = FALSE), collapse = ",")
+  } else if (geometryType == "esriGeometryPoint") {
+    x <- sf::st_coordinates(x)
+    geometry <- paste0(x, collapse = ",")
+  } else {
+    cli::cli_abort("The {.arg geometry} parameter currently only supports bounding boxes or simple feature POINT objects.")
+  }
+
+  return(geometry)
+}
+
+
+#' Helper function for converting bounding box to geometry parameter for spatial filter
+#'
+#' Supports conversion of simple feature to bounding box objects
+#'
+#' @noRd
+#' @importFrom sf st_bbox st_union st_crs st_transform st_as_sfc
+#' @importFrom cli cli_abort
+bbox2geometry <- function(bbox, layerCRS) {
+  if ("sf" %in% class(bbox)) {
+    bbox <- sf::st_bbox(sf::st_union(bbox))
+  }
+
+  if (sf::st_crs(bbox) != layerCRS) {
+    bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
+  }
+
+  geometry <- paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
+
+  return(geometry)
 }

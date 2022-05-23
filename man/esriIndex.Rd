@@ -14,7 +14,7 @@ esriIndex(
   ...
 )
 
-esriIndexLayers(url, folderPath = NULL, serviceName = NULL, token = "", ...)
+esriIndexLayers(url, folderPath = NULL, serviceName = NULL, token = NULL, ...)
 }
 \arguments{
 \item{url}{URL for ArcGIS server, folder, or service.}

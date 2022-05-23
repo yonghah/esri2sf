@@ -157,7 +157,7 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
 #' @rdname esriIndex
 #' @export
 #' @importFrom dplyr bind_cols bind_rows
-esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = "", ...) {
+esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = NULL, ...) {
   esriResp <- esriCatalog(url, token = token, ...)
 
   index <- NULL

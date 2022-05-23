@@ -5,8 +5,9 @@ Version: 0.1.1
 Authors@R: c(
     person(family = "Yongha", given = "Hwang", email = "yongha.hwang@gmail.com", role = c("aut", "cre")), 
     person(family = "Cazelles", given = "Kevin", role = c("aut", "ctb")),
-    person(family = "Peterson", given = "Jacob", role = c("aut", "ctb"))
+    person(family = "Peterson", given = "Jacob", role = c("aut", "ctb")),
     person(family = "Pousson", given = "Eli", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8280-1706"))
+    )
 Description: This package enables you to scrape geographic features 
     directly from ArcGIS servers REST API into R as simple features. 
 URL: https://github.com/yonghah/esri2sf/

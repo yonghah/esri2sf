@@ -45,6 +45,8 @@
 #' plot(df)
 #'
 #' @export
+#' @importFrom cli cli_alert_warning cli_rule cli_abort cli_alert_success cli_dl
+#' @importFrom sf st_geometry_type
 
 esri2sf <- function(url,
                     outFields = c("*"),
@@ -164,6 +166,7 @@ esri2sf <- function(url,
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
+#' @importFrom cli cli_alert_warning cli_rule cli_alert_success cli_dl
 esri2df <- function(url,
                     outFields = c("*"),
                     where = "1=1",
@@ -211,6 +214,7 @@ esri2df <- function(url,
 #' @param fields `esrimeta` returns data frame with fields if `TRUE`. Default
 #'   `FALSE`.
 #' @export
+#' @importFrom dplyr bind_rows
 esrimeta <- function(url, token = "", fields = FALSE, ...) {
 
   # FIXME: esriRequest should be able to handle url error messages so url checks should be simplified.

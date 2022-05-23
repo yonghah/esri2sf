@@ -19,6 +19,7 @@
 #' @param ... Additional parameters passed to
 #' @return A list from the JSON return.
 #' @export
+#' @importFrom httr2 resp_body_json
 esriLayers <- function(url, token = NULL, returnUpdates = NULL, returnDomainNames = TRUE, ...) {
   # Format url (remove layer.table ID and check it is valid)
   urlServer <- esriUrl_serviceUrl(url, token = token)

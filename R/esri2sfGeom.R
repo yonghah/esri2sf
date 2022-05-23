@@ -1,6 +1,8 @@
 #' Convert esri geometry features to sfc objects
 #'
 #' @noRd
+#' @importFrom dplyr bind_rows
+#' @importFrom sf st_sf
 esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
   # convert esri json to simple feature
   geoms <- switch(layerGeomType,
@@ -33,6 +35,7 @@ esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
 #' Convert esriGeometryPoint to sfc MULTIPOINT
 #'
 #' @noRd
+#' @importFrom sf st_point st_sfc
 esri2sfPoint <- function(features) {
   getPointGeometry <- function(feature) {
     if (is.numeric(unlist(feature$geometry))) {
@@ -47,6 +50,7 @@ esri2sfPoint <- function(features) {
 #' Convert esriGeometryPolygon to sfc MULTIPOLYGON
 #'
 #' @noRd
+#' @importFrom sf st_multipolygon st_sfc
 esri2sfPolygon <- function(features) {
   ring2matrix <- function(ring) do.call(rbind, lapply(ring, unlist))
   rings2multipoly <- function(rings) {
@@ -67,6 +71,7 @@ esri2sfPolygon <- function(features) {
 #' Convert esriGeometryPolyline to sfc MULTILINESTRING
 #'
 #' @noRd
+#' @importFrom sf st_multilinestring st_sfc
 esri2sfPolyline <- function(features) {
   path2matrix <- function(path) do.call(rbind, lapply(path, unlist))
   paths2multiline <- function(paths) sf::st_multilinestring(lapply(paths, path2matrix))

@@ -1,6 +1,7 @@
 #' Get object ids
 #'
 #' @noRd
+#' @importFrom httr2 resp_body_json
 getObjectIds <- function(url,
                          where = "1=1",
                          token = NULL,
@@ -49,6 +50,7 @@ getMaxRecordsCount <- function(url,
 #' Get table for Table layer
 #'
 #' @noRd
+#' @importFrom dplyr bind_rows as_tibble
 getEsriTable <- function(jsonFeats) {
   atts <- lapply(
     lapply(jsonFeats, `[[`, 1),
@@ -63,6 +65,8 @@ getEsriTable <- function(jsonFeats) {
 #' Get features using feature ids from getObjectIds
 #'
 #' @noRd
+#' @importFrom httr2 resp_body_json
+#' @importFrom cli cli_abort
 getEsriFeaturesByIds <- function(ids,
                                  url,
                                  fields = c("*"),
@@ -110,6 +114,10 @@ getEsriFeaturesByIds <- function(ids,
 #' Get ESRI features
 #'
 #' @noRd
+#' @importFrom cli cli_alert_danger
+#' @importFrom dplyr case_when
+#' @importFrom jsonlite toJSON
+#' @importFrom sf st_crs
 getEsriFeatures <- function(url,
                             fields = c("*"),
                             where = "1=1",
@@ -176,6 +184,10 @@ getEsriFeatures <- function(url,
 #' Get authority string for WKT (well known text) id
 #'
 #' @noRd
+#' @importFrom sf sf_proj_search_paths
+#' @importFrom DBI dbConnect dbGetQuery dbDisconnect
+#' @importFrom RSQLite SQLite
+#' @importFrom cli cli_abort
 getWKTidAuthority <- function(wktID) {
   projPaths <- file.path(sf::sf_proj_search_paths(), "proj.db")
   projDB <- projPaths[file.exists(projPaths)][1]

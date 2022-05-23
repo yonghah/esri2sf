@@ -14,8 +14,9 @@
 #' @inheritParams esriRequest
 #' @rdname esriInfo
 #' @export
-#' @importFrom httr2 request req_url_path_append req_url_query req_perform resp_body_json
+#' @importFrom httr2 resp_body_json resp_body_xml resp_body_raw
 #' @importFrom dplyr as_tibble
+#' @importFrom cli cli_abort
 esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   info <- match.arg(info, c("item", "metadata", "thumbnail", "info"))
 

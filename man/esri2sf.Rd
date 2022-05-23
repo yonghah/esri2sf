@@ -3,7 +3,6 @@
 \name{esri2sf}
 \alias{esri2sf}
 \alias{esri2df}
-\alias{esrimeta}
 \title{Import data from ESRI's ArcGIS Server}
 \usage{
 esri2sf(
@@ -11,11 +10,12 @@ esri2sf(
   outFields = c("*"),
   where = "1=1",
   bbox = NULL,
-  token = "",
+  token = NULL,
   geomType = NULL,
   crs = 4326,
   progress = FALSE,
-  replaceDomainInfo = TRUE,
+  replaceDomainInfo = FALSE,
+  geometry = NULL,
   ...
 )
 
@@ -23,39 +23,49 @@ esri2df(
   url,
   outFields = c("*"),
   where = "1=1",
-  token = "",
+  token = NULL,
   progress = FALSE,
-  replaceDomainInfo = TRUE,
+  replaceDomainInfo = FALSE,
   ...
 )
-
-esrimeta(url, token = "", fields = FALSE)
 }
 \arguments{
-\item{url}{character string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
+\item{url}{character string for service url, e.g.
+\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
 
-\item{outFields}{vector of fields you want to include. default is '*' for all fields".}
+\item{outFields}{vector of fields you want to include. default is '*' for all
+fields".}
 
 \item{where}{string for where condition. Default is \code{1=1} for all rows.}
 
-\item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}}.}
+\item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}} or a simple feature object
+that can be converted to a bounding box.}
 
-\item{token}{string for authentication token (if needed).}
+\item{token}{string for authentication token (if needed). defaults to \code{NULL}.}
 
-\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to be inferred from the server)}
+\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon'
+or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to
+be inferred from the server)}
 
-\item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be NULL or a CRS that can be handled by GDAL through sf::st_sf(). Default is 4326. NULL returns the feature in the same CRS that the layer is hosted as in the Feature/Map Server.}
+\item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be
+\code{NULL} or a CRS that can be handled by GDAL through sf::st_sf(). Default is
+4326. \code{NULL} returns the feature in the same CRS that the layer is hosted as
+in the Feature/Map Server.}
 
-\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if TRUE. Default FALSE.}
+\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}. Default
+FALSE.}
 
-\item{replaceDomainInfo}{add domain information to the return dataframe? Default TRUE.}
+\item{replaceDomainInfo}{add domain information to the return dataframe?
+Default \code{TRUE}.}
 
-\item{...}{additional named parameters to pass to the query. ex) "resultRecordCount = 3"}
+\item{geometry}{A sf object.}
 
-\item{fields}{\code{esrimeta} returns dataframe with fields if TRUE. Default FALSE.}
+\item{...}{additional named parameters to pass to the query. (e.g.
+\code{"resultRecordCount = 3"})}
 }
 \value{
-sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or dataframe (\code{esrimeta}).
+sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or
+dataframe (\code{esrimeta}).
 }
 \description{
 These functions are the interface to the user.
@@ -65,8 +75,6 @@ These functions are the interface to the user.
 \item \code{esri2sf}: Retrieve spatial object
 
 \item \code{esri2df}: Retrieve table object (no spatial data).
-
-\item \code{esrimeta}: Retrieve layer metadata
 }}
 
 \note{

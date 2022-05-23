@@ -4,13 +4,26 @@
 \alias{esriLayers}
 \title{Get All Layers and Tables for the whole service}
 \usage{
-esriLayers(url, token = "")
+esriLayers(
+  url,
+  token = NULL,
+  returnUpdates = NULL,
+  returnDomainNames = TRUE,
+  ...
+)
 }
 \arguments{
 \item{url}{The url for the Map/Feature server. If given a url specifying a
 layer or table ID it will truncate it.}
 
-\item{token}{String for authentication token (if needed).}
+\item{token}{String for authentication token; defaults to \code{NULL}.}
+
+\item{returnUpdates}{If \code{TRUE}, updated features will be returned; defaults to \code{NULL}.}
+
+\item{returnDomainNames}{If \code{TRUE}, the REST API response does not include
+the full domain information for each layer (only the domain names). Defaults to \code{TRUE}.}
+
+\item{...}{Additional parameters passed to}
 }
 \value{
 A list from the JSON return.
@@ -19,7 +32,7 @@ A list from the JSON return.
 Retrieve JSON for all layers and tables as specified in
 \url{https://si-pweb-vecmap.si.edu/vectormap/sdk/rest/index.html#/All_Layers_and_Tables/02ss0000005t000000/}.
 Service type must either be a MapServer or FeatureServer.
-Performs a POST request towards the server url in one of the following the
+Performs a request towards the server url in one of the following the
 forms:
 \itemize{
 \item \verb{https://<host>/<instance>/rest/services/<folderName>/serviceName>/MapServer/layers}

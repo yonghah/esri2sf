@@ -5,7 +5,13 @@
 \alias{generateOAuthToken}
 \title{Create authorization tokens}
 \usage{
-generateToken(server, uid, pwd = "", expiration = 5000)
+generateToken(
+  server,
+  uid,
+  pwd = "",
+  type = c("tokens", "admin"),
+  expiration = 5000
+)
 
 generateOAuthToken(clientId, clientSecret, expiration = 5000)
 }
@@ -19,13 +25,13 @@ the server}
 the server. If left blank, RStudio will prompt you for the password. If you
 aren't using RStudio, you must specify it in the function call.}
 
+\item{type}{Either 'tokens' or 'admin'. Specify the endpoint you use to
+create the token. Defaults to 'tokens'.}
+
 \item{expiration}{Set an expiration limit on the token in minutes. Max
 expiration date may be controlled by the server.}
 
 \item{clientId}{Client ID}
-
-\item{type}{Either 'tokens' or 'admin'. Specify the endpoint you use to
-create the token. Defaults to 'tokens'.}
 
 \item{cliendSecret}{Client Secret}
 }

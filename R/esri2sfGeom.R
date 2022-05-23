@@ -4,9 +4,9 @@
 esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
   # convert esri json to simple feature
   geoms <- switch(layerGeomType,
-                  esriGeometryPolygon = esri2sfPolygon(jsonFeats),
-                  esriGeometryPoint = esri2sfPoint(jsonFeats),
-                  esriGeometryPolyline = esri2sfPolyline(jsonFeats)
+    esriGeometryPolygon = esri2sfPolygon(jsonFeats),
+    esriGeometryPoint = esri2sfPoint(jsonFeats),
+    esriGeometryPolyline = esri2sfPolyline(jsonFeats)
   )
 
   # Format CRS

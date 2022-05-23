@@ -105,4 +105,3 @@ extent2bbox <- function(x, crs = 4326) {
     crs = crs
   )
 }
-

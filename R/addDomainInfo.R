@@ -10,12 +10,18 @@
 #' @param token string for authentication token (if needed).
 #'
 #' @return An {sf} dataframe
-addDomainInfo <- function(df, url, token = "") {
+addDomainInfo <- function(df, url, token = NULL) {
   # Get Field Metadata
   layerTableFields <- esrimeta(url, token = token, fields = TRUE)
 
   # Check for domain column
   if (!("domain" %in% names(layerTableFields))) {
+    return(df)
+  }
+
+  # Check if any values in the domain list column are NULL
+  if (any(lapply(layerTableFields[["domain"]], is.null))) {
+    cli::cli_alert("This layer has partial domain information but {.fn addDomainInfo} does not support this possibility.")
     return(df)
   }
 
@@ -26,12 +32,12 @@ addDomainInfo <- function(df, url, token = "") {
 
   # Check that domain column is a dataframe
   if (!("data.frame" %in% class(layerTableFields[["domain"]]))) {
-    stop("The domain field in the layerTableFields is not a dataframe. Edits need to be made to the addDomainInfo() function. Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the issue can be fixed.")
+    cli::cli_abort("The domain field in the layerTableFields is not a dataframe. Edits need to be made to the addDomainInfo() function. Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the issue can be fixed.")
   }
 
   # Check that domain dataframe is the same length as the layerTableFields dataframe.
   if (nrow(layerTableFields) != nrow(layerTableFields[["domain"]])) {
-    stop("The domain dataframe in the layerTableFields is not the same length as the layerTableFields dataframe. Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the issue can be fixed.")
+    cli::cli_abort("The domain dataframe in the layerTableFields is not the same length as the layerTableFields dataframe. Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the issue can be fixed.")
   }
 
   # Reformat layerTableFields so that its all one dataframe
@@ -44,7 +50,7 @@ addDomainInfo <- function(df, url, token = "") {
   domainTypes <- stats::na.omit(layerTableFields[["domain_type"]])
   if (!all(domainTypes %in% handledDomainTypes)) {
     newDomainTypes <- domainTypes[!(domainTypes %in% handledDomainTypes)]
-    stop(paste0("Field domain of type(s): ", paste0("'", newDomainTypes, "'", collapse = ", "), " found in the function esri2sf:::getDomainInfo(). Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the novel domain type can be handled by the package."))
+    cli::cli_abort(paste0("Field domain of type(s): ", paste0("'", newDomainTypes, "'", collapse = ", "), " found in the function esri2sf:::getDomainInfo(). Please start an issue at 'https://github.com/yonghah/esri2sf/issues/new/choose' so that the novel domain type can be handled by the package."))
   }
 
 

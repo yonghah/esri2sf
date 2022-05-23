@@ -4,7 +4,7 @@
 \alias{addDomainInfo}
 \title{Add domain information to the return (sf) dataframe}
 \usage{
-addDomainInfo(df, url, token = "")
+addDomainInfo(df, url, token = NULL)
 }
 \arguments{
 \item{df}{The returned (sf) df from esri2sf/esri2df.}

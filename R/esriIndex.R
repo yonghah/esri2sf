@@ -1,7 +1,7 @@
 #' Create an index of folders, services, layers, and tables for an ArcGIS Server
 #'
 #' Currently only returns layers and tables for MapServer and FeatureServer
-#' services. Consider using [esriCatalog] with `format = "sitemap"` or `format = "geositemap"`
+#' services. Consider using [esriCatalog] with `f = "sitemap"` or `f = "geositemap"`
 #' as an alternative approach to indexing available folders and services.
 #'
 #' @rdname esriIndex
@@ -220,17 +220,20 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #' @rdname esriCatalog
 #' @param format Format to use for request. Supported options include "json", "sitemap", or "geositemap"; "html" and "kmz" are not
 #'   currently supported.
-#' @param option Option parameter, "footprints" is the only option.
-#' @param outSR Output spatial reference.
+#' @param option If `option = "footprints"` and the url is for a folder, spatial
+#'   footprints of all map, feature, and image services in that folder are
+#'   returned as a feature collection
+#' @param outSR Output spatial reference of the geometry returned in footprints;
+#'   only supported when `option = "footprints"`.
 #' @inheritParams esriRequest
 #' @export
 #' @importFrom httr2 request req_url_query req_perform resp_body_json resp_body_xml
 #' @importFrom xml2 as_list
 #' @importFrom dplyr bind_rows
-esriCatalog <- function(url, format = "json", token = NULL, option = NULL, outSR = NULL, ...) {
-  format <- match.arg(format, c("json", "html", "kmz", "sitemap", "geositemap"))
+esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...) {
+  f <- match.arg(f, c("json", "html", "kmz", "sitemap", "geositemap"))
 
-  if (format == "json") {
+  if (f == "json") {
     stopifnot(
       is.null(option) | (option == "footprints"),
       is.null(outSR) | (!is.null(outSR) && (option == "footprints"))
@@ -245,14 +248,14 @@ esriCatalog <- function(url, format = "json", token = NULL, option = NULL, outSR
 
     resp <-
       switch(resp,
-        "catalog" = esriRequest(url, format = format, token = token, ...),
-        "option" = esriRequest(url, format = format, token = token, option = option, ...),
-        "outSR" = esriRequest(url, format = format, token = token, option = option, outSR = outSR, ...)
+        "catalog" = esriRequest(url, f = f, token = token, ...),
+        "option" = esriRequest(url, f = f, token = token, option = option, ...),
+        "outSR" = esriRequest(url, f = f, token = token, option = option, outSR = outSR, ...)
       )
 
-    json <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
+    resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 
-    return(json)
+    return(resp)
   }
 
   if (format %in% c("sitemap", "geositemap")) {
@@ -265,5 +268,5 @@ esriCatalog <- function(url, format = "json", token = NULL, option = NULL, outSR
     return(sitemap)
   }
 
-  cli::cli_abort("{.fn esriCatalog} does not support {.val {format}} as a {.arg format} argument.")
+  cli::cli_abort("{.fn esriCatalog} does not support {.val {f}} as a {.arg f} argument.")
 }

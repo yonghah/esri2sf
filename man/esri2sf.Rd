@@ -21,7 +21,7 @@ esri2sf(
 
 esri2df(
   url,
-  outFields = c("*"),
+  outFields = NULL,
   where = NULL,
   token = NULL,
   progress = FALSE,
@@ -55,10 +55,11 @@ as in the Feature/Map Server.}
 \item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}.
 Default FALSE.}
 
-\item{replaceDomainInfo}{add domain information to the return data frame?
+\item{replaceDomainInfo}{If \code{TRUE}, add domain information to the return data frame.
 Default \code{FALSE}.}
 
-\item{geometry}{A sf object.}
+\item{geometry}{An \code{sf} or \code{bbox} object. Only sf objects a single \code{POINT}
+feature are currently supported.}
 
 \item{...}{additional named parameters to pass to the query. (e.g.
 \code{"resultRecordCount = 3"})}

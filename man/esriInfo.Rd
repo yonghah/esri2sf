@@ -13,8 +13,7 @@ REST API.}
 \item{info}{Options include "item", "metadata", or "thumbnail".}
 
 \item{format}{If \code{info = "metadata"}, options include "fgdc" or "iso19139";
-"json" format is used for \code{info = "item"} and no format is required for
-\code{info = "thumbnail"}}
+no format is required if \code{info} is "item" or "thumbnail".}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 

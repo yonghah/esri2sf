@@ -4,7 +4,7 @@
 #'   REST API.
 #' @param append String to append to url using [httr2::req_url_path_append];
 #'   defaults to `NULL`.
-#' @param format Return format to use as query parameter with
+#' @param format,f Return format to use as query parameter with
 #'   [httr2::req_url_query]; defaults to "json".
 #' @param token String for authentication token; defaults to `NULL`.
 #' @param perform If `TRUE`, perform the request with [httr2::req_perform] and
@@ -13,7 +13,7 @@
 #' @rdname esriRequest
 #' @importFrom httr2 request req_url_path_append req_url_query req_perform
 #' @importFrom cli cli_ul cli_abort
-esriRequest <- function(url, append = NULL, format = "json", token = NULL, perform = TRUE, ...) {
+esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NULL, perform = TRUE, ...) {
   # Make request based on url
   req <- httr2::request(url)
 
@@ -22,9 +22,14 @@ esriRequest <- function(url, append = NULL, format = "json", token = NULL, perfo
     req <- httr2::req_url_path_append(req = req, append)
   }
 
+  # Add f query parameter if provided
+  if (!is.null(f)) {
+    req <- httr2::req_url_query(req = req, f = f)
+  }
+
   # Add format query parameter if provided
   if (!is.null(format)) {
-    req <- httr2::req_url_query(req = req, f = format)
+    req <- httr2::req_url_query(req = req, format = format)
   }
 
   # Add token and other query parameters

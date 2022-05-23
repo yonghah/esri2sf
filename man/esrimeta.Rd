@@ -4,7 +4,7 @@
 \alias{esrimeta}
 \title{Retrieve layer metadata}
 \usage{
-esrimeta(url, token = "", fields = FALSE, ...)
+esrimeta(url, token = NULL, fields = FALSE, ...)
 }
 \arguments{
 \item{url}{url to retrieve metadata for.}

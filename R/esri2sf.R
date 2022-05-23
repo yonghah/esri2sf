@@ -18,10 +18,11 @@
 #'   as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()] or a simple feature object
 #'   that can be converted to a bounding box.
-#' @param geometry A sf object.
+#' @param geometry An `sf` or `bbox` object. Only sf objects a single `POINT`
+#'   feature are currently supported.
 #' @param progress Show progress bar with [pbapply::pblapply()] if `TRUE`.
 #'   Default FALSE.
-#' @param replaceDomainInfo add domain information to the return data frame?
+#' @param replaceDomainInfo If `TRUE`, add domain information to the return data frame.
 #'   Default `FALSE`.
 #' @param ... additional named parameters to pass to the query. (e.g.
 #'   `"resultRecordCount = 3"`)

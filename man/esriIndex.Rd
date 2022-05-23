@@ -32,6 +32,6 @@ Defaults to \code{FALSE}.}
 }
 \description{
 Currently only returns layers and tables for MapServer and FeatureServer
-services. Consider using \link{esriCatalog} with \code{format = "sitemap"} or \code{format = "geositemap"}
+services. Consider using \link{esriCatalog} with \code{f = "sitemap"} or \code{f = "geositemap"}
 as an alternative approach to indexing available folders and services.
 }

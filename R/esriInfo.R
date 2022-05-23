@@ -9,8 +9,7 @@
 #'
 #' @param info Options include "item", "metadata", or "thumbnail".
 #' @param format If `info = "metadata"`, options include "fgdc" or "iso19139";
-#'   "json" format is used for `info = "item"` and no format is required for
-#'   `info = "thumbnail"`
+#'   no format is required if `info` is "item" or "thumbnail".
 #' @inheritParams esriRequest
 #' @rdname esriInfo
 #' @export
@@ -29,13 +28,13 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
 
   if (info == "item") {
-    format <- "json"
+    f <- "json"
 
     resp <-
       esriRequest(
         url = url,
         append = append,
-        format = format,
+        f = f,
         token = token
       )
 

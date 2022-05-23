@@ -17,7 +17,7 @@ getObjectIds <- function(url,
       url = url,
       append = "query",
       token = token,
-      format = "json",
+      f = "json",
       where = where,
       geometryType = geometryType,
       geometry = geometry,
@@ -77,7 +77,6 @@ getEsriFeaturesByIds <- function(ids,
                                  token = NULL,
                                  crs = 4326,
                                  ...) {
-
   if (is.null(fields)) {
     fields <- c("*")
   }
@@ -87,7 +86,7 @@ getEsriFeaturesByIds <- function(ids,
     esriRequest(
       url,
       append = "query",
-      format = "json",
+      f = "json",
       token = token,
       objectIds = paste(ids, collapse = ","),
       outFields = paste(fields, collapse = ","),

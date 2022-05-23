@@ -5,29 +5,28 @@
 \title{Get information on folders, services, tables, and layers using the Catalog
 service}
 \usage{
-esriCatalog(
-  url,
-  format = "json",
-  token = NULL,
-  option = NULL,
-  outSR = NULL,
-  ...
-)
+esriCatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
 }
 \arguments{
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
 REST API.}
 
-\item{format}{Format to use for request. Supported options include "json", "sitemap", or "geositemap"; "html" and "kmz" are not
-currently supported.}
+\item{f}{Return format to use as query parameter with
+\link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
-\item{option}{Option parameter, "footprints" is the only option.}
+\item{option}{If \code{option = "footprints"} and the url is for a folder, spatial
+footprints of all map, feature, and image services in that folder are
+returned as a feature collection}
 
-\item{outSR}{Output spatial reference.}
+\item{outSR}{Output spatial reference of the geometry returned in footprints;
+only supported when \code{option = "footprints"}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
+
+\item{format}{Format to use for request. Supported options include "json", "sitemap", or "geositemap"; "html" and "kmz" are not
+currently supported.}
 }
 \description{
 \url{https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm}

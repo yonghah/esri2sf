@@ -17,7 +17,16 @@ esriRequest(
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
 REST API.}
 
+\item{append}{String to append to url using \link[httr2:req_url]{httr2::req_url_path_append};
+defaults to \code{NULL}.}
+
+\item{format}{Return format to use as query parameter with
+\link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
+
 \item{token}{String for authentication token; defaults to \code{NULL}.}
+
+\item{perform}{If \code{TRUE}, perform the request with \link[httr2:req_perform]{httr2::req_perform} and
+return the response. If \code{FALSE}, return the request.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }

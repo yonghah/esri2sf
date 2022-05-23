@@ -2,7 +2,13 @@
 #'
 #' @param url A folder, service, or layer URL that can be used with the ArcGIS
 #'   REST API.
+#' @param append String to append to url using [httr2::req_url_path_append];
+#'   defaults to `NULL`.
+#' @param format Return format to use as query parameter with
+#'   [httr2::req_url_query]; defaults to "json".
 #' @param token String for authentication token; defaults to `NULL`.
+#' @param perform If `TRUE`, perform the request with [httr2::req_perform] and
+#'   return the response. If `FALSE`, return the request.
 #' @param ... Additional parameters passed to [httr2::req_url_query]
 #' @rdname esriRequest
 #' @importFrom httr2 request req_url_path_append req_url_query req_perform

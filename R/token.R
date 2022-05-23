@@ -46,7 +46,8 @@ generateToken <- function(server, uid, pwd = "", type = c("tokens", "admin"), ex
   )
 
   r <- httr::POST(paste(server, "arcgis", type, "generateToken", sep = "/"),
-                  body = query, encode = "form")
+    body = query, encode = "form"
+  )
   jsonlite::fromJSON(httr::content(r, "parsed"))$token
 }
 
@@ -54,8 +55,7 @@ generateToken <- function(server, uid, pwd = "", type = c("tokens", "admin"), ex
 #' @describeIn token Create ArcGIS OAuth Token
 #' @export
 generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
-
-  query = list(
+  query <- list(
     client_id = clientId,
     client_secret = clientSecret,
     expiration = expiration,

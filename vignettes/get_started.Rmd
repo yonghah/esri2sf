@@ -44,18 +44,18 @@ What you need is the URL of REST service you want. You can get the URL by asking
 ### Point data
 
 ```{r}
-url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
+url <- "https://carto.nationalmap.gov/arcgis/rest/services/transportation/MapServer/15"
 df <- esri2sf(url)
 plot(df)
 ```
 
 ### Polyline data
 
-You can filter output fields. This may take a minute since it gets 18000 polylines. 
+You can filter output fields.
 
 ```{r}
-url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0"
-outFields <- c("AADT", "DFLG")
+url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/LocalGovernmentInfrastructureBasemap/MapServer/112"
+outFields <- c("RAILROAD", "MILES")
 df <- esri2sf(url, outFields)
 plot(df)
 ```
@@ -68,7 +68,7 @@ You can filter rows as well by giving where condition.
 ```{r}
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 where <- "STATE_NAME = 'Michigan'"
-df <- esri2sf(url, where=where, outFields=c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI"))
+df <- esri2sf(url, where=where, outFields=c("POP2000", "POP2007", "POP00_SQMI", "POP07_SQMI"))
 plot(df)
 ```
 

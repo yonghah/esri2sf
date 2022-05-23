@@ -3,11 +3,15 @@
 #' @noRd
 #' @importFrom httr2 resp_body_json
 getObjectIds <- function(url,
-                         where = "1=1",
+                         where = NULL,
                          token = NULL,
                          geometry = NULL,
                          geometryType = NULL,
                          ...) {
+  if (is.null(where)) {
+    where <- "1=1"
+  }
+
   resp <-
     esriRequest(
       url = url,
@@ -30,9 +34,9 @@ getObjectIds <- function(url,
 #'
 #' @noRd
 getMaxRecordsCount <- function(url,
-                               token = "",
+                               token = NULL,
                                upperLimit = FALSE) {
-  urlInfo <- esriCatalog(url)
+  urlInfo <- esriCatalog(url = url, token = token)
 
   if (!is.null(urlInfo[["maxRecordCount"]])) {
     if (urlInfo[["maxRecordCount"]] > 25000 & upperLimit) {
@@ -69,10 +73,14 @@ getEsriTable <- function(jsonFeats) {
 #' @importFrom cli cli_abort
 getEsriFeaturesByIds <- function(ids,
                                  url,
-                                 fields = c("*"),
+                                 fields = NULL,
                                  token = NULL,
                                  crs = 4326,
                                  ...) {
+
+  if (is.null(fields)) {
+    fields <- c("*")
+  }
 
   # create Simple Features from ArcGIS servers json response
   resp <-
@@ -119,8 +127,8 @@ getEsriFeaturesByIds <- function(ids,
 #' @importFrom jsonlite toJSON
 #' @importFrom sf st_crs
 getEsriFeatures <- function(url,
-                            fields = c("*"),
-                            where = "1=1",
+                            fields = NULL,
+                            where = NULL,
                             geometry = NULL,
                             geometryType = NULL,
                             token = NULL,

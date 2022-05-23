@@ -7,8 +7,8 @@
 \usage{
 esri2sf(
   url,
-  outFields = c("*"),
-  where = "1=1",
+  outFields = NULL,
+  where = NULL,
   bbox = NULL,
   token = NULL,
   geomType = NULL,
@@ -22,7 +22,7 @@ esri2sf(
 esri2df(
   url,
   outFields = c("*"),
-  where = "1=1",
+  where = NULL,
   token = NULL,
   progress = FALSE,
   replaceDomainInfo = FALSE,
@@ -33,10 +33,10 @@ esri2df(
 \item{url}{character string for service url, e.g.
 \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
 
-\item{outFields}{vector of fields you want to include. default is '*' for all
-fields".}
+\item{outFields}{vector of fields you want to include. default is \code{NULL} for
+all fields.}
 
-\item{where}{string for where condition. Default is \code{1=1} for all rows.}
+\item{where}{string for where condition. Default is \code{NULL} for all rows.}
 
 \item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}} or a simple feature object
 that can be converted to a bounding box.}
@@ -49,14 +49,14 @@ be inferred from the server)}
 
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be
 \code{NULL} or a CRS that can be handled by GDAL through sf::st_sf(). Default is
-4326. \code{NULL} returns the feature in the same CRS that the layer is hosted as
-in the Feature/Map Server.}
+4326. \code{NULL} returns the feature in the same CRS that the layer is hosted
+as in the Feature/Map Server.}
 
-\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}. Default
-FALSE.}
+\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}.
+Default FALSE.}
 
-\item{replaceDomainInfo}{add domain information to the return dataframe?
-Default \code{TRUE}.}
+\item{replaceDomainInfo}{add domain information to the return data frame?
+Default \code{FALSE}.}
 
 \item{geometry}{A sf object.}
 

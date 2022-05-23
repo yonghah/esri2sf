@@ -28,6 +28,8 @@ esriRequest <- function(url, append = NULL, format = "json", token = NULL, perfo
 
   req <- httr2::req_url_query(req = req, token = token, ...)
 
+  req <- httr2::req_user_agent(req = req, "esri2sf (https://github.com/yonghah/esri2sf)")
+
   # Return request if perform is FALSE
   if (!perform) {
     return(req)

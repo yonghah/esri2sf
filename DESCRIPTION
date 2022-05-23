@@ -3,35 +3,37 @@ Type: Package
 Title: Create Simple Features from ArcGIS Server REST API
 Version: 0.1.1
 Authors@R: c(
-    person("Yongha", "Hwang", email = "yongha.hwang@gmail.com", role = c("aut", "cre")), 
-    person("Cazelles", "Kevin", role = c("aut", "ctb")),
-    person("Peterson", "Jacob", role = c("aut", "ctb"))
-    )
+    person(family = "Yongha", given = "Hwang", email = "yongha.hwang@gmail.com", role = c("aut", "cre")), 
+    person(family = "Cazelles", given = "Kevin", role = c("aut", "ctb")),
+    person(family = "Peterson", given = "Jacob", role = c("aut", "ctb"))
+    person(family = "Pousson", given = "Eli", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8280-1706"))
 Description: This package enables you to scrape geographic features 
     directly from ArcGIS servers REST API into R as simple features. 
+URL: https://github.com/yonghah/esri2sf/
+BugReports: https://github.com/yonghah/esri2sf/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.1.0)
 Imports:
+    cli,
+    DBI,
     dplyr,
-    jsonlite,
     httr,
+    httr2,
+    jsonlite,
+    RSQLite,
     rstudioapi,
     sf (>= 1.0.1),
-    DBI,
-    RSQLite,
     stats,
-    cli,
-    xml2,
-    httr2
+    xml2
 Suggests:
-    rmarkdown,
     knitr,
-    pbapply,
-    testthat (>= 3.0.0),
     magick,
-    purrr
+    pbapply,
+    purrr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

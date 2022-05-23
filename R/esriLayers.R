@@ -29,7 +29,7 @@ esriLayers <- function(url, token = NULL, returnUpdates = NULL, returnDomainName
   resp <-
     esriRequest(
       url = url,
-      format = "json",
+      f = "json",
       token = token,
       returnDomainNames = returnDomainNames,
       returnUpdates = returnUpdates

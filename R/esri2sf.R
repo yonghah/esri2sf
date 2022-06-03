@@ -63,6 +63,9 @@ esri2sf <- function(url,
                     ...) {
   layerInfo <- esrimeta(url = url, token = token)
 
+  # Share basic layer information
+  cli::cli_alert_success("Downloading {.val {layerInfo$name}} from {.url {url}}")
+
   # Get the layer geometry type
   if (is.null(geomType)) {
     if (is.null(layerInfo$geometryType) | (layerInfo$geometryType == "")) {
@@ -73,10 +76,43 @@ esri2sf <- function(url,
     }
 
     layerGeomType <- layerInfo$geometryType
+  } else {
+
+    if ((!is.null(layerInfo$geometryType)) && (layerInfo$geometryType != geomType)) {
+      cli::cli_alert_warning(
+        "The provided {.arg geomType} value {.val {geomType}} does not match the layer geometryType value {.val {layerInfo$geometryType}}."
+        )
+    }
+
+    layerGeomType <- geomType
   }
 
-  layerCRS <-
-    getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
+  cli::cli_dl(
+    items = c(
+      "Layer type" = "{.val {layerInfo$type}}",
+      "Geometry type" = "{.val {layerGeomType}}"
+    )
+  )
+
+  if (!is.null(layerInfo$extent$spatialReference)) {
+    layerCRS <-
+      getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
+
+    layerCRS_missing <- FALSE
+  } else {
+    cli::cli_alert_warning(
+      "The spatial reference for this layer is missing."
+    )
+
+    if (!is.null(crs)) {
+      cli::cli_alert_info(
+        "Attempting to access the layer using the provided {.arg crs} value {.val {crs}}."
+      )
+
+      layerCRS_missing <- TRUE
+      layerCRS <- crs
+    }
+  }
 
   if (is.null(crs)) {
     crs <- layerCRS
@@ -109,16 +145,12 @@ esri2sf <- function(url,
       )
   }
 
-  # Alert user with basic layer information
-  cli::cli_alert_success("Downloading {.val {layerInfo$name}}")
+  if (!layerCRS_missing) {
+    cli::cli_dl(c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}"))
+  }
 
   cli::cli_dl(
-    items = c(
-      "Layer type" = "{.val {layerInfo$type}}",
-      "Geometry type" = "{.val {layerInfo$geometryType}}",
-      "Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}",
-      "Output Coordinate Reference System" = "{.val {sf::st_crs(crs)$input}}"
-    )
+    c("Output Coordinate Reference System" = "{.val {sf::st_crs(crs)$input}}")
   )
 
   # Get layer features
@@ -231,6 +263,7 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
 #' @noRd
 #' @importFrom cli cli_abort
 getLayerCRS <- function(spatialReference, layerCRS = NULL) {
+
   # Get the layer CRS from the layer spatial reference
   if ("latestWkid" %in% names(spatialReference)) {
     layerCRS <- spatialReference$latestWkid
@@ -238,6 +271,12 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
     layerCRS <- spatialReference$wkid
   } else if ("wkt" %in% names(spatialReference)) {
     layerCRS <- spatialReference$wkt
+  }
+
+  # Format CRS (from esri2sfGeom)
+  if (isWktID(layerCRS)) {
+    layerCRS <- gsub(pattern = "^(EPSG|ESRI):", replacement = "", x = layerCRS)
+    layerCRS <- getWKTidAuthority(layerCRS)
   }
 
   if (is.null(layerCRS)) {

@@ -24,12 +24,12 @@ esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NUL
 
   # Add f query parameter if provided
   if (!is.null(f)) {
-    req <- httr2::req_url_query(req = req, f = f)
+    req <- httr2::req_url_query(req, f = f)
   }
 
   # Add format query parameter if provided
   if (!is.null(format)) {
-    req <- httr2::req_url_query(req = req, format = format)
+    req <- httr2::req_url_query(req, format = format)
   }
 
   # Add token and other query parameters
@@ -37,7 +37,7 @@ esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NUL
     token <- ""
   }
 
-  req <- httr2::req_url_query(req = req, token = token, ...)
+  req <- httr2::req_url_query(req, token = token, ...)
 
   req <- httr2::req_user_agent(req = req, "esri2sf (https://github.com/yonghah/esri2sf)")
 
@@ -50,6 +50,7 @@ esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NUL
   resp <- httr2::req_perform(req = req)
 
   # Return details on error if needed
+  # FIXME: This is not working
   if ("error" %in% names(resp)) {
     cli::cli_ul("{.emph {resp$error$details}}")
     cli::cli_abort("{resp$error$message} (HTTP code {.code {resp$error$code}})")

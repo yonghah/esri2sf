@@ -11,9 +11,6 @@ esriCatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
 REST API.}
 
-\item{f}{Return format to use as query parameter with
-\link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
-
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
 \item{option}{If \code{option = "footprints"} and the url is for a folder, spatial

@@ -41,7 +41,13 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
     resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 
     if (!is.null(resp[["extent"]])) {
-      resp[["extent"]] <- list(extent2bbox(resp[["extent"]]))
+      resp[["extent"]] <-
+        list(
+          extent2bbox(
+            resp[["extent"]],
+            crs = getLayerCRS(resp[["extent"]][["spatialReference"]])
+          )
+        )
     }
 
     resp[["typeKeywords"]] <- list(resp[["typeKeywords"]])
@@ -97,10 +103,10 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 extent2bbox <- function(x, crs = 4326) {
   sf::st_bbox(
     c(
-      xmin = x[[1]][[1]],
-      ymin = x[[1]][[2]],
-      xmax = x[[2]][[1]],
-      ymax = x[[2]][[2]]
+      xmin = x[["xmin"]],
+      ymin = x[["ymin"]],
+      xmax = x[["xmax"]],
+      ymax = x[["ymax"]]
     ),
     crs = crs
   )

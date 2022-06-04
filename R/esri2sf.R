@@ -120,10 +120,10 @@ esri2sf <- function(url,
   # Set default geometryType for spatial filter
   geometryType <- NULL
 
-  # Use bbox to set geometry and geometryType
   if (!is.null(bbox)) {
+    # convert sf class bbox to bbox class
     if ("sf" %in% class(bbox)) {
-      bbox <- sf::st_bbox(bbox)
+      bbox <- sf::st_bbox(sf::st_union(bbox))
     }
 
     if (!("bbox" %in% class(bbox))) {
@@ -317,12 +317,13 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
 #' @importFrom sf st_transform st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
-  if ("bbox" %in% class(x)) {
-    x <- sf::st_sf(sf::st_as_sfc(x))
-  }
 
   if (!is.null(layerCRS)) {
-    x <- sf::st_transform(x, layerCRS)
+    if ("bbox" %in% class(x)) {
+      x <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(x), layerCRS))
+    } else {
+      x <- sf::st_transform(x, layerCRS)
+    }
   }
 
   geometry <-

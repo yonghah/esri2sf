@@ -76,6 +76,8 @@ getEsriFeaturesByIds <- function(ids,
                                  fields = NULL,
                                  token = NULL,
                                  crs = 4326,
+                                 simplifyDataFrame = FALSE,
+                                 simplifyVector = simplifyDataFrame,
                                  ...) {
   if (is.null(fields)) {
     fields <- c("*")
@@ -99,22 +101,12 @@ getEsriFeaturesByIds <- function(ids,
       resp,
       check_type = FALSE,
       # Additional parameters passed to jsonlite::fromJSON
-      simplifyDataFrame = FALSE,
-      simplifyVector = FALSE,
-      digits = NA
+      digits = NA,
+      simplifyDataFrame = simplifyDataFrame,
+      simplifyVector = simplifyVector,
     )
 
-  if ("error" %in% names(resp)) {
-    cli::cli_abort(
-      c(
-        "Error code: {resp$error$code}.",
-        "Message: {resp$error$message}",
-        "Details: {resp$error$details}"
-      )
-    )
-  }
-
-  return(resp$features)
+  return(resp[["features"]])
 }
 
 

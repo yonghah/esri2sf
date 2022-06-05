@@ -117,9 +117,6 @@ esri2sf <- function(url,
     crs <- layerCRS
   }
 
-  # Set default geometryType for spatial filter
-  geometryType <- NULL
-
   if (!is.null(bbox)) {
     # convert sf class bbox to bbox class
     if ("sf" %in% class(bbox)) {
@@ -132,6 +129,9 @@ esri2sf <- function(url,
 
     geometry <- bbox
   }
+
+  # Set default geometryType for spatial filter
+  geometryType <- NULL
 
   if (!is.null(geometry)) {
     # Set geometryType based on geometry type of simple feature
@@ -250,7 +250,7 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
   #  }
   # )
 
-  layerInfo <- esriCatalog(url = url, token = token, ...)
+  layerInfo <- esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
 
   if (fields) {
     return(dplyr::bind_rows(layerInfo$fields))
@@ -289,41 +289,51 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
   return(layerCRS)
 }
 
+
+#' Helper function for setting geometryType based on geometry parameter
+#'
+#' @noRd
+#' @importFrom cli cli_abort
 sf2geometryType <- function(x, by_geometry = FALSE) {
   if ("bbox" %in% class(x)) {
-    return("esriGeometryEnvelope")
-  }
+    geometryType <- "esriGeometryEnvelope"
+  } else if ("sf" %in% class(x)) {
+    geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
 
-  if (!("sf" %in% class(x))) {
+    geometryType <- switch(as.character(geometryType),
+      "POINT" = "esriGeometryPoint",
+      "MULTIPOLYGON" = "esriGeometryPolygon",
+      "MULTIPOINT" = "esriGeometryMultipoint",
+      "LINESTRING" = "esriGeometryPolyline",
+      "MULTILINESTRING" = "esriGeometryPolyline"
+    )
+  } else {
     cli::cli_abort("geometry must be a sf or bbox object")
   }
 
-  geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
-
-  switch(as.character(geometryType),
-    "POINT" = "esriGeometryPoint",
-    "MULTIPOLYGON" = "esriGeometryPolygon",
-    "MULTIPOINT" = "esriGeometryMultipoint",
-    "LINESTRING" = "esriGeometryPolyline",
-    "MULTILINESTRING" = "esriGeometryPolyline"
-  )
+  return(geometryType)
 }
 
-#' Helper function for converting simple feature object to geometry parameter for spatial filter
+#' Helper function for converting simple feature object to geometry parameter
+#' for spatial filter
 #'
-#' Currently only supports sf objects with POINT geometry.
+#' Currently only supports sf objects with POINT geometry. All other sf or bbox
+#' objects are converted to a bbox.
 #'
 #' @noRd
 #' @importFrom sf st_transform st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
-
   if (!is.null(layerCRS)) {
     if ("bbox" %in% class(x)) {
-      x <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(x), layerCRS))
-    } else {
-      x <- sf::st_transform(x, layerCRS)
+      x <- sf::st_sf(sf::st_as_sfc(x))
     }
+    x <- sf::st_transform(x, layerCRS)
+  }
+
+  if (!(sf::st_geometry_type(x, by_geometry = FALSE) == "POINT")) {
+    x <- sf::st_bbox(x)
+    geometryType <- "esriGeometryEnvelope"
   }
 
   geometry <-
@@ -332,17 +342,15 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
       "esriGeometryPoint" = paste0(sf::st_coordinates(x), collapse = ",")
     )
 
-  if (is.null(geometryType)) {
-    cli::cli_abort("The {.arg geometry} parameter currently only supports bounding boxes or simple feature POINT objects.")
-  }
-
   return(geometry)
 }
 
 
-#' Helper function for converting bounding box to geometry parameter for spatial filter
+#' Helper function for converting bounding box to geometry parameter for spatial
+#' filter
 #'
-#' Supports conversion of simple feature to bounding box objects
+#' Supports conversion of simple feature to bounding box objects. This function
+#' is not currently used.
 #'
 #' @noRd
 #' @importFrom sf st_bbox st_union st_crs st_transform st_as_sfc

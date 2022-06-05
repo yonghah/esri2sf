@@ -13,7 +13,14 @@
 #' @rdname esriRequest
 #' @importFrom httr2 request req_url_path_append req_url_query req_perform
 #' @importFrom cli cli_ul cli_abort
-esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NULL, perform = TRUE, ...) {
+esriRequest <- function(url,
+                        append = NULL,
+                        f = NULL,
+                        format = NULL,
+                        token = NULL,
+                        perform = TRUE,
+                        cache = FALSE,
+                        ...) {
   # Make request based on url
   req <- httr2::request(url)
 
@@ -39,7 +46,30 @@ esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NUL
 
   req <- httr2::req_url_query(req, token = token, ...)
 
-  req <- httr2::req_user_agent(req = req, "esri2sf (https://github.com/yonghah/esri2sf)")
+  req <-
+    httr2::req_user_agent(
+      req = req,
+      string = "esri2sf (https://github.com/yonghah/esri2sf)"
+    )
+
+  # Check if rappdirs::user_cache_dir progress bar can be used
+  if (!requireNamespace("rappdirs", quietly = TRUE) & cache) {
+    cli::cli_alert_danger(
+      "The {.pkg rappdirs} package is not installed.
+      {.pkg rappdirs} is required to use the {.arg cache} argument.
+      Setting {.arg cache} to {.val FALSE}."
+    )
+    cache <- FALSE
+  }
+
+
+  if (cache) {
+    req <-
+      httr2::req_cache(
+        req = req,
+        path = rappdirs::user_cache_dir("esri2sf")
+      )
+  }
 
   # Return request if perform is FALSE
   if (!perform) {
@@ -48,13 +78,6 @@ esriRequest <- function(url, append = NULL, f = NULL, format = NULL, token = NUL
 
   # Otherwise perform the request
   resp <- httr2::req_perform(req = req)
-
-  # Return details on error if needed
-  # FIXME: This is not working
-  if ("error" %in% names(resp)) {
-    cli::cli_ul("{.emph {resp$error$details}}")
-    cli::cli_abort("{resp$error$message} (HTTP code {.code {resp$error$code}})")
-  }
 
   return(resp)
 }

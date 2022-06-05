@@ -11,6 +11,7 @@ esriRequest(
   format = NULL,
   token = NULL,
   perform = TRUE,
+  cache = FALSE,
   ...
 )
 }

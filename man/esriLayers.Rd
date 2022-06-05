@@ -23,7 +23,7 @@ layer or table ID it will truncate it.}
 \item{returnDomainNames}{If \code{TRUE}, the REST API response does not include
 the full domain information for each layer (only the domain names). Defaults to \code{TRUE}.}
 
-\item{...}{Additional parameters passed to}
+\item{...}{Additional parameters passed to \link[httr2:resp_body_raw]{httr2::resp_body_json}}
 }
 \value{
 A list from the JSON return.

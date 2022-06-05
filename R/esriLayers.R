@@ -16,7 +16,7 @@
 #' @param returnDomainNames If `TRUE`, the REST API response does not include
 #'   the full domain information for each layer (only the domain names). Defaults to `TRUE`.
 #' @param returnUpdates If `TRUE`, updated features will be returned; defaults to `NULL`.
-#' @param ... Additional parameters passed to
+#' @param ... Additional parameters passed to [httr2::resp_body_json]
 #' @return A list from the JSON return.
 #' @export
 #' @importFrom httr2 resp_body_json

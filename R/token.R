@@ -25,7 +25,7 @@
 #' @param expiration Set an expiration limit on the token in minutes. Max
 #' expiration date may be controlled by the server.
 #' @param clientId Client ID
-#' @param cliendSecret Client Secret
+#' @param clientSecret Client Secret
 #'
 #' @return Character string with the token
 
@@ -35,7 +35,9 @@ generateToken <- function(server, uid, pwd = "", type = c("tokens", "admin"), ex
   type <- match.arg(type)
 
   # generate auth token from GIS server
-  if (pwd == "") pwd <- rstudioapi::askForPassword("pwd")
+  if (pwd == "") {
+    pwd <- rstudioapi::askForPassword("pwd")
+  }
 
   query <- list(
     username = uid,

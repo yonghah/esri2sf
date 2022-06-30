@@ -90,8 +90,8 @@ getEsriFeaturesByIds <- function(ids,
       append = "query",
       f = "json",
       token = token,
-      objectIds = paste(ids, collapse = ","),
-      outFields = paste(fields, collapse = ","),
+      objectIds = I(paste(ids, collapse = ",")),
+      outFields = I(paste(fields, collapse = ",")),
       outSR = crs,
       ...
     )

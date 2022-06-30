@@ -10,8 +10,8 @@ esriRequest(
   f = NULL,
   format = NULL,
   token = NULL,
-  perform = TRUE,
-  cache = FALSE,
+  .perform = TRUE,
+  .cache = FALSE,
   ...
 )
 }
@@ -22,13 +22,16 @@ REST API.}
 \item{append}{String to append to url using \link[httr2:req_url]{httr2::req_url_path_append};
 defaults to \code{NULL}.}
 
-\item{format, f}{Return format to use as query parameter with
+\item{f, format}{Return format to use as query parameter with
 \link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
-\item{perform}{If \code{TRUE}, perform the request with \link[httr2:req_perform]{httr2::req_perform} and
+\item{.perform}{If \code{TRUE}, perform the request with \link[httr2:req_perform]{httr2::req_perform} and
 return the response. If \code{FALSE}, return the request.}
+
+\item{.cache}{If \code{TRUE}, pass a cache folder path created with \link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir} and \code{esri2sf}
+package to the path parameter of \link[httr2:req_cache]{httr2::req_cache}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }

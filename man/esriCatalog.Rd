@@ -11,6 +11,9 @@ esriCatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
 REST API.}
 
+\item{f}{Format to use for request. Supported options include "json",
+"sitemap", or "geositemap"; "html" and "kmz" are not currently supported.}
+
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
 \item{option}{If \code{option = "footprints"} and the url is for a folder, spatial
@@ -21,9 +24,6 @@ returned as a feature collection}
 only supported when \code{option = "footprints"}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
-
-\item{format}{Format to use for request. Supported options include "json", "sitemap", or "geositemap"; "html" and "kmz" are not
-currently supported.}
 }
 \description{
 \url{https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm}

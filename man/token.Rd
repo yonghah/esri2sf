@@ -33,7 +33,7 @@ expiration date may be controlled by the server.}
 
 \item{clientId}{Client ID}
 
-\item{cliendSecret}{Client Secret}
+\item{clientSecret}{Client Secret}
 }
 \value{
 Character string with the token

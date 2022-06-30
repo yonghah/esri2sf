@@ -100,7 +100,6 @@ esri2sf(url, where = where, outFields = outFields)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
 ```
 
-
 Also since the addition of the `WKT1_ESRI` output from sf::st_crs() in sf version 1.0-1, you can enter common CRS format (any that sf::st_crs() can handle) into the `crs` parameters and it will be able to convert to the ESRI formatted WKT needed for the outSR field in the REST query. Below are examples of the variety of input types that you can use with the `crs` parameters. All examples are just different formulations of the ESRI:102690 CRS.
 
 ```{r}

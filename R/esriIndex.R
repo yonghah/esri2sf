@@ -143,14 +143,11 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
       )
     )
 
-  index <-
-    dplyr::relocate(
-      index,
-      urlType, folderPath, serviceName, serviceType,
-      .after = "url"
-    )
-
-  return(index)
+  dplyr::relocate(
+    index,
+    urlType, folderPath, serviceName, serviceType,
+    .after = "url"
+  )
 }
 
 #' @name esriIndexLayers
@@ -202,14 +199,11 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
       "serviceName" = serviceName
     )
 
-  index <-
-    dplyr::distinct(
-      index,
-      url,
-      .keep_all = TRUE
-    )
-
-  return(index)
+  dplyr::distinct(
+    index,
+    url,
+    .keep_all = TRUE
+  )
 }
 
 #' Get information on folders, services, tables, and layers using the Catalog
@@ -218,8 +212,8 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #' <https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm>
 #'
 #' @rdname esriCatalog
-#' @param format Format to use for request. Supported options include "json", "sitemap", or "geositemap"; "html" and "kmz" are not
-#'   currently supported.
+#' @param f Format to use for request. Supported options include "json",
+#'   "sitemap", or "geositemap"; "html" and "kmz" are not currently supported.
 #' @param option If `option = "footprints"` and the url is for a folder, spatial
 #'   footprints of all map, feature, and image services in that folder are
 #'   returned as a feature collection

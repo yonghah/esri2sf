@@ -8,5 +8,5 @@ test_that("esriLayers checks", {
   expect_snapshot(esriLayers('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/TaxParcel/AssessorsBasemap/MapServer'))
   expect_snapshot(esriLayers('https://carto.nationalmap.gov/arcgis/rest/services/contours/MapServer'))
 
-  expect_error(esriLayers("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Elevation/ESRI_Elevation_World/GPServer"), "Url is not valid.\n Service type is not either 'MapServer' or 'FeatureServer'", fixed=TRUE)
+  expect_error(esriLayers("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Elevation/ESRI_Elevation_World/GPServer"), 'Function requires a "MapServer" or "FeaturepServer" url', fixed=TRUE)
 })

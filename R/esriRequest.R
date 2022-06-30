@@ -11,6 +11,7 @@
 #'   return the response. If `FALSE`, return the request.
 #' @param .cache If `TRUE`, pass a cache folder path created with [rappdirs::user_cache_dir] and `esri2sf`
 #'   package to the path parameter of [httr2::req_cache].
+#' @param .max_seconds Passed to max_seconds parameter of [httr2::req_retry]
 #' @param ... Additional parameters passed to [httr2::req_url_query]
 #' @rdname esriRequest
 #' @importFrom httr2 request req_url_path_append req_url_query req_perform
@@ -22,6 +23,7 @@ esriRequest <- function(url,
                         token = NULL,
                         .perform = TRUE,
                         .cache = FALSE,
+                        .max_seconds = 3,
                         ...) {
   # Make request based on url
   req <- httr2::request(url)
@@ -70,6 +72,12 @@ esriRequest <- function(url,
         path = rappdirs::user_cache_dir("esri2sf")
       )
   }
+
+  req <-
+    httr2::req_retry(
+      req = req,
+      max_seconds = .max_seconds
+    )
 
   # Return request if perform is FALSE
   if (!.perform) {

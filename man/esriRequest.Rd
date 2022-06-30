@@ -12,6 +12,7 @@ esriRequest(
   token = NULL,
   .perform = TRUE,
   .cache = FALSE,
+  .max_seconds = 3,
   ...
 )
 }
@@ -32,6 +33,8 @@ return the response. If \code{FALSE}, return the request.}
 
 \item{.cache}{If \code{TRUE}, pass a cache folder path created with \link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir} and \code{esri2sf}
 package to the path parameter of \link[httr2:req_cache]{httr2::req_cache}.}
+
+\item{.max_seconds}{Passed to max_seconds parameter of \link[httr2:req_retry]{httr2::req_retry}}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }

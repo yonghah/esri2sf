@@ -1747,13 +1747,13 @@
       
       $initialExtent
       $initialExtent$xmin
-      [1] -83.31369
+      [1] -83.31589
       
       $initialExtent$ymin
       [1] 42.55829
       
       $initialExtent$xmax
-      [1] -83.30237
+      [1] -83.30017
       
       $initialExtent$ymax
       [1] 42.56714

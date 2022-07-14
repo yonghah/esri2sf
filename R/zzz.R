@@ -27,7 +27,7 @@ getObjectIds <- function(url,
 
   resp <- httr2::resp_body_json(resp = resp, check_type = FALSE)
 
-  return(resp$objectIds)
+  resp$objectIds
 }
 
 #' Get count of maximum records per request
@@ -35,7 +35,16 @@ getObjectIds <- function(url,
 #' @noRd
 getMaxRecordsCount <- function(url,
                                token = NULL,
+                               maxRecords = NULL,
                                upperLimit = FALSE) {
+  if (!is.null(maxRecords)) {
+    if (!is.integer(maxRecords)) {
+      maxRecords <- as.integer(maxRecords)
+    }
+
+    return(maxRecords)
+  }
+
   urlInfo <- esriCatalog(url = url, token = token)
 
   if (!is.null(urlInfo[["maxRecordCount"]])) {
@@ -48,7 +57,7 @@ getMaxRecordsCount <- function(url,
     maxRC <- 500L
   }
 
-  return(maxRC)
+  maxRC
 }
 
 #' Get table for Table layer
@@ -62,7 +71,7 @@ getEsriTable <- function(jsonFeats) {
   )
   df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
 
-  return(dplyr::as_tibble(df))
+  dplyr::as_tibble(df)
 }
 
 
@@ -106,7 +115,7 @@ getEsriFeaturesByIds <- function(ids,
       simplifyVector = simplifyVector,
     )
 
-  return(resp[["features"]])
+  resp[["features"]]
 }
 
 
@@ -122,6 +131,7 @@ getEsriFeatures <- function(url,
                             where = NULL,
                             geometry = NULL,
                             geometryType = NULL,
+                            maxRecords = NULL,
                             token = NULL,
                             crs = 4326,
                             progress = FALSE,
@@ -138,9 +148,9 @@ getEsriFeatures <- function(url,
 
   if (is.null(ids)) {
     cli::cli_alert_danger("No records match the search criteria.")
-    return()
+    invisible(return(NULL))
   }
-  maxRC <- getMaxRecordsCount(url, token, upperLimit = TRUE)
+  maxRC <- getMaxRecordsCount(url, token, maxRecords, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
   crs <-
@@ -177,7 +187,7 @@ getEsriFeatures <- function(url,
       )
   }
 
-  return(unlist(results, recursive = FALSE))
+  unlist(results, recursive = FALSE)
 }
 
 #' Get authority string for WKT (well known text) id
@@ -208,9 +218,8 @@ getWKTidAuthority <- function(wktID) {
     )
   }
 
-  wktID <- paste0(crsData$auth_name, ":", crsData$code)
-
-  return(wktID)
+  # Return wktID
+  paste0(crsData$auth_name, ":", crsData$code)
 }
 
 isWktID <- function(crs) {

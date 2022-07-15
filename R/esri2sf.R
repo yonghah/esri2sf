@@ -9,23 +9,36 @@
 #'   all fields.
 #' @param where string for where condition. Default is `NULL` for all rows.
 #' @param token string for authentication token (if needed). defaults to `NULL`.
-#' @param geomType string specifying the layer geometry ('esriGeometryPolygon'
-#'   or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to
-#'   be inferred from the server)
 #' @param crs coordinate reference system (see [sf::st_sf()]). Should either be
 #'   `NULL` or a CRS that can be handled by GDAL through sf::st_sf(). Default is
 #'   4326. `NULL` returns the feature in the same CRS that the layer is hosted
 #'   as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()] or a simple feature object
 #'   that can be converted to a bounding box.
-#' @param geometry An `sf` or `bbox` object. Only sf objects a single `POINT`
-#'   feature are currently supported.
+#' @param geometry An `sf` or `bbox` object. Currently, sf objects with a single
+#'   `POINT` feature are supported. All other sf objects are converted to bbox
+#'   objects.
 #' @param progress Show progress bar with [pbapply::pblapply()] if `TRUE`.
 #'   Default FALSE.
+#' @param geomType string specifying the layer geometry ('esriGeometryPolygon'
+#'   or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to
+#'   be inferred from the server)
+#' @param maxRecords Maximum number of records to return per request. This does
+#'   not limit the total number of records returned overall. Typically, this
+#'   parameter is only required if a query with default parameters (set based on
+#'   the server maxRecords value) fails.
+#' @param spatialRel Spatial relationship applied to the input `geometry` when
+#'   performing the query; defaults to `NULL` (equivalent to
+#'   "esriSpatialRelIntersects"). Additional supported options include
+#'   "esriSpatialRelContains", "esriSpatialRelCrosses",
+#'   "esriSpatialRelEnvelopeIntersects", "esriSpatialRelIndexIntersects",
+#'   "esriSpatialRelOverlaps", "esriSpatialRelTouches", "esriSpatialRelWithin"
 #' @param replaceDomainInfo If `TRUE`, add domain information to the return data frame.
 #'   Default `FALSE`.
 #' @param ... additional named parameters to pass to the query. (e.g.
-#'   `"resultRecordCount = 3"`)
+#'   `"resultRecordCount = 3"`). See the [ArcGIS REST APIs
+#'   documentation](https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm)
+#'   for more information on all supported parameters.
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`) or list or
 #'   dataframe (`esrimeta`).
 #'
@@ -49,17 +62,18 @@
 #' @export
 #' @importFrom cli cli_alert_warning cli_rule cli_abort cli_alert_success cli_dl
 #' @importFrom sf st_geometry_type
-
 esri2sf <- function(url,
                     outFields = NULL,
                     where = NULL,
+                    geometry = NULL,
                     bbox = NULL,
                     token = NULL,
-                    geomType = NULL,
                     crs = 4326,
                     progress = FALSE,
+                    geomType = NULL,
+                    maxRecords = NULL,
+                    spatialRel = NULL,
                     replaceDomainInfo = FALSE,
-                    geometry = NULL,
                     ...) {
   layerInfo <- esrimeta(url = url, token = token)
 
@@ -156,6 +170,18 @@ esri2sf <- function(url,
     c("Output Coordinate Reference System" = "{.val {sf::st_crs(crs)$input}}")
   )
 
+  if (!is.null(spatialRel)) {
+    spatialRel <-
+      match.arg(
+        spatialRel,
+        c(
+          "esriSpatialRelIntersects", "esriSpatialRelContains", "esriSpatialRelCrosses",
+          "esriSpatialRelEnvelopeIntersects", "esriSpatialRelIndexIntersects",
+          "esriSpatialRelOverlaps", "esriSpatialRelTouches", "esriSpatialRelWithin"
+        )
+      )
+  }
+
   # Get layer features
   esriFeatures <-
     getEsriFeatures(
@@ -164,9 +190,11 @@ esri2sf <- function(url,
       where = where,
       geometry = geometry,
       geometryType = geometryType,
+      maxRecords = maxRecords,
       token = token,
       crs = crs,
       progress = progress,
+      spatialRel = spatialRel,
       ...
     )
 
@@ -194,6 +222,7 @@ esri2df <- function(url,
                     where = NULL,
                     token = NULL,
                     progress = FALSE,
+                    maxRecords = NULL,
                     replaceDomainInfo = FALSE,
                     ...) {
   layerInfo <- esrimeta(url = url, token = token)
@@ -215,6 +244,7 @@ esri2df <- function(url,
       url = url,
       fields = outFields,
       where = where,
+      maxRecords = maxRecords,
       token = token,
       progress = progress,
       ...
@@ -224,7 +254,7 @@ esri2df <- function(url,
     df <- addDomainInfo(df, url = url, token = token)
   }
 
-  return(df)
+  df
 }
 
 
@@ -238,25 +268,13 @@ esri2df <- function(url,
 #' @export
 #' @importFrom dplyr bind_rows
 esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
-
-  # FIXME: esriRequest should be able to handle url error messages so url checks should be simplified.
-  # make sure url is valid and error otherwise
-  # tryCatch(
-  #  {
-  #    esriUrl_isValid(url, token = token, displayReason = TRUE)
-  #  },
-  #  message = function(m) {
-  #    stop(m$message)
-  #  }
-  # )
-
   layerInfo <- esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
 
-  if (fields) {
-    return(dplyr::bind_rows(layerInfo$fields))
-  } else {
+  if (!fields) {
     return(layerInfo)
   }
+
+  dplyr::bind_rows(layerInfo$fields)
 }
 
 
@@ -283,10 +301,12 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
   }
 
   if (is.null(layerCRS)) {
-    cli::cli_abort("No crs found. Check that the layer at the url has a spatial reference.")
+    cli::cli_abort("Valid layer coordinate reference system can't be found.",
+      "*" = "Check that the layer at the url has a spatial reference."
+    )
   }
 
-  return(layerCRS)
+  layerCRS
 }
 
 
@@ -296,22 +316,22 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 #' @importFrom cli cli_abort
 sf2geometryType <- function(x, by_geometry = FALSE) {
   if ("bbox" %in% class(x)) {
-    geometryType <- "esriGeometryEnvelope"
+    return("esriGeometryEnvelope")
   } else if ("sf" %in% class(x)) {
     geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
 
-    geometryType <- switch(as.character(geometryType),
-      "POINT" = "esriGeometryPoint",
-      "MULTIPOLYGON" = "esriGeometryPolygon",
-      "MULTIPOINT" = "esriGeometryMultipoint",
-      "LINESTRING" = "esriGeometryPolyline",
-      "MULTILINESTRING" = "esriGeometryPolyline"
+    return(
+      switch(as.character(geometryType),
+        "POINT" = "esriGeometryPoint",
+        "MULTIPOLYGON" = "esriGeometryPolygon",
+        "MULTIPOINT" = "esriGeometryMultipoint",
+        "LINESTRING" = "esriGeometryPolyline",
+        "MULTILINESTRING" = "esriGeometryPolyline"
+      )
     )
-  } else {
-    cli::cli_abort("geometry must be a sf or bbox object")
   }
 
-  return(geometryType)
+  cli::cli_abort("{.arg geometry} must be a sf or bbox object.")
 }
 
 #' Helper function for converting simple feature object to geometry parameter
@@ -336,13 +356,10 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
     geometryType <- "esriGeometryEnvelope"
   }
 
-  geometry <-
-    switch(geometryType,
-      "esriGeometryEnvelope" = paste0(unlist(as.list(x), use.names = FALSE), collapse = ","),
-      "esriGeometryPoint" = paste0(sf::st_coordinates(x), collapse = ",")
-    )
-
-  return(geometry)
+  switch(geometryType,
+    "esriGeometryEnvelope" = paste0(unlist(as.list(x), use.names = FALSE), collapse = ","),
+    "esriGeometryPoint" = paste0(sf::st_coordinates(x), collapse = ",")
+  )
 }
 
 
@@ -364,7 +381,5 @@ bbox2geometry <- function(bbox, layerCRS) {
     bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
   }
 
-  geometry <- paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
-
-  return(geometry)
+  paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
 }

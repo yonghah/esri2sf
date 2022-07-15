@@ -22,8 +22,7 @@ generateOAuthToken(clientId, clientSecret, expiration = 5000)
 the server}
 
 \item{pwd}{The password of the account used to create the token connection to
-the server. If left blank, RStudio will prompt you for the password. If you
-aren't using RStudio, you must specify it in the function call.}
+the server. If left blank, you will be prompted for the password.}
 
 \item{type}{Either 'tokens' or 'admin'. Specify the endpoint you use to
 create the token. Defaults to 'tokens'.}

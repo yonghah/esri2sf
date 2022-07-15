@@ -9,13 +9,15 @@ esri2sf(
   url,
   outFields = NULL,
   where = NULL,
+  geometry = NULL,
   bbox = NULL,
   token = NULL,
-  geomType = NULL,
   crs = 4326,
   progress = FALSE,
+  geomType = NULL,
+  maxRecords = NULL,
+  spatialRel = NULL,
   replaceDomainInfo = FALSE,
-  geometry = NULL,
   ...
 )
 
@@ -25,6 +27,7 @@ esri2df(
   where = NULL,
   token = NULL,
   progress = FALSE,
+  maxRecords = NULL,
   replaceDomainInfo = FALSE,
   ...
 )
@@ -38,14 +41,14 @@ all fields.}
 
 \item{where}{string for where condition. Default is \code{NULL} for all rows.}
 
+\item{geometry}{An \code{sf} or \code{bbox} object. Currently, sf objects with a single
+\code{POINT} feature are supported. All other sf objects are converted to bbox
+objects.}
+
 \item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}} or a simple feature object
 that can be converted to a bounding box.}
 
 \item{token}{string for authentication token (if needed). defaults to \code{NULL}.}
-
-\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon'
-or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to
-be inferred from the server)}
 
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be
 \code{NULL} or a CRS that can be handled by GDAL through sf::st_sf(). Default is
@@ -55,14 +58,28 @@ as in the Feature/Map Server.}
 \item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}.
 Default FALSE.}
 
+\item{geomType}{string specifying the layer geometry ('esriGeometryPolygon'
+or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to
+be inferred from the server)}
+
+\item{maxRecords}{Maximum number of records to return per request. This does
+not limit the total number of records returned overall. Typically, this
+parameter is only required if a query with default parameters (set based on
+the server maxRecords value) fails.}
+
+\item{spatialRel}{Spatial relationship applied to the input \code{geometry} when
+performing the query; defaults to \code{NULL} (equivalent to
+"esriSpatialRelIntersects"). Additional supported options include
+"esriSpatialRelContains", "esriSpatialRelCrosses",
+"esriSpatialRelEnvelopeIntersects", "esriSpatialRelIndexIntersects",
+"esriSpatialRelOverlaps", "esriSpatialRelTouches", "esriSpatialRelWithin"}
+
 \item{replaceDomainInfo}{If \code{TRUE}, add domain information to the return data frame.
 Default \code{FALSE}.}
 
-\item{geometry}{An \code{sf} or \code{bbox} object. Only sf objects a single \code{POINT}
-feature are currently supported.}
-
 \item{...}{additional named parameters to pass to the query. (e.g.
-\code{"resultRecordCount = 3"})}
+\code{"resultRecordCount = 3"}). See the \href{https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm}{ArcGIS REST APIs documentation}
+for more information on all supported parameters.}
 }
 \value{
 sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or

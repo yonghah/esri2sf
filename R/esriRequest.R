@@ -54,7 +54,7 @@ esriRequest <- function(url,
       string = "esri2sf (https://github.com/yonghah/esri2sf)"
     )
 
-  # Check if rappdirs::user_cache_dir progress bar can be used
+  # Check if rappdirs::user_cache_dir can be used
   if (!requireNamespace("rappdirs", quietly = TRUE) & .cache) {
     cli::cli_alert_danger(
       "The {.pkg rappdirs} package is not installed.

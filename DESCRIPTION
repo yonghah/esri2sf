@@ -28,6 +28,7 @@ Imports:
     stats,
     xml2
 Suggests:
+    keyring,
     knitr,
     magick,
     purrr,

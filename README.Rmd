@@ -1,32 +1,45 @@
 ---
-output: 
-    - md_document
+output: github_document
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+<!-- badges: start -->
+  [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+ [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+  
 # esri2sf
+
 Scraping Geographic Features from ArcGIS Server
 
 Still many geographic data is delivered through ESRI's ArcGIS Server. 
 It is not easy to utilize the geographic data in the GIS servers from data analysis platform like R or Pandas. 
-This package enables users to scrape vector data in ArcGIS Server from R through the server's REST API. 
-It download geographic features from ArcGIS Server and saves it as [Simple Features](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html). 
 
+This package enables users to scrape vector data in ArcGIS Server from R through the server's REST API.
+
+It downloads geographic features from ArcGIS Server and saves it as [simple features](https://r-spatial.github.io/sf/articles/sf1.html).
 
 ## How it works
 
-This program sends a request to an ArcGIS Server and gets json responses containing coordinates of geometries 
-of which format is not the same as geojson. So it converts the json into simple feature geometries from the response. 
+This program sends a request to an ArcGIS Server and gets json responses containing coordinates of geometries of which format is not the same as geojson. So it converts the json into simple feature geometries from the response.
+
 Then it combines attribute data to the geometries to create sf dataframe. 
-Often ArcGIS servers limits the maximum number of rows in the result set. So this program 
-creates 500 features per request and automatically re-send requests until it gets all features in the dataset. 
+Often ArcGIS servers limits the maximum number of rows in the result set. So this program creates 500 features per request and automatically re-send requests until it gets all features in the dataset. 
 
 ## Install
 
-Use [remotes](https://cran.r-project.org/web/packages/remotes/index.html) to install this package. This package has dependencies on dplyr, sf, httr, jsonlite, rstudioapi, DBI, RSQLite, crayon and rmarkdown, knitr, and pbapply are suggested.
+Use [pak](https://pak.r-lib.org/) to install this package from GitHub. This package imports cli, DBI, dplyr, httr, httr2, jsonlite, RSQLITE, sf, stats, and xml2. knitr, magick, purrr, rappdirs, rmarkdown, and testhat are suggested.
 
-```R
-library(remotes)
-install_github("yonghah/esri2sf")
+```r
+pak::pkg_install("yonghah/esri2sf")
 ```
 
 ## How to use
@@ -38,10 +51,10 @@ by asking a GIS admin, or looking at the javascript code of a webpage where it c
 
 ### Point data
 
-```{R points}
+```{r points}
 library("esri2sf")
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
-df <- esri2sf(url)
+df <- esri2sf(url, maxRecords = 300)
 plot(df)
 ```
 <!-- ![point plot](https://user-images.githubusercontent.com/3218468/29668766-544723a2-88af-11e7-8852-e8f7d21ffd5b.png) -->
@@ -51,9 +64,9 @@ plot(df)
 
 You can filter output fields. This may take a minute since it gets 18000 polylines. 
 
-```{R polyline}
+```{r polyline}
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0"
-df <- esri2sf(url, outFields=c("AADT", "DFLG"))
+df <- esri2sf(url, outFields = c("AADT", "DFLG"), maxRecords = 100, progress = TRUE)
 plot(df)
 ```
 <!-- ![line plot](https://user-images.githubusercontent.com/3218468/29668781-5dc1f4de-88af-11e7-8680-4d2ad648e04f.png) -->
@@ -62,7 +75,7 @@ plot(df)
 
 You can filter rows as well by giving a `where` condition.
 
-```{R polygon}
+```{r polygon}
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
 df <- esri2sf(url, 
               where = "STATE_NAME = 'Michigan'", 
@@ -71,7 +84,6 @@ plot(df)
 ```
 
 <!-- ![polygon plot](https://user-images.githubusercontent.com/3218468/29668791-63e66976-88af-11e7-9f6c-5d95bac4a69e.png) -->
-
 
 ### Tabular data
 
@@ -99,7 +111,6 @@ esri2sf(url, where = where, outFields = outFields)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
 ```
 
-
 Also since the addition of the `WKT1_ESRI` output from sf::st_crs() in sf version 1.0-1, you can enter common CRS format (any that sf::st_crs() can handle) into the `crs` parameters and it will be able to convert to the ESRI formatted WKT needed for the outSR field in the REST query. Below are examples of the variety of input types that you can use with the `crs` parameters. All examples are just different formulations of the ESRI:102690 CRS.
 
 ```{r}
@@ -112,6 +123,7 @@ df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_198
 ```
 
 Their similarity on the output CRS can be proven by the following function that calculates the mean difference in X-Y coordinates at each point. All are very close to 0.
+
 ```{r}
 coord_diff <- function(df1, df2) {
   suppressWarnings({
@@ -121,10 +133,8 @@ coord_diff <- function(df1, df2) {
     )
   })
 }
+
 coord_diff(df1, df2)
 coord_diff(df1, df3)
 coord_diff(df2, df3)
-
 ```
-
-

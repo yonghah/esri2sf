@@ -161,21 +161,36 @@ getEsriFeatures <- function(url,
       TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
     )
 
+  message <-
+    c("The query can't be completed.",
+      "*" = "Set {.arg maxRecords} to a low value (e.g. 150) and try the request again."
+    )
+
   # Check if pbapply progress bar can be used
   if (progress) {
     results <-
-      lapply(
-        cli::cli_progress_along(idSplits),
-        function(x) {
-          getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
+      tryCatch(
+        lapply(
+          cli::cli_progress_along(idSplits),
+          function(x) {
+            getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
+          }
+        ),
+        error = function(x) {
+          cli::cli_abort(message = message)
         }
       )
   } else {
     results <-
-      lapply(
-        idSplits,
-        getEsriFeaturesByIds,
-        url, fields, token, crs, ...
+      tryCatch(
+        lapply(
+          idSplits,
+          getEsriFeaturesByIds,
+          url, fields, token, crs, ...
+        ),
+        error = function(x) {
+          cli::cli_abort(message = message)
+        }
       )
   }
 

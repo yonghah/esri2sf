@@ -135,6 +135,7 @@ getEsriFeatures <- function(url,
                             token = NULL,
                             crs = 4326,
                             progress = FALSE,
+                            call = parent.frame(),
                             ...) {
   ids <-
     getObjectIds(
@@ -161,10 +162,17 @@ getEsriFeatures <- function(url,
       TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
     )
 
-  message <-
-    c("The query can't be completed.",
-      "*" = "Set {.arg maxRecords} to a low value (e.g. 150) and try the request again."
-    )
+  error_fn <-
+    function(x) {
+      cli::cli_abort(
+        message = c(
+          "Your query can't be completed.",
+          "*" = "Try setting the {.arg maxRecords} parameter (500 or less suggested) and retrying your request."
+        ),
+        parent = x,
+        call = call
+      )
+    }
 
   # Check if pbapply progress bar can be used
   if (progress) {
@@ -176,9 +184,7 @@ getEsriFeatures <- function(url,
             getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
           }
         ),
-        error = function(x) {
-          cli::cli_abort(message = message)
-        }
+        error = error_fn
       )
   } else {
     results <-
@@ -188,9 +194,7 @@ getEsriFeatures <- function(url,
           getEsriFeaturesByIds,
           url, fields, token, crs, ...
         ),
-        error = function(x) {
-          cli::cli_abort(message = message)
-        }
+        error = error_fn
       )
   }
 

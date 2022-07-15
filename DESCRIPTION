@@ -1,21 +1,21 @@
-Package: esri2sf
 Type: Package
+Package: esri2sf
 Title: Create Simple Features from ArcGIS Server REST API
 Version: 0.1.1
 Authors@R: c(
-    person(family = "Yongha", given = "Hwang", email = "yongha.hwang@gmail.com", role = c("aut", "cre")), 
-    person(family = "Cazelles", given = "Kevin", role = c("aut", "ctb")),
-    person(family = "Peterson", given = "Jacob", role = c("aut", "ctb")),
-    person(family = "Pousson", given = "Eli", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8280-1706"))
-    )
-Description: This package enables you to scrape geographic features 
-    directly from ArcGIS servers REST API into R as simple features. 
+    person("Hwang", "Yongha", , "yongha.hwang@gmail.com", role = c("aut", "cre")),
+    person("Kevin", "Cazelles", role = c("aut", "ctb")),
+    person("Jacob", "Peterson", role = c("aut", "ctb")),
+    person("Eli", "Pousson", role = c("aut", "ctb"),
+           comment = c(ORCID = "0000-0001-8280-1706"))
+  )
+Description: This package enables you to scrape geographic features
+    directly from ArcGIS servers REST API into R as simple features.
+License: MIT + file LICENSE
 URL: https://github.com/yonghah/esri2sf/
 BugReports: https://github.com/yonghah/esri2sf/issues
-License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Depends: R (>= 3.1.0)
+Depends: 
+    R (>= 3.1.0)
 Imports:
     cli,
     DBI,
@@ -24,19 +24,19 @@ Imports:
     httr2,
     jsonlite,
     RSQLite,
-    rstudioapi,
     sf (>= 1.0.1),
     stats,
     xml2
 Suggests:
     knitr,
     magick,
-    pbapply,
     purrr,
     rappdirs,
     rmarkdown,
     testthat (>= 3.0.0)
-RoxygenNote: 7.2.0.9000
-Roxygen: list(markdown = TRUE)
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0.9000

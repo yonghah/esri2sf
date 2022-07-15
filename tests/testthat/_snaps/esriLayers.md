@@ -1747,13 +1747,13 @@
       
       $initialExtent
       $initialExtent$xmin
-      [1] -83.31589
+      [1] -83.31369
       
       $initialExtent$ymin
       [1] 42.55829
       
       $initialExtent$xmax
-      [1] -83.30017
+      [1] -83.30237
       
       $initialExtent$ymax
       [1] 42.56714
@@ -1826,7 +1826,7 @@
       [1] 10.81
       
       $serviceDescription
-      [1] "The USGS Elevation Contours service from The National Map displays contours generated for the United States at various scales. Small-scale contours were created by USGS TNM from 1 arc-second data with 100-meter contours, and are visible at 1:600,000 and smaller scales. Medium-scale contours were created by USGS EROS from 1/3-arc-second data with 100-foot intervals, and are visible between 1:150,000 and 1:600,000. Additional medium-scale contours were created by USGS EROS from 1/3-arc-second data with 50-foot intervals, and are visible between 1:50,000 and 1:150,000. Large scale contours are updated every quarter, and are created by USGS TNM for the 7.5' 1:24,000-scale US Topo digital map series. These contours are derived from 1/3 arc-second or better resolution data, and are visible at scales 1:50,000 and larger. Large scale contour intervals are variable across the United States depending on complexity of topography, and as contours are generated per US Topo quadrangle, lines may not match across quad boundaries. The National Map download client allows free downloads of public domain contour data in either Esri File Geodatabase or Shapefile formats. The 3D Elevation Program (3DEP) provides elevation data for The National Map and basic elevation information for earth science studies and mapping applications. Scientists and resource managers use elevation data for global change research, hydrologic modeling, resource monitoring, mapping and visualization, and many other applications. For additional information on 3DEP, go to http://nationalmap.gov/3DEP/. "
+      [1] "The USGS Elevation Contours service from The National Map displays contours generated for the United States at various scales. Small-scale contours were created by USGS TNM from 1 arc-second data with 100-meter contours, and are visible at 1:600,000 and smaller scales. Medium-scale contours were created by USGS EROS from 1/3-arc-second data with 100-foot intervals, and are visible between 1:150,000 and 1:600,000. Additional medium-scale contours were created by USGS EROS from 1/3-arc-second data with 50-foot intervals, and are visible between 1:50,000 and 1:150,000. Large scale contours are updated every quarter, and are created by USGS TNM for the 7.5' 1:24,000-scale US Topo digital map series. These contours are derived from 1/3 arc-second or better resolution data, and are visible at scales 1:50,000 and larger. Large scale contour intervals are variable across the United States depending on complexity of topography, and as contours are generated per US Topo quadrangle, lines may not match across quad boundaries. The National Map download client allows free downloads of public domain contour data in either Esri File Geodatabase or Shapefile formats. The 3D Elevation Program (3DEP) provides elevation data for The National Map and basic elevation information for earth science studies and mapping applications. Scientists and resource managers use elevation data for global change research, hydrologic modeling, resource monitoring, mapping and visualization, and many other applications. For additional information on 3DEP, go to http://nationalmap.gov/3DEP/. \n"
       
       $mapName
       [1] "Layers"
@@ -1835,7 +1835,7 @@
       [1] "Elevation"
       
       $copyrightText
-      [1] "USGS The National Map: 3D Elevation Program. Data Refreshed April, 2022."
+      [1] "USGS The National Map: 3D Elevation Program. Data Refreshed July, 2022."
       
       $supportsDynamicLayers
       [1] TRUE
@@ -2966,16 +2966,16 @@
       
       $initialExtent
       $initialExtent$xmin
-      [1] -9943985
+      [1] -9944377
       
       $initialExtent$ymin
-      [1] 5204732
+      [1] 5204490
       
       $initialExtent$xmax
-      [1] -9942242
+      [1] -9941849
       
       $initialExtent$ymax
-      [1] 5204991
+      [1] 5205233
       
       $initialExtent$spatialReference
       $initialExtent$spatialReference$wkid

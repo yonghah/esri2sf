@@ -82,7 +82,7 @@ esri2sf <- function(url,
 
   # Get the layer geometry type
   if (is.null(geomType)) {
-    if (is.null(layerInfo$geometryType) | (layerInfo$geometryType == "")) {
+    if (any(c(is.null(layerInfo$geometryType), (layerInfo$geometryType == "")))) {
       cli::cli_alert_warning("geomType is {.val NULL} and a layer geometry type could not be determined from the server.")
       cli::cli_rule("Attempting to download layer with {.fn esri2df}")
 

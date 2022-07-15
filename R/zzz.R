@@ -162,21 +162,13 @@ getEsriFeatures <- function(url,
     )
 
   # Check if pbapply progress bar can be used
-  if (!requireNamespace("pbapply", quietly = TRUE) & progress) {
-    cli::cli_alert_danger(
-      "The {.pkg pbapply} package is not installed.
-      {.pkg pbapply} is required to use the {.arg progress} argument.
-      Setting {.arg progress} to {.val FALSE}."
-    )
-    progress <- FALSE
-  }
-
   if (progress) {
     results <-
-      pbapply::pblapply(
-        idSplits,
-        getEsriFeaturesByIds,
-        url, fields, token, crs, ...
+      lapply(
+        cli::cli_progress_along(idSplits),
+        function(x) {
+          getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
+        }
       )
   } else {
     results <-

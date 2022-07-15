@@ -206,11 +206,11 @@ esri2sf <- function(url,
       crs = crs
     )
 
-  if (replaceDomainInfo & nrow(sfdf) > 0) {
+  if (replaceDomainInfo && (nrow(sfdf) > 0)) {
     sfdf <- addDomainInfo(sfdf, url = url, token = token)
   }
 
-  return(sfdf)
+  sfdf
 }
 
 
@@ -278,7 +278,6 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
 }
 
 
-
 #' Helper function for getting layer CRS based on spatialReference
 #'
 #' @noRd
@@ -334,6 +333,7 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
   cli::cli_abort("{.arg geometry} must be a sf or bbox object.")
 }
 
+
 #' Helper function for converting simple feature object to geometry parameter
 #' for spatial filter
 #'
@@ -341,7 +341,7 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
 #' objects are converted to a bbox.
 #'
 #' @noRd
-#' @importFrom sf st_transform st_coordinates
+#' @importFrom sf st_sf st_as_sfc st_transform st_bbox st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
   if (!is.null(layerCRS)) {
@@ -360,26 +360,4 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
     "esriGeometryEnvelope" = paste0(unlist(as.list(x), use.names = FALSE), collapse = ","),
     "esriGeometryPoint" = paste0(sf::st_coordinates(x), collapse = ",")
   )
-}
-
-
-#' Helper function for converting bounding box to geometry parameter for spatial
-#' filter
-#'
-#' Supports conversion of simple feature to bounding box objects. This function
-#' is not currently used.
-#'
-#' @noRd
-#' @importFrom sf st_bbox st_union st_crs st_transform st_as_sfc
-#' @importFrom cli cli_abort
-bbox2geometry <- function(bbox, layerCRS) {
-  if ("sf" %in% class(bbox)) {
-    bbox <- sf::st_bbox(sf::st_union(bbox))
-  }
-
-  if (sf::st_crs(bbox) != layerCRS) {
-    bbox <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(bbox), layerCRS))
-  }
-
-  paste0(unlist(as.list(bbox), use.names = FALSE), collapse = ",")
 }

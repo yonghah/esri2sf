@@ -18,7 +18,7 @@
 #' @param geometry An `sf` or `bbox` object. Currently, sf objects with a single
 #'   `POINT` feature are supported. All other sf objects are converted to bbox
 #'   objects.
-#' @param progress Show progress bar with [pbapply::pblapply()] if `TRUE`.
+#' @param progress Show progress bar from [cli::cli_progress_along()] if `TRUE`.
 #'   Default FALSE.
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon'
 #'   or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to
@@ -78,15 +78,30 @@ esri2sf <- function(url,
   layerInfo <- esrimeta(url = url, token = token)
 
   # Share basic layer information
-  cli::cli_alert_success("Downloading {.val {layerInfo$name}} from {.url {url}}")
+  cli::cli_inform(
+    c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
+  )
 
   # Get the layer geometry type
   if (is.null(geomType)) {
-    if (any(c(is.null(layerInfo$geometryType), (layerInfo$geometryType == "")))) {
-      cli::cli_alert_warning("geomType is {.val NULL} and a layer geometry type could not be determined from the server.")
+    if (is_missing_geomType(layerInfo)) {
+      cli::cli_inform(
+        c("!" = "geomType is {.val NULL} and a layer geometry type can't be found for this url.")
+      )
+
       cli::cli_rule("Attempting to download layer with {.fn esri2df}")
 
-      return(esri2df(url = url, outFields = outFields, where = where, token = token, progress = progress, replaceDomainInfo = replaceDomainInfo, ...))
+      return(
+        esri2df(
+          url = url,
+          outFields = outFields,
+          where = where,
+          token = token,
+          progress = progress,
+          replaceDomainInfo = replaceDomainInfo,
+          ...
+        )
+      )
     }
 
     layerGeomType <- layerInfo$geometryType
@@ -132,16 +147,7 @@ esri2sf <- function(url,
   }
 
   if (!is.null(bbox)) {
-    # convert sf class bbox to bbox class
-    if ("sf" %in% class(bbox)) {
-      bbox <- sf::st_bbox(sf::st_union(bbox))
-    }
-
-    if (!("bbox" %in% class(bbox))) {
-      cli::cli_abort("The provided bbox is not a {.code bbox} or {.code sf} class object.")
-    }
-
-    geometry <- bbox
+    geometry <- bbox2geometry(bbox)
   }
 
   # Set default geometryType for spatial filter
@@ -163,7 +169,9 @@ esri2sf <- function(url,
   }
 
   if (!layerCRS_missing) {
-    cli::cli_dl(c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}"))
+    cli::cli_dl(
+      c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}")
+    )
   }
 
   cli::cli_dl(
@@ -175,9 +183,10 @@ esri2sf <- function(url,
       match.arg(
         spatialRel,
         c(
-          "esriSpatialRelIntersects", "esriSpatialRelContains", "esriSpatialRelCrosses",
-          "esriSpatialRelEnvelopeIntersects", "esriSpatialRelIndexIntersects",
-          "esriSpatialRelOverlaps", "esriSpatialRelTouches", "esriSpatialRelWithin"
+          "esriSpatialRelIntersects", "esriSpatialRelContains",
+          "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
+          "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
+          "esriSpatialRelTouches", "esriSpatialRelWithin"
         )
       )
   }
@@ -213,6 +222,12 @@ esri2sf <- function(url,
   sfdf
 }
 
+#' Is layerInfo missing geometryType?
+#'
+#' @noRd
+is_missing_geomType <- function(layerInfo) {
+  any(c(is.null(layerInfo$geometryType), (layerInfo$geometryType == "")))
+}
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
@@ -228,12 +243,25 @@ esri2df <- function(url,
   layerInfo <- esrimeta(url = url, token = token)
 
   if (layerInfo$type != "Table") {
-    cli::cli_alert_warning("The provided layer {.var {layerInfo$name}} is not a {.val 'table'}.")
+    cli::cli_warn(
+      "The provided layer {.var {layerInfo$name}} is not a {.val 'table'}."
+    )
+
     cli::cli_rule("Attempting to download layer with {.fn esri2sf}")
-    return(esri2sf(url = url, outFields = outFields, where = where, token = token, progress = progress, replaceDomainInfo = replaceDomainInfo, ...))
+    return(
+      esri2sf(
+        url = url,
+        outFields = outFields,
+        where = where,
+        token = token,
+        progress = progress,
+        replaceDomainInfo = replaceDomainInfo,
+        ...
+      )
+    )
   }
 
-  cli::cli_alert_success("Downloading {.val {layerInfo$name}}")
+  cli::cli_inform(c("v" = "Downloading {.val {layerInfo$name}}"))
 
   cli::cli_dl(
     items = c("Layer type" = "{.val {layerInfo$type}}")
@@ -249,8 +277,9 @@ esri2df <- function(url,
       progress = progress,
       ...
     )
+
   df <- getEsriTable(esriFeatures)
-  if (replaceDomainInfo & nrow(df) > 0) {
+  if (replaceDomainInfo && (nrow(df) > 0)) {
     df <- addDomainInfo(df, url = url, token = token)
   }
 
@@ -268,7 +297,8 @@ esri2df <- function(url,
 #' @export
 #' @importFrom dplyr bind_rows
 esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
-  layerInfo <- esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
+  layerInfo <-
+    esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
 
   if (!fields) {
     return(layerInfo)
@@ -281,6 +311,7 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
 #' Helper function for getting layer CRS based on spatialReference
 #'
 #' @noRd
+#' @importFrom sf st_crs
 #' @importFrom cli cli_abort
 getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 
@@ -295,12 +326,12 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 
   # Format CRS (from esri2sfGeom)
   if (isWktID(layerCRS)) {
-    layerCRS <- gsub(pattern = "^(EPSG|ESRI):", replacement = "", x = layerCRS)
-    layerCRS <- getWKTidAuthority(layerCRS)
+    layerCRS <- sf::st_crs(layerCRS)$srid
   }
 
   if (is.null(layerCRS)) {
-    cli::cli_abort("Valid layer coordinate reference system can't be found.",
+    cli::cli_abort(
+      "Valid layer coordinate reference system can't be found.",
       "*" = "Check that the layer at the url has a spatial reference."
     )
   }
@@ -314,9 +345,9 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 #' @noRd
 #' @importFrom cli cli_abort
 sf2geometryType <- function(x, by_geometry = FALSE) {
-  if ("bbox" %in% class(x)) {
+  if (inherits(x, "bbox")) {
     return("esriGeometryEnvelope")
-  } else if ("sf" %in% class(x)) {
+  } else if (inherits(x, "sf")) {
     geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
 
     return(
@@ -345,7 +376,7 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
   if (!is.null(layerCRS)) {
-    if ("bbox" %in% class(x)) {
+    if (inherits(x, "bbox")) {
       x <- sf::st_sf(sf::st_as_sfc(x))
     }
     x <- sf::st_transform(x, layerCRS)
@@ -357,7 +388,33 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
   }
 
   switch(geometryType,
-    "esriGeometryEnvelope" = paste0(unlist(as.list(x), use.names = FALSE), collapse = ","),
-    "esriGeometryPoint" = paste0(sf::st_coordinates(x), collapse = ",")
+    "esriGeometryEnvelope" = paste0(
+      unlist(as.list(x), use.names = FALSE),
+      collapse = ","
+    ),
+    "esriGeometryPoint" = paste0(
+      sf::st_coordinates(x),
+      collapse = ","
+    )
   )
+}
+
+#' Helper to convert bbox to sf or error on non-sf and non-bbox objects
+#'
+#' @noRd
+bbox2geometry <- function(bbox) {
+  # convert sf class bbox to bbox class
+  if (inherits(bbox, "sf")) {
+    bbox <- sf::st_bbox(sf::st_union(bbox))
+  }
+
+  if (!inherits(bbox, "bbox")) {
+    cli::cli_abort(
+      c("{.arg bbox} must be a {.code bbox} or {.code sf} class object.",
+        "i" = "The class of the provided {.arg bbox} is {.val {class(bbox)}}"
+      )
+    )
+  }
+
+  bbox
 }

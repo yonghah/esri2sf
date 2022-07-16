@@ -18,15 +18,12 @@ Depends:
     R (>= 3.1.0)
 Imports:
     cli,
-    DBI,
     dplyr,
     httr,
     httr2,
     jsonlite,
-    RSQLite,
     sf (>= 1.0.1),
-    stats,
-    xml2
+    stats
 Suggests:
     keyring,
     knitr,
@@ -34,7 +31,8 @@ Suggests:
     purrr,
     rappdirs,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    xml2
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

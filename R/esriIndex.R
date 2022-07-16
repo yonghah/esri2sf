@@ -84,7 +84,7 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
       "serviceName" = serviceName
     )
 
-  if (!requireNamespace("purrr", quietly = TRUE) & recurse) {
+  if (!requireNamespace("purrr", quietly = TRUE) && recurse) {
     cli::cli_alert_danger(
       "The {.pkg purrr} package is not installed.
     {.pkg purrr} is required to use the {.arg recurse} argument for {.fn esriIndex}.
@@ -211,7 +211,6 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #'
 #' <https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm>
 #'
-#' @rdname esriCatalog
 #' @param f Format to use for request. Supported options include "json",
 #'   "sitemap", or "geositemap"; "html" and "kmz" are not currently supported.
 #' @param option If `option = "footprints"` and the url is for a folder, spatial
@@ -222,7 +221,6 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #' @inheritParams esriRequest
 #' @export
 #' @importFrom httr2 request req_url_query req_perform resp_body_json resp_body_xml
-#' @importFrom xml2 as_list
 #' @importFrom dplyr bind_rows
 esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...) {
   f <- match.arg(f, c("json", "html", "kmz", "sitemap", "geositemap"))
@@ -253,6 +251,12 @@ esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NU
   }
 
   if (format %in% c("sitemap", "geositemap")) {
+    if (!requireNamespace("xml2", quietly = TRUE)) {
+      cli::cli_abort(
+        "The {.pkg xml2} package must be installed if {.arg format} is {.val sitemap} or {.val geositemap}."
+      )
+    }
+
     sitemap <- httr2::resp_body_xml(resp = resp, ...)
 
     sitemap <- xml2::as_list(sitemap)

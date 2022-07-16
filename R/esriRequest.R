@@ -13,7 +13,6 @@
 #'   package to the path parameter of [httr2::req_cache].
 #' @param .max_seconds Passed to max_seconds parameter of [httr2::req_retry]
 #' @param ... Additional parameters passed to [httr2::req_url_query]
-#' @rdname esriRequest
 #' @importFrom httr2 request req_url_path_append req_url_query req_perform
 #' @importFrom cli cli_ul cli_abort
 esriRequest <- function(url,
@@ -25,6 +24,7 @@ esriRequest <- function(url,
                         .cache = FALSE,
                         .max_seconds = 3,
                         ...) {
+
   # Make request based on url
   req <- httr2::request(url)
 
@@ -56,14 +56,13 @@ esriRequest <- function(url,
 
   # Check if rappdirs::user_cache_dir can be used
   if (!requireNamespace("rappdirs", quietly = TRUE) & .cache) {
-    cli::cli_alert_danger(
-      "The {.pkg rappdirs} package is not installed.
-      {.pkg rappdirs} is required to use the {.arg .cache} argument.
-      Setting {.arg .cache} to {.val FALSE}."
+    cli::cli_warn(
+      c("The {.pkg rappdirs} package must be installed if {.code .cache = TRUE}.",
+        "i" = "Setting {.arg .cache} to {.val FALSE}."
+      )
     )
     .cache <- FALSE
   }
-
 
   if (.cache) {
     req <-

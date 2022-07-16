@@ -35,9 +35,7 @@ esriLayers <- function(url, token = NULL, returnUpdates = NULL, returnDomainName
       returnUpdates = returnUpdates
     )
 
-  resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
-
-  return(resp)
+  httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 }
 
 #' Is URL a FeatureServer or MapServer URL?

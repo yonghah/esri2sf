@@ -87,7 +87,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     if (!requireNamespace("magick", quietly = TRUE)) {
       cli::cli_abort(
-        "The {.pkg magick} package is required when {.arg info} is set to {.val thumbnail}."
+        "The {.pkg magick} package must be installed when {.arg info} is set to {.val thumbnail}."
       )
     }
 

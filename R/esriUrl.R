@@ -47,7 +47,7 @@ esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root",
       "Feature" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)
     )
 
-    if (!is.na(type) & !(type %in% names(which(isType))) & !returnType) {
+    if (!is.na(type) && !(type %in% names(which(isType))) && !returnType) {
       if (type == "Root") {
         reason <- "Url does not end in '/rest/services'."
       } else if (type == "Folder") {

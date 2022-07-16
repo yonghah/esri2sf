@@ -2,19 +2,18 @@
 #'
 #' @noRd
 #' @importFrom dplyr bind_rows
-#' @importFrom sf st_sf
+#' @importFrom sf st_crs st_sf
 esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
   # convert esri json to simple feature
   geoms <- switch(layerGeomType,
-    esriGeometryPolygon = esri2sfPolygon(jsonFeats),
-    esriGeometryPoint = esri2sfPoint(jsonFeats),
-    esriGeometryPolyline = esri2sfPolyline(jsonFeats)
+    "esriGeometryPolygon" = esri2sfPolygon(jsonFeats),
+    "esriGeometryPoint" = esri2sfPoint(jsonFeats),
+    "esriGeometryPolyline" = esri2sfPolyline(jsonFeats)
   )
 
   # Format CRS
   if (isWktID(crs)) {
-    crs <- gsub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs)
-    crs <- getWKTidAuthority(crs)
+    crs <- sf::st_crs(crs)$srid
   }
 
   # attributes
@@ -24,9 +23,9 @@ esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
       function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
     )
 
-  af <-
-    dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
-  # geometry + attributes
+  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+
+  # geometry and attributes
   sf::st_sf(geoms, af, crs = crs)
 }
 

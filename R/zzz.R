@@ -48,7 +48,7 @@ getMaxRecordsCount <- function(url,
   urlInfo <- esriCatalog(url = url, token = token)
 
   if (!is.null(urlInfo[["maxRecordCount"]])) {
-    if (urlInfo[["maxRecordCount"]] > 25000 & upperLimit) {
+    if (urlInfo[["maxRecordCount"]] > 25000 && upperLimit) {
       maxRC <- 25000L
     } else {
       maxRC <- urlInfo[["maxRecordCount"]]
@@ -69,7 +69,11 @@ getEsriTable <- function(jsonFeats) {
     lapply(jsonFeats, `[[`, 1),
     function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
   )
-  df <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+
+  df <-
+    dplyr::bind_rows(
+      lapply(atts, as.data.frame.list, stringsAsFactors = FALSE)
+    )
 
   dplyr::as_tibble(df)
 }
@@ -92,16 +96,18 @@ getEsriFeaturesByIds <- function(ids,
     fields <- c("*")
   }
 
-  # create Simple Features from ArcGIS servers json response
+  objectIds <- I(paste(ids, collapse = ","))
+  outFields <- I(paste(fields, collapse = ","))
+
   resp <-
     esriRequest(
       url,
       append = "query",
       f = "json",
-      token = token,
-      objectIds = I(paste(ids, collapse = ",")),
-      outFields = I(paste(fields, collapse = ",")),
+      objectIds = objectIds,
+      outFields = outFields,
       outSR = crs,
+      token = token,
       ...
     )
 
@@ -148,9 +154,10 @@ getEsriFeatures <- function(url,
     )
 
   if (is.null(ids)) {
-    cli::cli_alert_danger("No records match the search criteria.")
+    cli::cli_warn("No records match the search criteria.")
     invisible(return(NULL))
   }
+
   maxRC <- getMaxRecordsCount(url, token, maxRecords, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
@@ -167,7 +174,8 @@ getEsriFeatures <- function(url,
       cli::cli_abort(
         message = c(
           "Your query can't be completed.",
-          "*" = "Try setting the {.arg maxRecords} parameter (500 or less suggested) and retrying your request."
+          "*" = "Try setting the {.arg maxRecords} parameter
+          (500 or less suggested) and retrying your request."
         ),
         parent = x,
         call = call
@@ -201,38 +209,6 @@ getEsriFeatures <- function(url,
   unlist(results, recursive = FALSE)
 }
 
-#' Get authority string for WKT (well known text) id
-#'
-#' @noRd
-#' @importFrom sf sf_proj_search_paths
-#' @importFrom DBI dbConnect dbGetQuery dbDisconnect
-#' @importFrom RSQLite SQLite
-#' @importFrom cli cli_abort
-getWKTidAuthority <- function(wktID) {
-  projPaths <- file.path(sf::sf_proj_search_paths(), "proj.db")
-  projDB <- projPaths[file.exists(projPaths)][1]
-
-  con <- DBI::dbConnect(RSQLite::SQLite(), projDB)
-
-  crsData <- DBI::dbGetQuery(con, paste0("SELECT * FROM crs_view WHERE code = '", wktID, "'"))
-
-  DBI::dbDisconnect(con)
-
-  if (nrow(crsData) == 0) {
-    cli::cli_abort("WKTid: {.val {wktID}} not found in {.file proj.db}")
-  }
-
-  if (nrow(crsData) > 1) {
-    cli::cli_abort(
-      "WKTid: {.val {wktID}} has multiple entries in  {.file proj.db}.
-    Please specify authority (EPSG|ESRI) in {.arg crs} argument"
-    )
-  }
-
-  # Return wktID
-  paste0(crsData$auth_name, ":", crsData$code)
-}
-
 isWktID <- function(crs) {
   is.numeric(crs) || grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
 }
@@ -241,4 +217,6 @@ WKTunPretty <- function(wkt) {
   gsub("\\n[[:blank:]]*", "", wkt)
 }
 
-utils::globalVariables(c("name", "serviceType", "type", "urlType"))
+utils::globalVariables(
+  c("name", "serviceType", "type", "urlType")
+)

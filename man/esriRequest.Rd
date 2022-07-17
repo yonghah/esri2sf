@@ -2,17 +2,19 @@
 % Please edit documentation in R/esriRequest.R
 \name{esriRequest}
 \alias{esriRequest}
-\title{Use {httr2} to create a request for the ArcGIS REST API}
+\title{Use httr2 to create a request for the ArcGIS REST API}
 \usage{
 esriRequest(
   url,
   append = NULL,
   f = NULL,
   format = NULL,
+  outFields = NULL,
   token = NULL,
   .perform = TRUE,
   .cache = FALSE,
   .max_seconds = 3,
+  .is_error = TRUE,
   ...
 )
 }
@@ -26,18 +28,26 @@ defaults to \code{NULL}.}
 \item{f, format}{Return format to use as query parameter with
 \link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
 
+\item{outFields}{Query parameter used only for layer query requests.}
+
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
 \item{.perform}{If \code{TRUE}, perform the request with \link[httr2:req_perform]{httr2::req_perform} and
 return the response. If \code{FALSE}, return the request.}
 
-\item{.cache}{If \code{TRUE}, pass a cache folder path created with \link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir} and \code{esri2sf}
-package to the path parameter of \link[httr2:req_cache]{httr2::req_cache}.}
+\item{.cache}{If \code{TRUE}, pass a cache folder path created with
+\link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir} and \code{esri2sf} package to the path parameter of
+\link[httr2:req_cache]{httr2::req_cache}.}
 
 \item{.max_seconds}{Passed to max_seconds parameter of \link[httr2:req_retry]{httr2::req_retry}}
 
+\item{.is_error}{If \code{FALSE}, .is_error is passed to the is_error parameter of
+\link[httr2:req_error]{httr2::req_error} function. If \code{TRUE}, the request does not use \link[httr2:req_error]{httr2::req_error}.}
+
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
+
+\item{.method}{optional method passed to \link[httr2:req_method]{httr2::req_method}}
 }
 \description{
-Use {httr2} to create a request for the ArcGIS REST API
+Use httr2 to create a request for the ArcGIS REST API
 }

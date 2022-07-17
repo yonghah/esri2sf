@@ -60,7 +60,7 @@
 #' plot(df)
 #'
 #' @export
-#' @importFrom cli cli_alert_warning cli_rule cli_abort cli_alert_success cli_dl
+#' @importFrom cli cli_inform cli_rule cli_abort cli_alert_success cli_dl
 #' @importFrom sf st_geometry_type
 esri2sf <- function(url,
                     outFields = NULL,
@@ -107,8 +107,9 @@ esri2sf <- function(url,
     layerGeomType <- layerInfo$geometryType
   } else {
     if ((!is.null(layerInfo$geometryType)) && (layerInfo$geometryType != geomType)) {
-      cli::cli_alert_warning(
-        "The provided {.arg geomType} value {.val {geomType}} does not match the layer geometryType value {.val {layerInfo$geometryType}}."
+      cli::cli_inform(
+        c("!" = "The provided {.arg geomType} value {.val {geomType}} does not
+          match the layer geometryType value {.val {layerInfo$geometryType}}.")
       )
     }
 
@@ -126,18 +127,19 @@ esri2sf <- function(url,
     layerCRS <-
       getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
 
-    layerCRS_missing <- FALSE
+    cli::cli_dl(
+      c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}")
+    )
   } else {
-    cli::cli_alert_warning(
-      "The spatial reference for this layer is missing."
+    cli::cli_inform(
+      c("!" = "The spatial reference for this layer is missing.")
     )
 
     if (!is.null(crs)) {
-      cli::cli_alert_info(
-        "Attempting to access the layer using the provided {.arg crs} value {.val {crs}}."
+      cli::cli_inform(
+        c("i" = "Trying to access the layer using the provided {.arg crs}: {.val {crs}}.")
       )
 
-      layerCRS_missing <- TRUE
       layerCRS <- crs
     }
   }
@@ -168,26 +170,23 @@ esri2sf <- function(url,
       )
   }
 
-  if (!layerCRS_missing) {
-    cli::cli_dl(
-      c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}")
-    )
-  }
-
   cli::cli_dl(
     c("Output Coordinate Reference System" = "{.val {sf::st_crs(crs)$input}}")
   )
 
   if (!is.null(spatialRel)) {
+    spatialRel_opts <-
+      c(
+        "esriSpatialRelIntersects", "esriSpatialRelContains",
+        "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
+        "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
+        "esriSpatialRelTouches", "esriSpatialRelWithin"
+      )
+
     spatialRel <-
       match.arg(
         spatialRel,
-        c(
-          "esriSpatialRelIntersects", "esriSpatialRelContains",
-          "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
-          "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
-          "esriSpatialRelTouches", "esriSpatialRelWithin"
-        )
+        spatialRel_opts
       )
   }
 
@@ -215,11 +214,11 @@ esri2sf <- function(url,
       crs = crs
     )
 
-  if (replaceDomainInfo && (nrow(sfdf) > 0)) {
-    sfdf <- addDomainInfo(sfdf, url = url, token = token)
+  if (!replaceDomainInfo) {
+    return(sfdf)
   }
 
-  sfdf
+  addDomainInfo(sfdf, url = url, token = token)
 }
 
 #' Is layerInfo missing geometryType?
@@ -231,7 +230,7 @@ is_missing_geomType <- function(layerInfo) {
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-#' @importFrom cli cli_alert_warning cli_rule cli_alert_success cli_dl
+#' @importFrom cli cli_warn cli_rule cli_inform cli_dl
 esri2df <- function(url,
                     outFields = NULL,
                     where = NULL,
@@ -279,11 +278,12 @@ esri2df <- function(url,
     )
 
   df <- getEsriTable(esriFeatures)
-  if (replaceDomainInfo && (nrow(df) > 0)) {
-    df <- addDomainInfo(df, url = url, token = token)
+
+  if (!replaceDomainInfo) {
+    return(df)
   }
 
-  df
+  addDomainInfo(df, url = url, token = token)
 }
 
 

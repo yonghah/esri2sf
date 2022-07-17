@@ -55,7 +55,7 @@ that can be converted to a bounding box.}
 4326. \code{NULL} returns the feature in the same CRS that the layer is hosted
 as in the Feature/Map Server.}
 
-\item{progress}{Show progress bar with \code{\link[pbapply:pbapply]{pbapply::pblapply()}} if \code{TRUE}.
+\item{progress}{Show progress bar from \code{\link[cli:cli_progress_along]{cli::cli_progress_along()}} if \code{TRUE}.
 Default FALSE.}
 
 \item{geomType}{string specifying the layer geometry ('esriGeometryPolygon'

@@ -26,5 +26,7 @@ only supported when \code{option = "footprints"}.}
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }
 \description{
+The Catalog resource from the ArcGIS REST API represents a catalog of folders
+and services published on the host. More information:
 \url{https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm}
 }

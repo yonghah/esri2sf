@@ -1,8 +1,8 @@
 #' Create an index of folders, services, layers, and tables for an ArcGIS Server
 #'
-#' Currently only returns layers and tables for MapServer and FeatureServer
-#' services. Consider using [esriCatalog] with `f = "sitemap"` or `f = "geositemap"`
-#' as an alternative approach to indexing available folders and services.
+#' Recurse over a ArcGIS Server url or folder url to return a data frame index
+#' of folders, services, layers, and tables. This function returns additional
+#' information than [esriCatalog] using `f = "sitemap"` or `f = "geositemap"`.
 #'
 #' @rdname esriIndex
 #' @param url URL for ArcGIS server, folder, or service.
@@ -15,7 +15,12 @@
 #' @param ... Additional parameters passed to [esriCatalog]
 #' @export
 #' @importFrom dplyr bind_cols bind_rows mutate if_else case_when relocate
-esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALSE, token = NULL, ...) {
+esriIndex <- function(url,
+                      folderPath = NULL,
+                      serviceName = NULL,
+                      recurse = FALSE,
+                      token = NULL,
+                      ...) {
   esriResp <- esriCatalog(url, token = token, ...)
 
   index <- NULL
@@ -36,8 +41,7 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
   }
 
   if (!!length(esriResp[["services"]])) {
-    services <-
-      dplyr::bind_rows(esriResp$services)
+    services <- dplyr::bind_rows(esriResp$services)
 
     services <-
       dplyr::bind_cols(
@@ -85,10 +89,11 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
     )
 
   if (!requireNamespace("purrr", quietly = TRUE) && recurse) {
-    cli::cli_alert_danger(
-      "The {.pkg purrr} package is not installed.
-    {.pkg purrr} is required to use the {.arg recurse} argument for {.fn esriIndex}.
-    Setting {.arg recurse} to {.val FALSE}."
+    cli::cli_warn(
+      c("The {.pkg purrr} package is not installed.",
+        "i" = "{.pkg purrr} is required when {.arg recurse} is {.val TRUE}.",
+        ">" = "Setting {.arg recurse} to {.val FALSE}."
+      )
     )
 
     recurse <- FALSE
@@ -102,7 +107,12 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
         purrr::map2_dfr(
           folderIndex$url,
           folderIndex$name,
-          ~ esriIndex(url = .x, folderPath = .y, serviceName = serviceName, recurse = TRUE)
+          ~ esriIndex(
+            url = .x,
+            folderPath = .y,
+            serviceName = serviceName,
+            recurse = TRUE
+          )
         )
 
       index <-
@@ -112,14 +122,26 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
         )
     }
 
-    layerIndex <- subset(index, type %in% c("MapServer", "FeatureServer", "ImageServer", "GeocodeServer", "GeometryServer", "GPServer"))
+    layerIndex <-
+      subset(
+        index,
+        type %in% c(
+          "MapServer", "FeatureServer", "ImageServer",
+          "GeocodeServer", "GeometryServer", "GPServer"
+        )
+      )
 
     if (nrow(layerIndex) > 0) {
       layerIndex <-
         purrr::map2_dfr(
           layerIndex$url,
           layerIndex$name,
-          ~ esriIndexLayers(url = .x, folderPath = folderPath, serviceName = .y, recurse = TRUE)
+          ~ esriIndexLayers(
+            url = .x,
+            folderPath = folderPath,
+            serviceName = .y,
+            recurse = TRUE
+          )
         )
 
       index <-
@@ -145,7 +167,7 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
 
   dplyr::relocate(
     index,
-    urlType, folderPath, serviceName, serviceType,
+    dplyr::all_of(c("urlType", "folderPath", "serviceName", "serviceType")),
     .after = "url"
   )
 }
@@ -154,7 +176,11 @@ esriIndex <- function(url, folderPath = NULL, serviceName = NULL, recurse = FALS
 #' @rdname esriIndex
 #' @export
 #' @importFrom dplyr bind_cols bind_rows
-esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = NULL, ...) {
+esriIndexLayers <- function(url,
+                            folderPath = NULL,
+                            serviceName = NULL,
+                            token = NULL,
+                            ...) {
   esriResp <- esriCatalog(url, token = token, ...)
 
   index <- NULL
@@ -209,6 +235,8 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #' Get information on folders, services, tables, and layers using the Catalog
 #' service
 #'
+#' The Catalog resource from the ArcGIS REST API represents a catalog of folders
+#' and services published on the host. More information:
 #' <https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm>
 #'
 #' @param f Format to use for request. Supported options include "json",
@@ -220,10 +248,22 @@ esriIndexLayers <- function(url, folderPath = NULL, serviceName = NULL, token = 
 #'   only supported when `option = "footprints"`.
 #' @inheritParams esriRequest
 #' @export
-#' @importFrom httr2 request req_url_query req_perform resp_body_json resp_body_xml
+#' @importFrom httr2 request req_url_query req_perform resp_body_json
+#'   resp_body_xml
 #' @importFrom dplyr bind_rows
-esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...) {
+esriCatalog <- function(url,
+                        f = "json",
+                        token = NULL,
+                        option = NULL,
+                        outSR = NULL,
+                        ...) {
   f <- match.arg(f, c("json", "html", "kmz", "sitemap", "geositemap"))
+
+  if (f %in% c("html", "kmz")) {
+    cli::cli_abort(
+      "{.fn esriCatalog} does not yet support {.arg f} = {.val {f}}."
+    )
+  }
 
   if (f == "json") {
     stopifnot(
@@ -240,9 +280,18 @@ esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NU
 
     resp <-
       switch(resp,
-        "catalog" = esriRequest(url, f = f, token = token, ...),
-        "option" = esriRequest(url, f = f, token = token, option = option, ...),
-        "outSR" = esriRequest(url, f = f, token = token, option = option, outSR = outSR, ...)
+        "catalog" = esriRequest(
+          url,
+          f = f, token = token, ...
+        ),
+        "option" = esriRequest(
+          url,
+          f = f, token = token, option = option, ...
+        ),
+        "outSR" = esriRequest(
+          url,
+          f = f, token = token, option = option, outSR = outSR, ...
+        )
       )
 
     resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
@@ -261,10 +310,6 @@ esriCatalog <- function(url, f = "json", token = NULL, option = NULL, outSR = NU
 
     sitemap <- xml2::as_list(sitemap)
 
-    sitemap <- dplyr::bind_rows("url" = unlist(sitemap, use.names = FALSE))
-
-    return(sitemap)
+    dplyr::bind_rows("url" = unlist(sitemap, use.names = FALSE))
   }
-
-  cli::cli_abort("{.fn esriCatalog} does not support {.val {f}} as a {.arg f} argument.")
 }

@@ -149,6 +149,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "xml2",
+      "name": "xml2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=xml2"
     }
   ],
   "softwareRequirements": {
@@ -172,18 +184,6 @@
     },
     "3": {
       "@type": "SoftwareApplication",
-      "identifier": "DBI",
-      "name": "DBI",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=DBI"
-    },
-    "4": {
-      "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
       "provider": {
@@ -194,7 +194,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "5": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
@@ -206,7 +206,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -218,7 +218,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -230,19 +230,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "8": {
-      "@type": "SoftwareApplication",
-      "identifier": "RSQLite",
-      "name": "RSQLite",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=RSQLite"
-    },
-    "9": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "sf",
       "name": "sf",
@@ -255,24 +243,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=sf"
     },
-    "10": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "11": {
-      "@type": "SoftwareApplication",
-      "identifier": "xml2",
-      "name": "xml2",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=xml2"
-    },
     "SystemRequirements": null
   },
-  "fileSize": "782.371KB"
+  "fileSize": "719.91KB"
 }

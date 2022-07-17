@@ -31,7 +31,7 @@ Defaults to \code{FALSE}.}
 \item{...}{Additional parameters passed to \link{esriCatalog}}
 }
 \description{
-Currently only returns layers and tables for MapServer and FeatureServer
-services. Consider using \link{esriCatalog} with \code{f = "sitemap"} or \code{f = "geositemap"}
-as an alternative approach to indexing available folders and services.
+Recurse over a ArcGIS Server url or folder url to return a data frame index
+of folders, services, layers, and tables. This function returns additional
+information than \link{esriCatalog} using \code{f = "sitemap"} or \code{f = "geositemap"}.
 }

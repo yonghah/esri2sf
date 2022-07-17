@@ -27,7 +27,7 @@ getObjectIds <- function(url,
 
   resp <- httr2::resp_body_json(resp = resp, check_type = FALSE)
 
-  resp$objectIds
+  resp[["objectIds"]]
 }
 
 #' Get count of maximum records per request
@@ -38,26 +38,20 @@ getMaxRecordsCount <- function(url,
                                maxRecords = NULL,
                                upperLimit = FALSE) {
   if (!is.null(maxRecords)) {
-    if (!is.integer(maxRecords)) {
-      maxRecords <- as.integer(maxRecords)
-    }
-
-    return(maxRecords)
+    return(as.integer(maxRecords))
   }
 
   urlInfo <- esriCatalog(url = url, token = token)
 
   if (!is.null(urlInfo[["maxRecordCount"]])) {
     if (urlInfo[["maxRecordCount"]] > 25000 && upperLimit) {
-      maxRC <- 25000L
-    } else {
-      maxRC <- urlInfo[["maxRecordCount"]]
+      return(25000L)
     }
-  } else {
-    maxRC <- 500L
+
+    return(urlInfo[["maxRecordCount"]])
   }
 
-  maxRC
+  500L
 }
 
 #' Get table for Table layer
@@ -83,7 +77,6 @@ getEsriTable <- function(jsonFeats) {
 #'
 #' @noRd
 #' @importFrom httr2 resp_body_json
-#' @importFrom cli cli_abort
 getEsriFeaturesByIds <- function(ids,
                                  url,
                                  fields = NULL,
@@ -92,11 +85,12 @@ getEsriFeaturesByIds <- function(ids,
                                  simplifyDataFrame = FALSE,
                                  simplifyVector = simplifyDataFrame,
                                  ...) {
+  objectIds <- I(paste(ids, collapse = ","))
+
   if (is.null(fields)) {
     fields <- c("*")
   }
 
-  objectIds <- I(paste(ids, collapse = ","))
   outFields <- I(paste(fields, collapse = ","))
 
   resp <-
@@ -128,7 +122,7 @@ getEsriFeaturesByIds <- function(ids,
 #' Get ESRI features
 #'
 #' @noRd
-#' @importFrom cli cli_alert_danger
+#' @importFrom cli cli_warn
 #' @importFrom dplyr case_when
 #' @importFrom jsonlite toJSON
 #' @importFrom sf st_crs
@@ -158,6 +152,7 @@ getEsriFeatures <- function(url,
     invisible(return(NULL))
   }
 
+  # Get max record count and split ids based on count
   maxRC <- getMaxRecordsCount(url, token, maxRecords, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
@@ -169,42 +164,19 @@ getEsriFeatures <- function(url,
       TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
     )
 
-  error_fn <-
-    function(x) {
-      cli::cli_abort(
-        message = c(
-          "Your query can't be completed.",
-          "*" = "Try setting the {.arg maxRecords} parameter
-          (500 or less suggested) and retrying your request."
-        ),
-        parent = x,
-        call = call
-      )
-    }
+  seq_fn <- seq_along
 
   # Check if pbapply progress bar can be used
   if (progress) {
-    results <-
-      tryCatch(
-        lapply(
-          cli::cli_progress_along(idSplits),
-          function(x) {
-            getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
-          }
-        ),
-        error = error_fn
-      )
-  } else {
-    results <-
-      tryCatch(
-        lapply(
-          idSplits,
-          getEsriFeaturesByIds,
-          url, fields, token, crs, ...
-        ),
-        error = error_fn
-      )
+    seq_fn <- cli::cli_progress_along
   }
+
+  results <- lapply(
+    seq_fn(idSplits),
+    function(x) {
+      getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
+    }
+  )
 
   unlist(results, recursive = FALSE)
 }

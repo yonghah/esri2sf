@@ -2,8 +2,9 @@
 
     Code
       esri2df(url = url, objectIds = paste(1:10, collapse = ","))
-    Message <cliMessage>
+    Message <rlang_message>
       v Downloading "AssetCondition"
+    Message <cliMessage>
       Layer type: "Table"
     Output
       # A tibble: 10 x 6
@@ -24,8 +25,9 @@
 
     Code
       esri2df(url = url, where = "OBJECTID <= 10 AND FACILITYID = '4'")
-    Message <cliMessage>
+    Message <rlang_message>
       v Downloading "AssetCondition"
+    Message <cliMessage>
       Layer type: "Table"
     Output
       # A tibble: 2 x 6

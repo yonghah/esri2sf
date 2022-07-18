@@ -12,7 +12,7 @@
 #'   index that includes services in folders, subfolders, layers, and tables.
 #'   Defaults to `FALSE`.
 #' @inheritParams esriRequest
-#' @param ... Additional parameters passed to [esriCatalog]
+#' @param ... Additional parameters passed to [esriCatalog] (not typically required)
 #' @export
 #' @importFrom dplyr bind_cols bind_rows mutate if_else case_when relocate
 esriIndex <- function(url,
@@ -26,11 +26,19 @@ esriIndex <- function(url,
   index <- NULL
   urlIndex <- url
 
+  urlbase <-
+    regmatches(
+      urlIndex,
+      regexpr(pattern = ".+(?=/)", text = urlIndex, perl = TRUE)
+    )
+
+
   if (!!length(esriResp[["folders"]])) {
     folders <-
       dplyr::bind_cols(
         "name" = unlist(esriResp$folders),
-        "urlType" = "folder"
+        "urlType" = "folder",
+        "type" = NA
       )
 
     index <-
@@ -60,12 +68,6 @@ esriIndex <- function(url,
     return(index)
   }
 
-  urlbase <-
-    regmatches(
-      urlIndex,
-      regexpr(pattern = ".+(?=/)", text = urlIndex, perl = TRUE)
-    )
-
   index <-
     dplyr::mutate(
       index,
@@ -74,10 +76,18 @@ esriIndex <- function(url,
         grepl(pattern = "/", x = name),
         urlbase,
         urlIndex
-      ),
+      )
+    )
+
+  na_type <- all(sapply(index$type, is.na))
+
+  index <-
+    dplyr::mutate(
+      index,
       url = dplyr::case_when(
         (urlType == "folder") ~ paste0(url, "/", name),
-        TRUE ~ paste0(url, "/", name, "/", type)
+        !na_type ~ paste0(url, "/", name, "/", type),
+        TRUE ~ url
       )
     )
 
@@ -167,7 +177,7 @@ esriIndex <- function(url,
 
   dplyr::relocate(
     index,
-    urlType, folderPath, serviceName, serviceType,
+    dplyr::any_of(c("urlType", "folderPath", "serviceName", "serviceType")),
     .after = "url"
   )
 }

@@ -28,7 +28,7 @@ Defaults to \code{FALSE}.}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
-\item{...}{Additional parameters passed to \link{esriCatalog}}
+\item{...}{Additional parameters passed to \link{esriCatalog} (not typically required)}
 }
 \description{
 Recurse over a ArcGIS Server url or folder url to return a data frame index

@@ -9,7 +9,7 @@ esriRequest(
   append = NULL,
   f = NULL,
   format = NULL,
-  outFields = NULL,
+  objectIds = NULL,
   token = NULL,
   .perform = TRUE,
   .cache = FALSE,
@@ -28,8 +28,6 @@ defaults to \code{NULL}.}
 \item{f, format}{Return format to use as query parameter with
 \link[httr2:req_url]{httr2::req_url_query}; defaults to "json".}
 
-\item{outFields}{Query parameter used only for layer query requests.}
-
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
 \item{.perform}{If \code{TRUE}, perform the request with \link[httr2:req_perform]{httr2::req_perform} and
@@ -45,6 +43,8 @@ return the response. If \code{FALSE}, return the request.}
 \link[httr2:req_error]{httr2::req_error} function. If \code{TRUE}, the request does not use \link[httr2:req_error]{httr2::req_error}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
+
+\item{outFields}{Query parameter used only for layer query requests.}
 
 \item{.method}{optional method passed to \link[httr2:req_method]{httr2::req_method}}
 }

@@ -12,10 +12,9 @@ esri2sf(
   geometry = NULL,
   bbox = NULL,
   token = NULL,
-  crs = 4326,
+  crs = getOption("esri2sf.crs", 4326),
   progress = FALSE,
   geomType = NULL,
-  maxRecords = NULL,
   spatialRel = NULL,
   replaceDomainInfo = FALSE,
   ...
@@ -27,7 +26,6 @@ esri2df(
   where = NULL,
   token = NULL,
   progress = FALSE,
-  maxRecords = NULL,
   replaceDomainInfo = FALSE,
   ...
 )
@@ -39,33 +37,30 @@ esri2df(
 \item{outFields}{vector of fields you want to include. default is \code{NULL} for
 all fields.}
 
-\item{where}{string for where condition. Default is \code{NULL} for all rows.}
+\item{where}{string for where condition. Default is \code{NULL} (equivalent to
+\code{1=1}) to return all rows.}
 
-\item{geometry}{An \code{sf} or \code{bbox} object. Currently, sf objects with a single
-\code{POINT} feature are supported. All other sf objects are converted to bbox
+\item{geometry}{An \code{sf} or \code{bbox} object. Currently, \code{sf} objects with a single
+POINT feature are supported. All other \code{sf} objects are converted to \code{bbox}
 objects.}
 
 \item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}} or a simple feature object
 that can be converted to a bounding box.}
 
-\item{token}{string for authentication token (if needed). defaults to \code{NULL}.}
+\item{token}{string for authentication token. defaults to \code{NULL}.}
 
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be
 \code{NULL} or a CRS that can be handled by GDAL through sf::st_sf(). Default is
-4326. \code{NULL} returns the feature in the same CRS that the layer is hosted
-as in the Feature/Map Server.}
+\code{getOption("esri2sf.crs", 4326)} which sets the CRS to EPSG:4326 if no option
+is set. If CRS is \code{NULL} feature is returned with the same CRS that the
+layer is hosted as in the Feature/Map Server.}
 
 \item{progress}{Show progress bar from \code{\link[cli:cli_progress_along]{cli::cli_progress_along()}} if \code{TRUE}.
-Default FALSE.}
+Default \code{FALSE}.}
 
 \item{geomType}{string specifying the layer geometry ('esriGeometryPolygon'
 or 'esriGeometryPoint' or 'esriGeometryPolyline' - if \code{NULL}, will try to
 be inferred from the server)}
-
-\item{maxRecords}{Maximum number of records to return per request. This does
-not limit the total number of records returned overall. Typically, this
-parameter is only required if a query with default parameters (set based on
-the server maxRecords value) fails.}
 
 \item{spatialRel}{Spatial relationship applied to the input \code{geometry} when
 performing the query; defaults to \code{NULL} (equivalent to

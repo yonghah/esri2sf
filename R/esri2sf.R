@@ -7,26 +7,24 @@
 #'
 #' @param outFields vector of fields you want to include. default is `NULL` for
 #'   all fields.
-#' @param where string for where condition. Default is `NULL` for all rows.
-#' @param token string for authentication token (if needed). defaults to `NULL`.
+#' @param where string for where condition. Default is `NULL` (equivalent to
+#'   `1=1`) to return all rows.
+#' @param token string for authentication token. defaults to `NULL`.
 #' @param crs coordinate reference system (see [sf::st_sf()]). Should either be
 #'   `NULL` or a CRS that can be handled by GDAL through sf::st_sf(). Default is
-#'   4326. `NULL` returns the feature in the same CRS that the layer is hosted
-#'   as in the Feature/Map Server.
+#'   `getOption("esri2sf.crs", 4326)` which sets the CRS to EPSG:4326 if no option
+#'   is set. If CRS is `NULL` feature is returned with the same CRS that the
+#'   layer is hosted as in the Feature/Map Server.
 #' @param bbox bbox class object from [sf::st_bbox()] or a simple feature object
 #'   that can be converted to a bounding box.
-#' @param geometry An `sf` or `bbox` object. Currently, sf objects with a single
-#'   `POINT` feature are supported. All other sf objects are converted to bbox
+#' @param geometry An `sf` or `bbox` object. Currently, `sf` objects with a single
+#'   POINT feature are supported. All other `sf` objects are converted to `bbox`
 #'   objects.
 #' @param progress Show progress bar from [cli::cli_progress_along()] if `TRUE`.
-#'   Default FALSE.
+#'   Default `FALSE`.
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon'
 #'   or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to
 #'   be inferred from the server)
-#' @param maxRecords Maximum number of records to return per request. This does
-#'   not limit the total number of records returned overall. Typically, this
-#'   parameter is only required if a query with default parameters (set based on
-#'   the server maxRecords value) fails.
 #' @param spatialRel Spatial relationship applied to the input `geometry` when
 #'   performing the query; defaults to `NULL` (equivalent to
 #'   "esriSpatialRelIntersects"). Additional supported options include
@@ -68,10 +66,9 @@ esri2sf <- function(url,
                     geometry = NULL,
                     bbox = NULL,
                     token = NULL,
-                    crs = 4326,
+                    crs = getOption("esri2sf.crs", 4326),
                     progress = FALSE,
                     geomType = NULL,
-                    maxRecords = NULL,
                     spatialRel = NULL,
                     replaceDomainInfo = FALSE,
                     ...) {
@@ -198,7 +195,6 @@ esri2sf <- function(url,
       where = where,
       geometry = geometry,
       geometryType = geometryType,
-      maxRecords = maxRecords,
       token = token,
       crs = crs,
       progress = progress,
@@ -236,7 +232,6 @@ esri2df <- function(url,
                     where = NULL,
                     token = NULL,
                     progress = FALSE,
-                    maxRecords = NULL,
                     replaceDomainInfo = FALSE,
                     ...) {
   layerInfo <- esrimeta(url = url, token = token)
@@ -271,7 +266,6 @@ esri2df <- function(url,
       url = url,
       fields = outFields,
       where = where,
-      maxRecords = maxRecords,
       token = token,
       progress = progress,
       ...

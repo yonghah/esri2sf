@@ -167,7 +167,7 @@ esriIndex <- function(url,
 
   dplyr::relocate(
     index,
-    dplyr::all_of(c("urlType", "folderPath", "serviceName", "serviceType")),
+    urlType, folderPath, serviceName, serviceType,
     .after = "url"
   )
 }

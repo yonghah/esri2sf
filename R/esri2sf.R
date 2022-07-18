@@ -236,7 +236,7 @@ esri2df <- function(url,
                     ...) {
   layerInfo <- esrimeta(url = url, token = token)
 
-  if (layerInfo$type != "Table") {
+  if (!is.null(layerInfo$type) && layerInfo$type != "Table") {
     cli::cli_warn(
       "The provided layer {.var {layerInfo$name}} is not a {.val 'table'}."
     )

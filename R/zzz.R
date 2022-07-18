@@ -5,6 +5,7 @@
 getObjectIds <- function(url,
                          where = NULL,
                          token = NULL,
+                         objectIds = NULL,
                          geometry = NULL,
                          geometryType = NULL,
                          ...) {
@@ -18,6 +19,7 @@ getObjectIds <- function(url,
       append = "query",
       token = token,
       f = "json",
+      objectIds = objectIds,
       where = where,
       geometryType = geometryType,
       geometry = geometry,
@@ -131,7 +133,7 @@ getEsriFeatures <- function(url,
                             where = NULL,
                             geometry = NULL,
                             geometryType = NULL,
-                            maxRecords = NULL,
+                            objectIds = NULL,
                             token = NULL,
                             crs = 4326,
                             progress = FALSE,
@@ -144,6 +146,7 @@ getEsriFeatures <- function(url,
       geometry = geometry,
       geometryType = geometryType,
       token = token,
+      objectIds = objectIds,
       ...
     )
 
@@ -153,7 +156,7 @@ getEsriFeatures <- function(url,
   }
 
   # Get max record count and split ids based on count
-  maxRC <- getMaxRecordsCount(url, token, maxRecords, upperLimit = TRUE)
+  maxRC <- getMaxRecordsCount(url, token, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
   crs <-
@@ -174,7 +177,14 @@ getEsriFeatures <- function(url,
   results <- lapply(
     seq_fn(idSplits),
     function(x) {
-      getEsriFeaturesByIds(idSplits[[x]], url, fields, token, crs, ...)
+      getEsriFeaturesByIds(
+        ids = idSplits[[x]],
+        url = url,
+        fields = fields,
+        token = token,
+        crs = crs,
+        ...
+        )
     }
   )
 

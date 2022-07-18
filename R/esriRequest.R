@@ -27,7 +27,7 @@ esriRequest <- function(url,
                         append = NULL,
                         f = NULL,
                         format = NULL,
-                        outFields = NULL,
+                        objectIds = NULL,
                         token = NULL,
                         .perform = TRUE,
                         .cache = FALSE,
@@ -40,9 +40,7 @@ esriRequest <- function(url,
 
   # Append method or other url elements
   if (!is.null(append)) {
-    req_full_url <- httr2::req_url_path_append(req, append)
-  } else {
-    req_full_url <- req
+    req <- httr2::req_url_path_append(req, append)
   }
 
   # Set token to required default
@@ -53,36 +51,39 @@ esriRequest <- function(url,
   # Add f, format, outFields, and additional query parameters if provided
   req <-
     httr2::req_url_query(
-      req_full_url,
+      req,
       f = f,
       format = format,
-      outFields = outFields,
       token = token,
       ...
+    )
+
+  req_ids_added <-
+    httr2::req_url_query(
+      req,
+      objectIds = objectIds
     )
 
   # If url is more than 2048 characters long, the query must be
   # contained in the body and submitted as a POST not a GET
   # This is only expected to be used for getEsriFeaturesByIds()
-  if (nchar(req$url) > 2048) {
-    query <- jsonlite::toJSON(httr2::url_parse(req$url)$query)
-
+  if (nchar(req_ids_added$url) > 2048) {
     where <- "1=1"
+    query <- httr2::url_parse(req_ids_added$url)$query
 
-    if (any("where" %in% names(query))) {
+    if (!is.null(query[["where"]])) {
       where <- query[["where"]]
     }
 
-    req <- httr2::req_body_json(req_full_url, query)
+    req <- httr2::req_body_json(req, jsonlite::toJSON(query))
 
     req <-
       httr2::req_url_query(
         req,
-        f = f,
-        format = format,
-        where = where,
-        outFields = outFields
+        where = where
       )
+  } else {
+    req <- req_ids_added
   }
 
   req <-

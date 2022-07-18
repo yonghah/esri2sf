@@ -71,7 +71,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
         output = output
       )
 
-    resp <- httr2::resp_body_xml(resp = resp, check_type = FALSE, ...)
+    return(httr2::resp_body_xml(resp = resp, check_type = FALSE, ...))
   }
 
   if (info == "thumbnail") {
@@ -91,7 +91,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
       )
     }
 
-    return(magick::image_read(resp))
+    magick::image_read(resp)
   }
 }
 

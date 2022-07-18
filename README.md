@@ -1,6 +1,12 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# esri2sf
+
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/esri2sf)](https://CRAN.R-project.org/package=esri2sf)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -8,45 +14,39 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-# esri2sf
-
 Scraping Geographic Features from ArcGIS Server
 
 Still many geographic data is delivered through ESRI’s ArcGIS Server. It
 is not easy to utilize the geographic data in the GIS servers from data
-analysis platform like R or Pandas.
+analysis platform like R or Pandas. This package enables users to scrape
+vector data in ArcGIS Server from R through the server’s REST API. It
+downloads geographic features from ArcGIS Server and converts the data
+into as a [simple
+feature](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html)
+object.
 
-This package enables users to scrape vector data in ArcGIS Server from R
-through the server’s REST API.
+## How esri2sf works
 
-It downloads geographic features from ArcGIS Server and saves it as
-[simple features](https://r-spatial.github.io/sf/articles/sf1.html).
-
-## How it works
-
-This program sends a request to an ArcGIS Server and gets json responses
+This program sends a request to an ArcGIS Server and gets JSON responses
 containing coordinates of geometries of which format is not the same as
-geojson. So it converts the json into simple feature geometries from the
-response.
-
-Then it combines attribute data to the geometries to create sf
-dataframe. Often ArcGIS servers limits the maximum number of rows in the
-result set. So this program creates 500 features per request and
+GeoJSON. The JSON into simple feature geometries from the response. Then
+it combines attribute data to the geometries to create sf dataframe.
+Often ArcGIS servers limits the maximum number of rows in the result
+set. So this program limits the number of features per request and
 automatically re-send requests until it gets all features in the
 dataset.
 
 ## Install
 
-Use [pak](https://pak.r-lib.org/) to install this package from GitHub.
-This package imports cli, DBI, dplyr, httr, httr2, jsonlite, RSQLITE,
-sf, stats, and xml2. knitr, magick, purrr, rappdirs, rmarkdown, and
-testhat are suggested.
+Use [pak](https://pak.r-lib.org/) to install this package. This package
+imports cli, dplyr, httr (expect to drop this dependency), httr2 (new),
+jsonlite, sf (\>= 1.0.1), and stats.
 
 ``` r
 pak::pkg_install("yonghah/esri2sf")
 ```
 
-## How to use
+## How to use esri2sf
 
 What you need is the URL of REST service you want. You can get the URL
 by viewing the URL widget on the service’s webpage (see image below), by
@@ -58,14 +58,19 @@ it creates a feature layer.
 ### Point data
 
 ``` r
-library("esri2sf")
+library(esri2sf)
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
-df <- esri2sf(url, maxRecords = 300)
-#> ✔ Downloading "Landscape_Trees" from <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0>
+
+df <- esri2sf(url, crs = NULL)
+#> ✔ Downloading "Landscape_Trees" from
+#>   <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPoint"
+#> 
 #> Service Coordinate Reference System: "EPSG:3857"
-#> Output Coordinate Reference System: "EPSG:4326"
+#> 
+#> Output Coordinate Reference System: "EPSG:3857"
 plot(df)
 #> Warning: plotting the first 9 out of 56 attributes; use max.plot = 56 to plot
 #> all
@@ -81,23 +86,16 @@ polylines.
 
 ``` r
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0"
-df <- esri2sf(url, outFields = c("AADT", "DFLG"), maxRecords = 100, progress = TRUE)
-#> ✔ Downloading "Florida_Annual_Average_Daily_Traffic" from <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0>
+df <- esri2sf(url, outFields = c("AADT", "DFLG"), crs = NULL)
+#> ✔ Downloading "Florida_Annual_Average_Daily_Traffic" from
+#>   <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolyline"
+#> 
 #> Service Coordinate Reference System: "EPSG:3857"
-#> Output Coordinate Reference System: "EPSG:4326"
-#> ■■■■■                             13% | ETA: 15s
-#> ■■■■■■■■■■■                       33% | ETA: 19s
-#> ■■■■■■■■■■■■■■                    44% | ETA: 16s
-#> ■■■■■■■■■■■■■■■■                  50% | ETA: 14s
-#> ■■■■■■■■■■■■■■■■■■■               60% | ETA: 12s
-#> ■■■■■■■■■■■■■■■■■■■■■             67% | ETA: 10s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  8s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        83% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    96% | ETA:  2s
+#> 
+#> Output Coordinate Reference System: "EPSG:3857"
 plot(df)
 ```
 
@@ -110,14 +108,20 @@ You can filter rows as well by giving a `where` condition.
 
 ``` r
 url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
-df <- esri2sf(url, 
-              where = "STATE_NAME = 'Michigan'", 
-              outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI"))
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+df <- esri2sf(
+  url,
+  where = "STATE_NAME = 'Michigan'",
+  outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
+)
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
-#> Output Coordinate Reference System: "EPSG:4326"
+#> 
+#> Output Coordinate Reference System: "EPSG:4269"
 plot(df)
 ```
 
@@ -131,7 +135,7 @@ You can download non-spatial tables of the ‘Table’ layer type using
 `esri2df()`.
 
 ``` r
-df <- esri2df('https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5', objectIds = paste(1:50, collapse = ","))
+df <- esri2df("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5", objectIds = paste(1:50, collapse = ","))
 #> ✔ Downloading "AssetCondition"
 #> Layer type: "Table"
 df
@@ -169,18 +173,22 @@ url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics
 where <- "STATE_NAME = 'Michigan'"
 outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 
-#default crs = 4326
-esri2sf(url, where = where, outFields = outFields) 
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+# default crs = 4326
+esri2sf(url, where = where, outFields = outFields)
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
-#> Output Coordinate Reference System: "EPSG:4326"
+#> 
+#> Output Coordinate Reference System: "EPSG:4269"
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
 #> Bounding box:  xmin: -90.4082 ymin: 41.69749 xmax: -82.41984 ymax: 48.1738
-#> Geodetic CRS:  WGS 84
+#> Geodetic CRS:  NAD83
 #> First 10 features:
 #>    POP2000 POP2007 POP00_SQMI POP07_SQMI                          geoms
 #> 1     2301    2324        4.1        4.2 MULTIPOLYGON (((-88.49753 4...
@@ -194,12 +202,16 @@ esri2sf(url, where = where, outFields = outFields)
 #> 9     8903    8781        7.3        7.2 MULTIPOLYGON (((-86.45828 4...
 #> 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
 
-#No transformation (recommended)
+# No transformation (recommended)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
+#> 
 #> Output Coordinate Reference System: "EPSG:4269"
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
@@ -220,37 +232,49 @@ esri2sf(url, where = where, outFields = outFields, crs = NULL)
 #> 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
 ```
 
-Also since the addition of the `WKT1_ESRI` output from sf::st_crs() in
-sf version 1.0-1, you can enter common CRS format (any that sf::st_crs()
-can handle) into the `crs` parameters and it will be able to convert to
-the ESRI formatted WKT needed for the outSR field in the REST query.
-Below are examples of the variety of input types that you can use with
-the `crs` parameters. All examples are just different formulations of
-the ESRI:102690 CRS.
+Also since the addition of the `WKT1_ESRI` output from `sf::st_crs()` in
+sf version 1.0-1, you can enter common CRS format (any that
+`sf::st_crs()` can handle) into the `crs` parameters and it will be able
+to convert to the ESRI formatted WKT needed for the outSR field in the
+REST query. Below are examples of the variety of input types that you
+can use with the `crs` parameters. All examples are just different
+formulations of the ESRI:102690 CRS.
 
 ``` r
-#ESRI Authority Code
+# ESRI Authority Code
 df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
+#> 
 #> Output Coordinate Reference System: "ESRI:102690"
-#PROJ string
+# PROJ string
 df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
+#> 
 #> Output Coordinate Reference System: "+proj=lcc +lat_1=42.1
 #> +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000
 #> +y_0=0 +datum=NAD83 +units=us-ft +no_defs"
-#OGC WKT
+# OGC WKT
 df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
-#> ✔ Downloading "Coarse Counties" from <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Coarse Counties" from
+#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
 #> Layer type: "Feature Layer"
+#> 
 #> Geometry type: "esriGeometryPolygon"
+#> 
 #> Service Coordinate Reference System: "EPSG:4269"
+#> 
 #> Output Coordinate Reference System:
 #> "PROJCS[\"NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"False_Easting\",13123333.33333333],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-84.36666666666666],PARAMETER[\"Standard_Parallel_1\",42.1],PARAMETER[\"Standard_Parallel_2\",43.66666666666666],PARAMETER[\"Latitude_Of_Origin\",41.5],UNIT[\"Foot_US\",0.30480060960121924],AUTHORITY[\"EPSG\",\"102690\"]]"
 ```
@@ -263,12 +287,11 @@ point. All are very close to 0.
 coord_diff <- function(df1, df2) {
   suppressWarnings({
     c(
-      "x" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[,1] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[,1]),
-      "y" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[,2] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[,2])
+      "x" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[, 1] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[, 1]),
+      "y" = mean(sf::st_coordinates(sf::st_cast(df1, "POINT"))[, 2] - sf::st_coordinates(sf::st_cast(df2, "POINT"))[, 2])
     )
   })
 }
-
 coord_diff(df1, df2)
 #>             x             y 
 #>  1.827251e-08 -1.191372e-09

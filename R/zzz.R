@@ -79,15 +79,17 @@ getEsriTable <- function(jsonFeats) {
 #'
 #' @noRd
 #' @importFrom httr2 resp_body_json
-getEsriFeaturesByIds <- function(ids,
+getEsriFeaturesByIds <- function(objectIds = NULL,
                                  url,
                                  fields = NULL,
                                  token = NULL,
-                                 crs = 4326,
+                                 crs = NULL,
                                  simplifyDataFrame = FALSE,
                                  simplifyVector = simplifyDataFrame,
                                  ...) {
-  objectIds <- I(paste(ids, collapse = ","))
+  if (!is.null(objectIds)) {
+    objectIds <- I(paste(objectIds, collapse = ","))
+  }
 
   if (is.null(fields)) {
     fields <- c("*")
@@ -135,10 +137,36 @@ getEsriFeatures <- function(url,
                             geometryType = NULL,
                             objectIds = NULL,
                             token = NULL,
-                            crs = 4326,
+                            crs = NULL,
                             progress = FALSE,
                             call = parent.frame(),
+                            getbyIds = TRUE,
                             ...) {
+  crs <-
+    dplyr::case_when(
+      is.null(crs) ~ "",
+      is.numeric(crs) ~ as.character(crs),
+      isWktID(crs) ~ sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs),
+      TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
+    )
+
+  if (!getbyIds) {
+    features <-
+      getEsriFeaturesNoIds(
+        url = url,
+        token = token,
+        objectIds = objectIds,
+        crs = crs,
+        geometryType = geometryType,
+        geometry = geometry,
+        where = where,
+        fields = fields,
+        ...
+      )
+
+    return(features)
+  }
+
   ids <-
     getObjectIds(
       url = url,
@@ -159,14 +187,6 @@ getEsriFeatures <- function(url,
   maxRC <- getMaxRecordsCount(url, token, upperLimit = TRUE)
   idSplits <- split(ids, seq_along(ids) %/% maxRC)
 
-  crs <-
-    dplyr::case_when(
-      is.null(crs) ~ "",
-      is.numeric(crs) ~ as.character(crs),
-      isWktID(crs) ~ sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs),
-      TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
-    )
-
   seq_fn <- seq_along
 
   # Check if pbapply progress bar can be used
@@ -178,17 +198,67 @@ getEsriFeatures <- function(url,
     seq_fn(idSplits),
     function(x) {
       getEsriFeaturesByIds(
-        ids = idSplits[[x]],
+        objectIds = idSplits[[x]],
         url = url,
         fields = fields,
         token = token,
         crs = crs,
         ...
-        )
+      )
     }
   )
 
   unlist(results, recursive = FALSE)
+}
+
+#' @noRd
+getEsriFeaturesNoIds <- function(url,
+                                 token = NULL,
+                                 objectIds = NULL,
+                                 crs = NULL,
+                                 geometryType = NULL,
+                                 geometry = NULL,
+                                 where = NULL,
+                                 fields = NULL,
+                                 simplifyDataFrame = FALSE,
+                                 simplifyVector = simplifyDataFrame,
+                                 ...) {
+  if (is.null(where)) {
+    where <- "1=1"
+  }
+
+  if (is.null(fields)) {
+    fields <- c("*")
+  }
+
+  outFields <- I(paste(fields, collapse = ","))
+
+  resp <-
+    esriRequest(
+      url = url,
+      append = "query",
+      token = token,
+      f = "json",
+      objectIds = objectIds,
+      outSR = crs,
+      where = where,
+      geometryType = geometryType,
+      geometry = geometry,
+      outFields = I(paste(fields, collapse = ",")),
+      ...
+    )
+
+  resp <-
+    httr2::resp_body_json(
+      resp,
+      check_type = FALSE,
+      # Additional parameters passed to jsonlite::fromJSON
+      digits = NA,
+      simplifyDataFrame = simplifyDataFrame,
+      simplifyVector = simplifyVector
+    )
+
+  resp[["features"]]
 }
 
 isWktID <- function(crs) {

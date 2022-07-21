@@ -369,10 +369,11 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
 #' @importFrom sf st_sf st_as_sfc st_transform st_bbox st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
+  if (inherits(x, "bbox")) {
+    x <- sf::st_sf(sf::st_as_sfc(x))
+  }
+
   if (!is.null(layerCRS)) {
-    if (inherits(x, "bbox")) {
-      x <- sf::st_sf(sf::st_as_sfc(x))
-    }
     x <- sf::st_transform(x, layerCRS)
   }
 
@@ -396,10 +397,11 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #' Helper to convert bbox to sf or error on non-sf and non-bbox objects
 #'
 #' @noRd
+#' @importFrom sf st_bbox
 bbox2geometry <- function(bbox) {
   # convert sf class bbox to bbox class
   if (inherits(bbox, "sf")) {
-    bbox <- sf::st_bbox(sf::st_union(bbox))
+    bbox <- sf::st_bbox(bbox)
   }
 
   if (!inherits(bbox, "bbox")) {

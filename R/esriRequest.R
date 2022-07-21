@@ -75,13 +75,16 @@ esriRequest <- function(url,
       where <- query[["where"]]
     }
 
-    req <- httr2::req_body_json(req, jsonlite::toJSON(query))
-
     req <-
       httr2::req_url_query(
         req,
         where = where
       )
+
+    # FIXME: This works for some servers but not others
+    # consider using passing the getbyIds = FALSE parameter to avoid the
+    # two-step process of quierying by objectIds
+    req <- httr2::req_body_json(req, jsonlite::toJSON(query))
   } else {
     req <- req_ids_added
   }

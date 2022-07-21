@@ -126,10 +126,10 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
 #' Get ESRI features
 #'
 #' @noRd
-#' @importFrom cli cli_warn
 #' @importFrom dplyr case_when
 #' @importFrom jsonlite toJSON
 #' @importFrom sf st_crs
+#' @importFrom cli cli_warn cli_progress_along
 getEsriFeatures <- function(url,
                             fields = NULL,
                             where = NULL,
@@ -140,7 +140,6 @@ getEsriFeatures <- function(url,
                             crs = NULL,
                             progress = FALSE,
                             call = parent.frame(),
-                            getbyIds = TRUE,
                             ...) {
   crs <-
     dplyr::case_when(
@@ -149,23 +148,6 @@ getEsriFeatures <- function(url,
       isWktID(crs) ~ sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs),
       TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
     )
-
-  if (!getbyIds) {
-    features <-
-      getEsriFeaturesNoIds(
-        url = url,
-        token = token,
-        objectIds = objectIds,
-        crs = crs,
-        geometryType = geometryType,
-        geometry = geometry,
-        where = where,
-        fields = fields,
-        ...
-      )
-
-    return(features)
-  }
 
   ids <-
     getObjectIds(
@@ -209,56 +191,6 @@ getEsriFeatures <- function(url,
   )
 
   unlist(results, recursive = FALSE)
-}
-
-#' @noRd
-getEsriFeaturesNoIds <- function(url,
-                                 token = NULL,
-                                 objectIds = NULL,
-                                 crs = NULL,
-                                 geometryType = NULL,
-                                 geometry = NULL,
-                                 where = NULL,
-                                 fields = NULL,
-                                 simplifyDataFrame = FALSE,
-                                 simplifyVector = simplifyDataFrame,
-                                 ...) {
-  if (is.null(where)) {
-    where <- "1=1"
-  }
-
-  if (is.null(fields)) {
-    fields <- c("*")
-  }
-
-  outFields <- I(paste(fields, collapse = ","))
-
-  resp <-
-    esriRequest(
-      url = url,
-      append = "query",
-      token = token,
-      f = "json",
-      objectIds = objectIds,
-      outSR = crs,
-      where = where,
-      geometryType = geometryType,
-      geometry = geometry,
-      outFields = I(paste(fields, collapse = ",")),
-      ...
-    )
-
-  resp <-
-    httr2::resp_body_json(
-      resp,
-      check_type = FALSE,
-      # Additional parameters passed to jsonlite::fromJSON
-      digits = NA,
-      simplifyDataFrame = simplifyDataFrame,
-      simplifyVector = simplifyVector
-    )
-
-  resp[["features"]]
 }
 
 isWktID <- function(crs) {

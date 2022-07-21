@@ -6,23 +6,24 @@
 #'   defaults to `NULL`.
 #' @param f,format Return format to use as query parameter with
 #'   [httr2::req_url_query]; defaults to "json".
+#' @param objectIds Parameter used for layer query requests. The addition of
+#'   objectIds to the query often leads the url length to exceed the 2048
+#'   character maximum. In those cases, the query is added to the body of the
+#'   request with [httr2::req_body_form]
 #' @param token String for authentication token; defaults to `NULL`.
-#' @param outFields Query parameter used only for layer query requests.
 #' @param .perform If `TRUE`, perform the request with [httr2::req_perform] and
 #'   return the response. If `FALSE`, return the request.
-#' @param .method optional method passed to [httr2::req_method]
 #' @param .cache If `TRUE`, pass a cache folder path created with
 #'   [rappdirs::user_cache_dir] and `esri2sf` package to the path parameter of
 #'   [httr2::req_cache].
 #' @param .max_seconds Passed to max_seconds parameter of [httr2::req_retry]
 #' @param .is_error If `FALSE`, .is_error is passed to the is_error parameter of
-#'   [httr2::req_error] function. If `TRUE`, the request does not use [httr2::req_error].
+#'   [httr2::req_error] function. If `TRUE`, the request does not use
+#'   [httr2::req_error].
 #' @param ... Additional parameters passed to [httr2::req_url_query]
-#' @importFrom httr2 request req_url_path_append req_url_query url_parse
-#'   req_body_json req_user_agent req_cache req_retry req_method req_error
-#'   resp_body_json req_perform
-#' @importFrom jsonlite toJSON
-#' @importFrom cli cli_ul cli_abort
+#' @importFrom httr2 request req_url_path_append req_url_query req_body_form
+#'   req_user_agent req_cache req_retry req_error resp_body_json req_perform
+#' @importFrom cli cli_warn
 esriRequest <- function(url,
                         append = NULL,
                         f = NULL,
@@ -64,27 +65,17 @@ esriRequest <- function(url,
       objectIds = objectIds
     )
 
-  # If url is more than 2048 characters long, the query must be
-  # contained in the body and submitted as a POST not a GET
-  # This is only expected to be used for getEsriFeaturesByIds()
+  # If url is more than 2048 characters long, add the query to the
+  # body of the request
   if (nchar(req_ids_added$url) > 2048) {
-    where <- "1=1"
-    query <- httr2::url_parse(req_ids_added$url)$query
-
-    if (!is.null(query[["where"]])) {
-      where <- query[["where"]]
-    }
-
-    req <-
-      httr2::req_url_query(
-        req,
-        where = where
-      )
-
-    # FIXME: This works for some servers but not others
-    # consider using passing the getbyIds = FALSE parameter to avoid the
-    # two-step process of quierying by objectIds
-    req <- httr2::req_body_json(req, jsonlite::toJSON(query))
+    req <- httr2::req_body_form(
+      req,
+      f = f,
+      format = format,
+      token = token,
+      objectIds = objectIds,
+      ...
+    )
   } else {
     req <- req_ids_added
   }
@@ -109,8 +100,7 @@ esriRequest <- function(url,
     req <-
       httr2::req_cache(
         req,
-        path = rappdirs::user_cache_dir("esri2sf"),
-        debug = TRUE
+        path = rappdirs::user_cache_dir("esri2sf")
       )
   }
 

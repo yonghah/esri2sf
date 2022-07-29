@@ -250,5 +250,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "719.91KB"
+  "fileSize": "719.569KB",
+  "readme": "https://github.com/yonghah/esri2sf/blob/master/README.md",
+  "developmentStatus": "https://www.repostatus.org/#active"
 }

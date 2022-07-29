@@ -18,14 +18,14 @@ esrigeocode(
 )
 }
 \arguments{
-\item{url}{GeocodeServer service url. Required.}
+\item{url}{A GeocodeServer service url. Required.}
 
 \item{address}{Single line address passed at the "SingleLine" parameter to
 the ArcGIS REST API. Specific format may depend on specific server
 configuration, Default: \code{NULL}}
 
 \item{coords}{Numeric vector with longitude, latitude coordinates or a sf
-object where the centroid is used as the coordinates. Default: NULL}
+object where the centroid is used as the coordinates. Default: \code{NULL}}
 
 \item{score}{Accuracy score, if provided only return results with provided
 accuracy score or greater Default: 0.95}
@@ -39,20 +39,12 @@ accuracy score or greater Default: 0.95}
 \item{geometry}{If \code{TRUE} (default), return a simple feature object. If
 \code{FALSE}, return a data frame.}
 
-\item{...}{Additional parameters passed to \link{esriRequest}}
+\item{...}{Additional parameters passed to \code{\link[=esriRequest]{esriRequest()}}.}
 }
 \description{
-This function supports two of the services available using an ArcGIS
-GeocodeServer:
-}
-\details{
-\itemize{
-\item Find Address Candidates:
-\url{https://developers.arcgis.com/rest/services-reference/enterprise/find-address-candidates.htm}
-\item Reverse Geocode:
-\url{https://developers.arcgis.com/rest/services-reference/enterprise/reverse-geocode.htm}
-}
-
-Provide an address parameter to use Find Address Candidates or a coords
-parameter to use Reverse Geocode.
+This function allows the use of an ArcGIS GeocodeServer url to support the
+\href{https://developers.arcgis.com/rest/services-reference/enterprise/find-address-candidates.htm}{Find Address Candidates}
+and \href{https://developers.arcgis.com/rest/services-reference/enterprise/reverse-geocode.htm}{Reverse Geocode}
+REST APIs. Provide an address parameter to use Find Address Candidates or a
+coords parameter to use Reverse Geocode.
 }

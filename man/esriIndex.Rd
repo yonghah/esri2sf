@@ -3,6 +3,7 @@
 \name{esriIndex}
 \alias{esriIndex}
 \alias{esriIndexLayers}
+\alias{esriindex}
 \title{Create an index of folders, services, layers, and tables for an ArcGIS Server}
 \usage{
 esriIndex(
@@ -15,6 +16,15 @@ esriIndex(
 )
 
 esriIndexLayers(url, folderPath = NULL, serviceName = NULL, token = NULL, ...)
+
+esriindex(
+  url,
+  folderPath = NULL,
+  serviceName = NULL,
+  recurse = FALSE,
+  token = NULL,
+  ...
+)
 }
 \arguments{
 \item{url}{URL for ArcGIS server, folder, or service.}

@@ -242,6 +242,10 @@ esriIndexLayers <- function(url,
   )
 }
 
+#' @rdname esriIndex
+#' @name esriindex
+esriindex <- esriIndex
+
 #' Get information on folders, services, tables, and layers using the Catalog
 #' service
 #'
@@ -260,7 +264,8 @@ esriIndexLayers <- function(url,
 #' @export
 #' @importFrom httr2 request req_url_query req_perform resp_body_json
 #'   resp_body_xml
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr case_when bind_rows
+#' @importFrom cli cli_abort
 esriCatalog <- function(url,
                         f = "json",
                         token = NULL,
@@ -323,3 +328,7 @@ esriCatalog <- function(url,
     dplyr::bind_rows("url" = unlist(sitemap, use.names = FALSE))
   }
 }
+
+#' @rdname esriCatalog
+#' @name esricatalog
+esricatalog <- esriCatalog

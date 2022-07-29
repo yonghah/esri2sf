@@ -2,10 +2,13 @@
 % Please edit documentation in R/esriIndex.R
 \name{esriCatalog}
 \alias{esriCatalog}
+\alias{esricatalog}
 \title{Get information on folders, services, tables, and layers using the Catalog
 service}
 \usage{
 esriCatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
+
+esricatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
 }
 \arguments{
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS

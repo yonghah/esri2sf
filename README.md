@@ -224,23 +224,23 @@ df
 #> # ℹ Use `print(n = ...)` to see more rows
 ```
 
-In some cases, tables may include coordinates as numeric columns. If
-this is the case, you can create a bounding box filter condition using
-the following format:
+In some cases, tables may include coordinates as numeric attribute
+columns but no geometry. If this is the case, you can create a bounding
+box filter condition using the following format:
 
 ``` r
+# Using the Michigan sf data to create a bbox
 bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
 where <- paste0(c(
-  sprintf("(%s >= %s)", coords[1], bbox$xmax[[1]]),
-  sprintf("(%s <= %s)", coords[1], bbox$xmin[[1]]),
-  sprintf("(%s >= %s)", coords[2], bbox$ymax[[1]]),
-  sprintf("(%s <= %s)", coords[2], bbox$ymin[[1]])
+  sprintf("(%s >= %s)", coords[1], bbox$xmax),
+  sprintf("(%s <= %s)", coords[1], bbox$xmin),
+  sprintf("(%s >= %s)", coords[2], bbox$ymax),
+  sprintf("(%s <= %s)", coords[2], bbox$ymin)
 ),
 collapse = " AND "
 )
-
 
 where
 #> [1] "(longitude >= -82.419835847249) AND (longitude <= -90.4081998349311) AND (latitude >= 48.1737952928041) AND (latitude <= 41.6974947570863)"
@@ -394,4 +394,126 @@ coord_diff(df1, df3)
 coord_diff(df2, df3)
 #> x y 
 #> 0 0
+```
+
+### Additional functions
+
+The `esriRequest()` function has also made it easier to build new
+functions for ArcGIS REST API services. `esriCatalog()` uses the
+[Catalog
+endpoint](https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm)
+to return a list of folders and layers.
+
+``` r
+url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"
+
+esriCatalog(url)
+#> $currentVersion
+#> [1] 10.01
+#> 
+#> $folders
+#> $folders[[1]]
+#> [1] "Demographics"
+#> 
+#> $folders[[2]]
+#> [1] "Elevation"
+#> 
+#> $folders[[3]]
+#> [1] "Locators"
+#> 
+#> $folders[[4]]
+#> [1] "Louisville"
+#> 
+#> $folders[[5]]
+#> [1] "Network"
+#> 
+#> $folders[[6]]
+#> [1] "Petroleum"
+#> 
+#> $folders[[7]]
+#> [1] "PublicSafety"
+#> 
+#> $folders[[8]]
+#> [1] "Specialty"
+#> 
+#> $folders[[9]]
+#> [1] "TaxParcel"
+#> 
+#> $folders[[10]]
+#> [1] "WaterTemplate"
+#> 
+#> 
+#> $services
+#> $services[[1]]
+#> $services[[1]]$name
+#> [1] "Geometry"
+#> 
+#> $services[[1]]$type
+#> [1] "GeometryServer"
+```
+
+`esriIndex()` wraps `esriCatalog()` but returns a data frame with added
+columns to differentiate between folder, service, and layer URLs.
+
+``` r
+esriIndex(url)
+#> # A tibble: 11 × 5
+#>    name          type           url                              urlType servi…¹
+#>    <chr>         <chr>          <chr>                            <chr>   <chr>  
+#>  1 Demographics  <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  2 Elevation     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  3 Locators      <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  4 Louisville    <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  5 Network       <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  6 Petroleum     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  7 PublicSafety  <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  8 Specialty     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#>  9 TaxParcel     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#> 10 WaterTemplate <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
+#> 11 Geometry      GeometryServer https://sampleserver1.arcgisonl… service Geomet…
+#> # … with abbreviated variable name ¹​serviceType
+```
+
+Set `recurse = TRUE` to loop through folders and ensure the data frame
+includes all available services.
+
+``` r
+esriIndex(url, recurse = TRUE)
+#> # A tibble: 813 × 13
+#>    name        type  url   urlType folde…¹ servi…² servi…³    id paren…⁴ defau…⁵
+#>    <chr>       <chr> <chr> <chr>   <chr>   <chr>   <chr>   <int>   <int> <lgl>  
+#>  1 Demographi… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  2 Elevation   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  3 Locators    <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  4 Louisville  <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  5 Network     <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  6 Petroleum   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  7 PublicSafe… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  8 Specialty   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  9 TaxParcel   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#> 10 WaterTempl… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#> # … with 803 more rows, 3 more variables: minScale <dbl>, maxScale <int>,
+#> #   subLayerIds <list>, and abbreviated variable names ¹​folderPath,
+#> #   ²​serviceName, ³​serviceType, ⁴​parentLayerId, ⁵​defaultVisibility
+#> # ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+```
+
+Similarly, the new `esrigeocode()` provides support for the [Find
+Address
+Candidates](https://developers.arcgis.com/rest/services-reference/enterprise/find-address-candidates.htm)
+and [Reverse
+Geocode](https://developers.arcgis.com/rest/services-reference/enterprise/reverse-geocode.htm)
+REST APIs.
+
+``` r
+url <- "https://geodata.baltimorecity.gov/egis/rest/services/Locator/EGISCompositeLocator/GeocodeServer"
+
+esrigeocode(url, address = "100 HOLLIDAY STREET")
+#> Simple feature collection with 1 feature and 2 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -76.61032 ymin: 39.29052 xmax: -76.61032 ymax: 39.29052
+#> Geodetic CRS:  WGS 84
+#>           address score                   geometry
+#> 1 100 HOLLIDAY ST   100 POINT (-76.61032 39.29052)
 ```

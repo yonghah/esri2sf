@@ -1,23 +1,20 @@
 #' Use an ArcGIS GeocodeServer to geocode an address or reverse geocode
 #' coordinates
 #'
-#' This function supports two of the services available using an ArcGIS
-#' GeocodeServer:
+#' This function allows the use of an ArcGIS GeocodeServer url to support the
+#' [Find Address
+#' Candidates](https://developers.arcgis.com/rest/services-reference/enterprise/find-address-candidates.htm)
+#' and [Reverse
+#' Geocode](https://developers.arcgis.com/rest/services-reference/enterprise/reverse-geocode.htm)
+#' REST APIs. Provide an address parameter to use Find Address Candidates or a
+#' coords parameter to use Reverse Geocode.
 #'
-#' - Find Address Candidates:
-#' <https://developers.arcgis.com/rest/services-reference/enterprise/find-address-candidates.htm>
-#' - Reverse Geocode:
-#' <https://developers.arcgis.com/rest/services-reference/enterprise/reverse-geocode.htm>
-#'
-#' Provide an address parameter to use Find Address Candidates or a coords
-#' parameter to use Reverse Geocode.
-#'
-#' @param url GeocodeServer service url. Required.
+#' @param url A GeocodeServer service url. Required.
 #' @param address Single line address passed at the "SingleLine" parameter to
 #'   the ArcGIS REST API. Specific format may depend on specific server
 #'   configuration, Default: `NULL`
 #' @param coords Numeric vector with longitude, latitude coordinates or a sf
-#'   object where the centroid is used as the coordinates. Default: NULL
+#'   object where the centroid is used as the coordinates. Default: `NULL`
 #' @param score Accuracy score, if provided only return results with provided
 #'   accuracy score or greater Default: 0.95
 #' @param n Number of candidates to return, Default: 1
@@ -25,7 +22,7 @@
 #' @param crs Coordinate reference system to return.
 #' @param geometry If `TRUE` (default), return a simple feature object. If
 #'   `FALSE`, return a data frame.
-#' @param ... Additional parameters passed to [esriRequest]
+#' @param ... Additional parameters passed to [esriRequest()].
 #' @export
 #' @importFrom cli cli_warn cli_abort
 #' @importFrom sf st_union st_transform st_centroid st_coordinates
@@ -51,7 +48,7 @@ esrigeocode <- function(url,
     layerCRS <- getLayerCRS(spatialReference = layerInfo$spatialReference)
   } else {
     cli::cli_warn("Can't find a spatial reference at the provided url.")
-    layerCRS <- crs
+    layerCRS <- sf::st_crs(crs)$srid
   }
 
   location <- NULL
@@ -100,9 +97,10 @@ esrigeocode <- function(url,
     )
 
   if (operation == "findAddressCandidates") {
+
     candidates <- resp[["candidates"]]
 
-    if (!is.data.frame(candidates) | nrow(candidates) == 0) {
+    if (nrow(candidates) == 0) {
       cli::cli_abort(
         "Can't find any candidates matching the
       provided {.arg address} or {.arg coords}."

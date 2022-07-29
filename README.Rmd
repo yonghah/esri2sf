@@ -110,10 +110,10 @@ bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
 where <- paste0(c(
-  sprintf("(%s >= %s)", coords[1], bbox$xmax),
-  sprintf("(%s <= %s)", coords[1], bbox$xmin),
-  sprintf("(%s >= %s)", coords[2], bbox$ymax),
-  sprintf("(%s <= %s)", coords[2], bbox$ymin)
+  sprintf("(%s >= %s)", coords[1], bbox$xmin),
+  sprintf("(%s <= %s)", coords[1], bbox$xmax),
+  sprintf("(%s >= %s)", coords[2], bbox$ymin),
+  sprintf("(%s <= %s)", coords[2], bbox$ymax)
 ),
 collapse = " AND "
 )

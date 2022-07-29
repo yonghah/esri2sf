@@ -234,16 +234,16 @@ bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
 where <- paste0(c(
-  sprintf("(%s >= %s)", coords[1], bbox$xmax),
-  sprintf("(%s <= %s)", coords[1], bbox$xmin),
-  sprintf("(%s >= %s)", coords[2], bbox$ymax),
-  sprintf("(%s <= %s)", coords[2], bbox$ymin)
+  sprintf("(%s >= %s)", coords[1], bbox$xmin),
+  sprintf("(%s <= %s)", coords[1], bbox$xmax),
+  sprintf("(%s >= %s)", coords[2], bbox$ymin),
+  sprintf("(%s <= %s)", coords[2], bbox$ymax)
 ),
 collapse = " AND "
 )
 
 where
-#> [1] "(longitude >= -82.419835847249) AND (longitude <= -90.4081998349311) AND (latitude >= 48.1737952928041) AND (latitude <= 41.6974947570863)"
+#> [1] "(longitude >= -90.4081998349311) AND (longitude <= -82.419835847249) AND (latitude >= 41.6974947570863) AND (latitude <= 48.1737952928041)"
 ```
 
 ### Using the `crs` parameter

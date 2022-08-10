@@ -71,10 +71,32 @@ esri2sf <- function(url,
                     geomType = NULL,
                     spatialRel = NULL,
                     replaceDomainInfo = FALSE,
+                    quiet = FALSE,
                     ...) {
+  # Share basic layer information
+  if (quiet) {
+    return(
+      suppressMessages(
+        esri2sf(
+          url = url,
+          outFields = outFields,
+          where = where,
+          geometry = geometry,
+          bbox = bbox,
+          token = token,
+          crs = crs,
+          progress = progress,
+          geomType = geomType,
+          spatialRel = spatialRel,
+          replaceDomainInfo = replaceDomainInfo,
+          ...
+        )
+      )
+    )
+  }
+
   layerInfo <- esrimeta(url = url, token = token)
 
-  # Share basic layer information
   cli::cli_inform(
     c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
   )
@@ -83,10 +105,11 @@ esri2sf <- function(url,
   if (is.null(geomType)) {
     if (is_missing_geomType(layerInfo)) {
       cli::cli_inform(
-        c("!" = "geomType is {.val NULL} and a layer geometry type can't be found for this url.")
+        c("!" = "geomType is {.val NULL} and a layer geometry type
+          can't be found for this url.")
       )
 
-      cli::cli_rule("Attempting to download layer with {.fn esri2df}")
+      cli::cli_rule("Trying to download layer with {.fn esri2df}")
 
       return(
         esri2df(
@@ -103,7 +126,10 @@ esri2sf <- function(url,
 
     layerGeomType <- layerInfo$geometryType
   } else {
-    if ((!is.null(layerInfo$geometryType)) && (layerInfo$geometryType != geomType)) {
+    geomType_mismatch <-
+      !is.null(layerInfo$geometryType) && (layerInfo$geometryType != geomType)
+
+    if (geomType_mismatch) {
       cli::cli_inform(
         c("!" = "The provided {.arg geomType} value {.val {geomType}} does not
           match the layer geometryType value {.val {layerInfo$geometryType}}.")
@@ -125,7 +151,7 @@ esri2sf <- function(url,
       getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
 
     cli::cli_dl(
-      c("Service Coordinate Reference System" = "{.val {sf::st_crs(layerCRS)$input}}")
+      c("Service CRS" = "{.val {sf::st_crs(layerCRS)$input}}")
     )
   } else {
     cli::cli_inform(
@@ -134,7 +160,8 @@ esri2sf <- function(url,
 
     if (!is.null(crs)) {
       cli::cli_inform(
-        c("i" = "Trying to access the layer using the provided {.arg crs}: {.val {crs}}.")
+        c("i" = "Trying to access the layer using the provided
+          {.arg crs}: {.val {crs}}.")
       )
 
       layerCRS <- crs
@@ -168,7 +195,7 @@ esri2sf <- function(url,
   }
 
   cli::cli_dl(
-    c("Output Coordinate Reference System" = "{.val {sf::st_crs(crs)$input}}")
+    c("Output CRS" = "{.val {sf::st_crs(crs)$input}}")
   )
 
   if (!is.null(spatialRel)) {
@@ -233,7 +260,23 @@ esri2df <- function(url,
                     token = NULL,
                     progress = FALSE,
                     replaceDomainInfo = FALSE,
+                    quiet = FALSE,
                     ...) {
+  if (quiet) {
+    return(
+      suppressMessages(
+        esri2sf(
+          url = url,
+          outFields = outFields,
+          where = where,
+          progress = progress,
+          replaceDomainInfo = replaceDomainInfo,
+          ...
+        )
+      )
+    )
+  }
+
   layerInfo <- esrimeta(url = url, token = token)
 
   if (!is.null(layerInfo$type) && layerInfo$type != "Table") {
@@ -241,7 +284,7 @@ esri2df <- function(url,
       "The provided layer {.var {layerInfo$name}} is not a {.val 'table'}."
     )
 
-    cli::cli_rule("Attempting to download layer with {.fn esri2sf}")
+    cli::cli_rule("Trying to download layer with {.fn esri2sf}")
     return(
       esri2sf(
         url = url,
@@ -291,8 +334,7 @@ esri2df <- function(url,
 #' @export
 #' @importFrom dplyr bind_rows
 esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
-  layerInfo <-
-    esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
+  layerInfo <- esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
 
   if (!fields) {
     return(layerInfo)

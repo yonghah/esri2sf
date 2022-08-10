@@ -17,6 +17,7 @@ esri2sf(
   geomType = NULL,
   spatialRel = NULL,
   replaceDomainInfo = FALSE,
+  quiet = FALSE,
   ...
 )
 
@@ -27,6 +28,7 @@ esri2df(
   token = NULL,
   progress = FALSE,
   replaceDomainInfo = FALSE,
+  quiet = FALSE,
   ...
 )
 }

@@ -1,11 +1,17 @@
 #' Import data from ArcGIS ImageServer url using the exportImage API
 #'
+#' See the ArcGIS REST API documentation for more information on the exportImage
+#' API
+#' <https://developers.arcgis.com/rest/services-reference/enterprise/export-image.htm>
+#'
 #' @noRd
 #' @param url ImageServer url
 #' @param bbox Bounding box for image to return; defaults to `NULL`.
 #' @param token defaults to `NULL`.
-#' @param format defaults to "jpgpng"
+#' @param format defaults to "jpgpng". Options include "jpgpng", "png", "png8",
+#'   "png24", "jpg", "bmp", "gif", "tiff", "png32", "bip", "bsq", and "lerc"
 #' @param adjustAspectRatio defaults to `FALSE`
+#' @return SpatRaster object from `terra::rast`
 esri2rast <- function(url,
                       bbox = NULL,
                       token = NULL,
@@ -13,7 +19,7 @@ esri2rast <- function(url,
                       adjustAspectRatio = FALSE,
                       ...) {
   if (!requireNamespace("terra", quietly = TRUE)) {
-    cli::cli_abort("The {.pkg terra} package is not installed.")
+    cli::cli_abort("{.pkg terra} must be installed to use {.fn esri2rast}.")
   }
 
   layerInfo <- esrimeta(url = url, token = token)
@@ -29,6 +35,13 @@ esri2rast <- function(url,
       x = bbox,
       geometryType = "esriEnvelope",
       layerCRS = layerCRS
+    )
+
+  format <-
+    match.arg(
+      tolower(format),
+      c("jpgpng", "png", "png8", "png24", "jpg", "bmp",
+        "gif", "tiff", "png32", "bip", "bsq", "lerc")
     )
 
   req <-
@@ -47,5 +60,5 @@ esri2rast <- function(url,
 
   terra::ext(ras) <- as.numeric(bbox)
 
-  return(ras)
+  ras
 }

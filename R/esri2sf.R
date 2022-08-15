@@ -101,6 +101,16 @@ esri2sf <- function(url,
     c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
   )
 
+  layerTypes <- c("Table", "Feature Layer")
+
+  if (!is.null(layerInfo$type) && !(layerInfo$type %in% layerTypes)) {
+    cli::cli_abort(
+      c("The {.arg url} must be for a
+        {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
+        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service.")
+    )
+  }
+
   # Get the layer geometry type
   if (is.null(geomType)) {
     if (is_missing_geomType(layerInfo)) {
